@@ -69,7 +69,7 @@ const HomePage = () => {
         setError(null);
 
         const response = await fetch(
-          "http://https://vinicola-amana-back.onrender.com/api/products"
+          "https://vinicola-amana-back.onrender.com/api/products"
         );
         if (!response.ok) {
           throw new Error(`Erro ${response.status}: ${response.statusText}`);

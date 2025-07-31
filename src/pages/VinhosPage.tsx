@@ -27,7 +27,7 @@ const VinhosPage = () => {
     setLoading(true);
     try {
       const res = await fetch(
-        `http://https://vinicola-amana-back.onrender.com/api/products?page=${pageNumber}&per_page=8`
+        `https://vinicola-amana-back.onrender.com/api/products?page=${pageNumber}&per_page=8`
       );
       if (!res.ok) throw new Error("Erro ao carregar os vinhos");
       const data = await res.json();
