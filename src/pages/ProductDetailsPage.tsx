@@ -52,7 +52,7 @@ const ProductDetailsPage = ({ recommendations }: Props) => {
       try {
         setLoading(true);
         const response = await fetch(
-          `http://localhost:3001/api/products/${id}`
+          `https://vinicola-amana-back.onrender.com//api/products/${id}`
         );
         if (!response.ok) throw new Error("Produto não encontrado");
         const data = await response.json();
