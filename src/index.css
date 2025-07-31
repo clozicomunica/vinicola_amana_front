@@ -1,0 +1,46 @@
+@import "tailwindcss";
+
+@import url("https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;700&display=swap");
+
+@layer base {
+  body {
+    font-family: "Oswald", sans-serif;
+    @apply text-[15px];
+  }
+}
+
+@theme {
+  --cinza-claro: #dad6d6;
+  --dourado: #89764b;
+  --preto: #000000;
+  --branco: #ffffff;
+  --cinza: #9ca3af;
+}
+
+@layer components {
+  .btn-principal {
+    @apply bg-[var(--dourado)] hover:bg-[var(--dourado)] text-[var(--branco)] shadow-lg px-8 py-4 text-lg uppercase duration-300;
+  }
+
+  .btn-principal:hover {
+    background-color: #6e5f3e; /* cor dourada escura para hover, para evitar color-mix */
+  }
+
+  .fundo-claro {
+    @apply bg-[var(--cinza-claro)];
+  }
+
+  .card-padrao {
+    @apply bg-[var(--branco)] shadow-lg rounded p-4;
+  }
+
+  .text-preto {
+    @apply text-[var(--preto)];
+  }
+  .text-branco {
+    @apply text-[var(--branco)];
+  }
+  .text-cinza {
+    @apply text-[var(--cinza)];
+  }
+}
