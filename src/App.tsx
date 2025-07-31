@@ -9,10 +9,12 @@ import CartPage from "./pages/CartPage";
 import ScrollToTop from "./components/ScrollToTop";
 import WhatsAppButton from "./components/WhatsappButton";
 import ScrollToTopLeft from "./components/ScrollToTopLeft";
+import { Analytics } from "@vercel/analytics/next";
 
 function App() {
   return (
     <BrowserRouter>
+      <Analytics />;
       <ScrollToTop />
       <WhatsAppButton />
       <ScrollToTopLeft />
