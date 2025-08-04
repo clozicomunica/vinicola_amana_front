@@ -31,7 +31,7 @@ const HeroSection = () => {
 
           {/* Descrição */}
           <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-white mb-6 md:mb-8 max-w-2xl mx-auto lg:mx-0 leading-relaxed">
-            Tradição e excelência da Vinícola Amana em cada garrafa.
+            Excelência nas encostas da Serra da Mantiqueira
           </p>
 
           {/* Botões */}
