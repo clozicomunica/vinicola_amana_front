@@ -15,14 +15,17 @@ interface Wine {
 }
 
 const CATEGORIES = [
-  { id: "all", name: "Todos" },
   { id: "tinto", name: "Vinhos Tintos" },
   { id: "branco", name: "Vinhos Brancos" },
   { id: "rose", name: "Vinhos Rosé" },
+  { id: "amana", name: "Amana" },
+  { id: "una", name: "Una" },
+  { id: "singular", name: "Singular" },
   { id: "cafe", name: "Cafés" },
-  { id: "acessorio", name: "Acessórios" },
-  { id: "combo", name: "Combos" },
-  { id: "experiencia", name: "Experiências" },
+  { id: "em grao", name: "Em grão" },
+  { id: "em po", name: "Em pó" },
+  { id: "diversos", name: "Diversos" },
+  { id: "experiencias", name: "Experiências" },
   { id: "vale-presente", name: "Vale Presente" },
 ];
 
