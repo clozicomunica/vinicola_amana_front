@@ -22,6 +22,7 @@ interface Wine {
   region?: string;
   alcohol?: string;
   rating?: number;
+  pairing?: string;
 }
 
 interface Props {
@@ -42,7 +43,7 @@ const ProductDetailsPage = ({ recommendations }: Props) => {
   const formatPrice = (price: string) =>
     parseFloat(price).toFixed(2).replace(".", ",");
 
-  // Função para adicionar ao carrinho, memoizada para evitar re-criações desnecessárias
+  // Função para adicionar ao carrinho
   const handleAddToCart = useCallback(() => {
     if (!wine || wine.variants.length === 0) return;
 
@@ -87,21 +88,27 @@ const ProductDetailsPage = ({ recommendations }: Props) => {
             ["Vale dos Vinhedos", "Serra Gaúcha", "Vale do São Francisco"][
               Math.floor(Math.random() * 3)
             ],
+          pairing:
+            data.pairing ||
+            [
+              "Carnes vermelhas grelhadas",
+              "Queijos amarelos",
+              "Massas com molhos encorpados",
+              "Chocolates amargos",
+              "Frutos do mar",
+            ][Math.floor(Math.random() * 5)],
         };
 
         setWine(enhancedData);
 
-        // Busca similares pela categoria principal, pegando nome slug ou pt
+        // Busca similares pela categoria principal
         const categoryName = enhancedData.categories[0]?.name.pt || "";
         if (categoryName) {
           const similarResponse = await fetch(
-            `https://vinicola-amana-back.onrender.com/api/products?category=${encodeURIComponent(
-              categoryName
-            )}`
+            `https://vinicola-amana-back.onrender.com/api/products/${enhancedData.id}/similares`
           );
           if (similarResponse.ok) {
             const similarData = await similarResponse.json();
-            // Filtra o produto atual e limita 4
             setSimilarProducts(
               similarData
                 .filter((item: Wine) => item.id !== enhancedData.id)
@@ -241,13 +248,13 @@ const ProductDetailsPage = ({ recommendations }: Props) => {
               <div className="flex items-center gap-3 mb-4 flex-wrap">
                 {wine.rating !== undefined && (
                   <div className="flex items-center bg-black px-3 py-1 rounded-full">
-                    <Star className="h-4 w-4 fill-[#d4af37] text-[#d4af37] mr-1" />
+                    <Star className="h-4 w-4 fill-[#89764b] text-[#89764b] mr-1" />
                     <span className="font-medium text-[#d4af37] text-sm">
                       {wine.rating.toFixed(1)}
                     </span>
                   </div>
                 )}
-                <span className="text-sm text-gray-600 uppercase tracking-wider">
+                <span className="text-sm bg-black rounded-full text-[#89764b] py-1 px-3 flex items-center uppercase tracking-wider">
                   {wine.categories[0]?.name.pt || "Vinho"}
                 </span>
               </div>
@@ -283,12 +290,26 @@ const ProductDetailsPage = ({ recommendations }: Props) => {
                 )}
                 {wine.alcohol && (
                   <span className="flex items-center">
-                    <div className="relative mr-1 flex space-x-1">
-                      <div className="h-2 w-2 rounded-full bg-[#89764b]"></div>
-                      <div className="h-2 w-2 rounded-full bg-[#89764b]"></div>
-                      <div className="h-2 w-2 rounded-full bg-[#89764b]"></div>
-                    </div>
+                    <svg
+                      className="h-4 w-4 mr-1"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M7 11.5V14m0-2.5v-6a1.5 1.5 0 113 0m-3 6a1.5 1.5 0 00-3 0v2a7.5 7.5 0 0015 0v-5a1.5 1.5 0 00-3 0m-6-3V11m0-5.5v-1a1.5 1.5 0 013 0v1m0 0V11m0-5.5a1.5 1.5 0 013 0v3m0 0V11"
+                      />
+                    </svg>
                     {wine.alcohol}
+                  </span>
+                )}
+                {wine.pairing && (
+                  <span className="flex items-center">
+                    <Utensils className="h-4 w-4 mr-1" />
+                    {wine.pairing}
                   </span>
                 )}
                 {wine.created_at && (
@@ -377,7 +398,9 @@ const ProductDetailsPage = ({ recommendations }: Props) => {
                 <Utensils className="h-5 w-5 text-[#89764b] mt-0.5" />
                 <div>
                   <p className="font-medium">Harmonização</p>
-                  <p className="text-gray-600">Sugestões de acompanhamento</p>
+                  <p className="text-gray-600">
+                    {wine.pairing || "Sugestões de acompanhamento"}
+                  </p>
                 </div>
               </div>
             </div>
@@ -405,7 +428,7 @@ const ProductDetailsPage = ({ recommendations }: Props) => {
                   key={product.id}
                   className="group bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1"
                 >
-                  <Link to={`/vinho/${product.id}`} className="block">
+                  <Link to={`/produto/${product.id}`} className="block">
                     <div className="relative h-64 bg-gradient-to-b from-gray-50 to-gray-100 flex items-center justify-center p-6">
                       <img
                         src={product.images[0]?.src || "/placeholder-wine.jpg"}
@@ -464,7 +487,7 @@ const ProductDetailsPage = ({ recommendations }: Props) => {
                   key={rec.id}
                   className="group bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1"
                 >
-                  <Link to={`/vinho/${rec.id}`} className="block">
+                  <Link to={`/produto/${rec.id}`} className="block">
                     <div className="relative h-64 bg-gradient-to-b from-gray-50 to-gray-100 flex items-center justify-center p-6">
                       <img
                         src={rec.images[0]?.src || "/placeholder-wine.jpg"}
