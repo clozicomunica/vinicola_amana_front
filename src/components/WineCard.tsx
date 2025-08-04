@@ -8,6 +8,7 @@ type WineCategory = "Tinto" | "Branco" | "Rosé" | "Espumante" | "Sobremesa";
 
 type Wine = {
   id: number;
+  variant_id: number;
   name: string;
   price: number;
   image: string;
@@ -24,6 +25,7 @@ const WineCard = ({ wine }: { wine: Wine }) => {
   const handleAddToCart = () => {
     addToCart({
       id: wine.id,
+      variant_id: wine.variant_id,
       name: wine.name,
       image: wine.image,
       price: wine.price,

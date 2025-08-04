@@ -114,7 +114,7 @@ const HomePage = () => {
       image: wine.images[0]?.src || wineImage,
       category: wine.categories[0]?.name.pt || "Vinho",
       quantity: 1,
-      variantId: wine.variants[0]?.id,
+      variant_id: wine.variants[0]?.id,
     };
 
     addToCart(cartItem);

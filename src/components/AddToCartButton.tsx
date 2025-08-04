@@ -7,6 +7,7 @@ interface Props {
   image: string;
   price: number;
   category: string;
+  variant_id: number;
 }
 
 export const AddToCartButton = ({
@@ -15,11 +16,12 @@ export const AddToCartButton = ({
   image,
   price,
   category,
+  variant_id,
 }: Props) => {
   const { addToCart } = useCart();
 
   const handleClick = () => {
-    addToCart({ id, name, image, price, quantity: 1, category });
+    addToCart({ id, name, image, price, quantity: 1, category, variant_id });
   };
 
   return (

@@ -11,10 +11,16 @@ import {
 
 import { useCart } from "../context/useCart";
 
+interface Variant {
+  id: number; // Incluído o id aqui, que estava faltando
+  price: string;
+  compare_at_price?: string;
+}
+
 interface Wine {
   id: number;
   name: { pt: string };
-  variants: { price: string; compare_at_price?: string }[];
+  variants: Variant[]; // Usando o tipo Variant com id
   images: { src: string; alt?: string }[];
   categories: { name: { pt: string } }[];
   description: { pt: string };
@@ -54,6 +60,7 @@ const ProductDetailsPage = ({ recommendations }: Props) => {
       quantity: 1,
       image: wine.images[0]?.src || "/placeholder-wine.jpg",
       category: wine.categories[0]?.name.pt || "Vinho",
+      variant_id: wine.variants[0].id, // Aqui já temos certeza que id existe
     });
   }, [addToCart, wine]);
 
