@@ -58,7 +58,7 @@ const Header = () => {
           </Link>
 
           {/* Navegação Desktop */}
-          <nav className="hidden md:flex items-center space-x-1">
+          <nav className="hidden md:flex items-center space-x-1 text-transform: uppercase">
             {navLinks.map((item) => (
               <Link
                 key={item.path}
