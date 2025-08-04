@@ -33,7 +33,8 @@ const CartPage = () => {
     // Mapeia os itens do carrinho
     const cartItems = cart.map((item) => ({
       id: item.id,
-      quantity: item.quantity || 1, // Ajuste se houver variantes
+      variant_id: item.variant_id, // aqui
+      quantity: item.quantity || 1,
     }));
 
     // Validação básica

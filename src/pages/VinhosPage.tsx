@@ -4,10 +4,16 @@ import { Link } from "react-router-dom";
 import { useCart } from "../context/useCart";
 import wineImage from "../assets/wine-bottle.jpg";
 
+interface WineVariant {
+  id: number;
+  price: string;
+  compare_at_price?: string;
+}
+
 interface Wine {
   id: number;
   name: { pt: string };
-  variants: { price: string; compare_at_price?: string }[];
+  variants: WineVariant[];
   images: { src: string; alt?: string[] }[];
   categories: { name: { pt: string } }[];
   description: { pt: string };
@@ -74,6 +80,8 @@ const VinhosPage = () => {
 
       if (isFirstPage) {
         setWines(data);
+        console.log("Primeiro vinho:", data[0]);
+        console.log("Primeiro variant:", data[0]?.variants?.[0]);
       } else {
         setWines((prev) => [...prev, ...data]);
       }
@@ -121,6 +129,7 @@ const VinhosPage = () => {
     if (!wine.variants[0]) return;
     addToCart({
       id: wine.id,
+      variant_id: wine.variants[0]?.id || wine.id, // garante fallback
       name: wine.name.pt,
       price: parseFloat(wine.variants[0].price),
       quantity: 1,
