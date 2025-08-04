@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useCart } from "../context/useCart";
 import { ShoppingCart, X, ArrowLeft, Wine, ChevronRight } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -5,6 +6,11 @@ import type { CartItem } from "../context/CartProvider";
 
 const CartPage = () => {
   const { cart, removeFromCart, clearCart, addToCart } = useCart();
+  const [customer, setCustomer] = useState({
+    email: "",
+    name: "",
+    document: "",
+  }); // Estado pra dados do cliente
 
   const total = cart.reduce(
     (sum, item) => sum + Number(item.price) * item.quantity,
@@ -20,6 +26,48 @@ const CartPage = () => {
       addToCart({ ...item, quantity: -1 });
     } else {
       removeFromCart(item.id);
+    }
+  };
+
+  const handleCheckout = async () => {
+    // Mapeia os itens do carrinho
+    const cartItems = cart.map((item) => ({
+      id: item.id,
+      quantity: item.quantity || 1, // Ajuste se houver variantes
+    }));
+
+    // Validação básica
+    if (!cartItems.length) {
+      alert("O carrinho está vazio!");
+      return;
+    }
+    if (!customer.email || !customer.name || !customer.document) {
+      alert("Preencha todos os dados do cliente (email, nome e CPF)!");
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        "https://vinicola-amana-back.onrender.com/api/products/checkout",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ items: cartItems, customer }),
+        }
+      );
+
+      if (response.redirected) {
+        window.location.href = response.url; // Segue o redirecionamento pra Nuvemshop
+      } else {
+        const data = await response.json();
+        console.error("Erro no checkout:", data.error);
+        alert("Erro ao finalizar compra: " + data.error);
+      }
+    } catch (err) {
+      console.error("Erro ao iniciar checkout:", err);
+      alert("Erro ao conectar com o servidor.");
     }
   };
 
@@ -233,6 +281,42 @@ const CartPage = () => {
               </button>
             </div>
 
+            {/* Formulário de Dados do Cliente */}
+            <div className="bg-white rounded-xl shadow-sm p-5 border border-gray-100">
+              <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-4 pb-3 border-b font-oswald uppercase tracking-tight">
+                Dados do Cliente
+              </h3>
+              <div className="space-y-4">
+                <input
+                  type="email"
+                  value={customer.email}
+                  onChange={(e) =>
+                    setCustomer({ ...customer, email: e.target.value })
+                  }
+                  placeholder="Email"
+                  className="w-full px-4 py-2 border border-gray-200 rounded focus:outline-none focus:ring-2 focus:ring-[#89764b]/50"
+                />
+                <input
+                  type="text"
+                  value={customer.name}
+                  onChange={(e) =>
+                    setCustomer({ ...customer, name: e.target.value })
+                  }
+                  placeholder="Nome"
+                  className="w-full px-4 py-2 border border-gray-200 rounded focus:outline-none focus:ring-2 focus:ring-[#89764b]/50"
+                />
+                <input
+                  type="text"
+                  value={customer.document}
+                  onChange={(e) =>
+                    setCustomer({ ...customer, document: e.target.value })
+                  }
+                  placeholder="CPF (somente números)"
+                  className="w-full px-4 py-2 border border-gray-200 rounded focus:outline-none focus:ring-2 focus:ring-[#89764b]/50"
+                />
+              </div>
+            </div>
+
             {/* Resumo do Pedido */}
             <div className="bg-white rounded-xl shadow-sm p-5 border border-gray-100 sticky bottom-0 sm:relative sm:bottom-auto">
               <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-4 pb-3 border-b flex items-center font-oswald uppercase tracking-tight">
@@ -246,7 +330,7 @@ const CartPage = () => {
                     Subtotal
                   </span>
                   <span className="text-gray-900 font-medium text-sm sm:text-base">
-                    R$ {total.toFixed(2).replace(".", ",")}
+                    R${total.toFixed(2).replace(".", ",")}
                   </span>
                 </div>
                 <div className="flex justify-between">
@@ -272,11 +356,14 @@ const CartPage = () => {
                   Total
                 </span>
                 <span className="font-bold text-lg sm:text-xl text-[#89764b]">
-                  R$ {total.toFixed(2).replace(".", ",")}
+                  R${total.toFixed(2).replace(".", ",")}
                 </span>
               </div>
 
-              <button className="w-full mt-4 bg-gradient-to-r from-[#89764b] to-[#a08d5f] hover:from-[#756343] hover:to-[#89764b] text-white py-3 sm:py-4 px-4 sm:px-6 rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl font-oswald uppercase tracking-wider text-xs sm:text-sm flex items-center justify-center gap-1 sm:gap-2">
+              <button
+                onClick={handleCheckout}
+                className="w-full mt-4 bg-gradient-to-r from-[#89764b] to-[#a08d5f] hover:from-[#756343] hover:to-[#89764b] text-white py-3 sm:py-4 px-4 sm:px-6 rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl font-oswald uppercase tracking-wider text-xs sm:text-sm flex items-center justify-center gap-1 sm:gap-2"
+              >
                 Finalizar Compra
                 <ChevronRight className="h-4 w-4 sm:h-5 sm:w-5" />
               </button>
