@@ -412,7 +412,7 @@ const ProductDetailsPage = ({ recommendations }: Props) => {
           <section className="mt-16">
             <div className="flex items-center justify-between mb-8">
               <h2 className="text-2xl font-bold text-gray-900 font-oswald uppercase tracking-tight">
-                Produtos Similares
+                Você também pode gostar
               </h2>
               <Link
                 to="/vinhos"
