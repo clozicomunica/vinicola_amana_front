@@ -6,8 +6,9 @@ import {
   Mail,
   Phone,
   MapPin,
-  Heart,
 } from "lucide-react";
+import logo from "../assets/Amana.png";
+import developedby from "../assets/developedby.png";
 
 const Footer = () => {
   return (
@@ -38,29 +39,37 @@ const Footer = () => {
 
         {/* Main Footer Content */}
         <div className="py-8 md:py-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-12">
-          {/* Company Info */}
+          {/* Company Info - Área ajustada */}
           <div className="lg:col-span-2">
-            <div className="mb-6">
-              <h2 className="text-xl md:text-2xl font-bold mb-4 text-white">
-                Vinícola Amana
-              </h2>
-              <p className="text-white/80 leading-relaxed max-w-md text-sm md:text-base">
-                Três gerações dedicadas à arte de produzir vinhos únicos que
-                expressam a essência de nossa terra e tradição familiar.
+            <div className="mb-6 flex flex-col items-start gap-4">
+              <div className="flex-shrink-0">
+                <img
+                  src={logo}
+                  alt="Logo da Vinícola"
+                  className="w-32 h-auto max-h-20 object-contain" // Tamanho ajustado e proporcional
+                />
+              </div>
+              <p className="text-white/80 leading-relaxed max-w-md text-sm md:text-base mt-2">
+                Desfrute de vinhos excepcionais, cardápio cuidadoso e um
+                ambiente único, imerso nas encostas da serra da Mantiqueira.
               </p>
             </div>
 
             <div className="space-y-3">
               <div className="flex items-start gap-3">
                 <MapPin className="h-5 w-5 text-white mt-0.5 flex-shrink-0" />
-                <span className="text-white/90 text-sm md:text-base">
-                  Estrada do Vinho, 1952 - Vale dos Vinhedos, RS
+                <span className="text-white/90 text-sm md:text-base leading-relaxed">
+                  Estrada Vicinal Alberto Bartholomei, s/n
+                  <br />
+                  Barthô - Espírito Santo do Pinhal - SP
+                  <br />
+                  CEP 13990-000
                 </span>
               </div>
               <div className="flex items-center gap-3">
                 <Phone className="h-5 w-5 text-white" />
                 <span className="text-white/90 text-sm md:text-base">
-                  (11) 3456-7890
+                  +55 19 99842-3261
                 </span>
               </div>
               <div className="flex items-center gap-3">
@@ -94,6 +103,7 @@ const Footer = () => {
             </div>
           </div>
 
+          {/* Restante do código permanece igual */}
           {/* Quick Links */}
           <div>
             <h3 className="font-semibold mb-4 text-white/70 text-base">
@@ -122,14 +132,6 @@ const Footer = () => {
                   className="text-white/80 hover:text-white transition-colors text-sm md:text-base"
                 >
                   Experiências
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="/clube"
-                  className="text-white/80 hover:text-white transition-colors text-sm md:text-base"
-                >
-                  Clube do Vinho
                 </Link>
               </li>
               <li>
@@ -178,7 +180,7 @@ const Footer = () => {
                   to="/vinhos/especiais"
                   className="text-white/80 hover:text-white transition-colors text-sm md:text-base"
                 >
-                  Edições Especiais
+                  Premiados
                 </Link>
               </li>
               <li>
@@ -200,21 +202,24 @@ const Footer = () => {
               © {new Date().getFullYear()} Vinícola Amana. Todos os direitos
               reservados.
             </p>
-
-            <div className="hidden md:flex items-center gap-1 text-sm text-white order-3 md:order-none">
-              <span>Desenvolvido com</span>
-              <Heart className="h-3 w-3 fill-current text-white" />
-              <span>por</span>
+            <div className="flex items-center gap-2 text-sm text-white bg-black/20 px-3 py-2 rounded-lg">
+              <span className="opacity-80">DESENVOLVIDO POR</span>
               <a
                 href="https://clozicomunica.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="font-medium hover:text-[#9a3324] text-white"
+                className="flex items-center gap-2 hover:opacity-90 transition-opacity"
               >
-                Clozi Comunica
+                <img
+                  src={developedby}
+                  alt="Clozi Comunica"
+                  className="h-5 w-auto object-contain"
+                />
+                <span className="font-semibold tracking-tight">
+                  CLOZI COMUNICAÇÃO E IMAGEM
+                </span>
               </a>
             </div>
-
             <div className="flex gap-4 md:gap-6 order-2 md:order-none">
               <Link
                 to="/privacidade"
@@ -231,16 +236,17 @@ const Footer = () => {
             </div>
 
             <div className="md:hidden flex items-center justify-center gap-1 text-sm text-white order-4 md:order-none w-full mt-2">
-              <span>Desenvolvido com</span>
-              <Heart className="h-3 w-3 fill-current text-white" />
-              <span>por</span>
               <a
                 href="https://clozicomunica.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="font-medium hover:text-[#9a3324] text-white"
+                className="font-medium hover:text-[#9a3324] text-white flex items-center"
               >
-                Clozi Comunica
+                <img
+                  src={developedby}
+                  alt="Clozi Comunica"
+                  className="h-8 w-auto ml-1 object-contain"
+                />
               </a>
             </div>
           </div>

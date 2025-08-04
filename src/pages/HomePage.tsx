@@ -7,7 +7,6 @@ import {
   Eye,
   Loader2,
   Star,
-  Heart,
   X,
   ChevronRight,
   Info,
@@ -57,7 +56,6 @@ const HomePage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [quickViewProduct, setQuickViewProduct] = useState<Wine | null>(null);
-  const [isWishlist, setIsWishlist] = useState<Record<number, boolean>>({});
   const [activeImageIndex, setActiveImageIndex] = useState(0);
 
   const { addToCart } = useCart();
@@ -76,7 +74,7 @@ const HomePage = () => {
         }
         const data: Wine[] = await response.json();
 
-        const enhancedData = data
+        const filteredData = data
           .filter((product) =>
             product.categories.some(
               (category) =>
@@ -84,23 +82,9 @@ const HomePage = () => {
                 category.name.en?.toLowerCase().includes("wine")
             )
           )
-          .slice(0, 4)
-          .map((wine) => ({
-            ...wine,
-            rating: +(3.5 + Math.random() * 1.5).toFixed(1),
-            year: new Date().getFullYear() - Math.floor(Math.random() * 10),
-            alcohol: `${(12 + Math.random() * 4).toFixed(1)}%`,
-            region: [
-              "Vale dos Vinhedos",
-              "Serra Gaúcha",
-              "Vale do São Francisco",
-              "Campanha",
-            ][Math.floor(Math.random() * 4)],
-            awards:
-              Math.random() > 0.7 ? ["Melhor Vinho do Ano", "Gold Medal"] : [],
-          }));
+          .slice(0, 4);
 
-        setFeaturedWines(enhancedData);
+        setFeaturedWines(filteredData);
       } catch (error: unknown) {
         if (error instanceof Error) {
           console.error("Erro ao buscar vinhos:", error);
@@ -151,27 +135,8 @@ const HomePage = () => {
     });
   };
 
-  const toggleWishlist = (wineId: number) => {
-    setIsWishlist((prev) => {
-      const newState = { ...prev, [wineId]: !prev[wineId] };
-      toast.success(
-        newState[wineId]
-          ? "Adicionado à lista de desejos"
-          : "Removido da lista de desejos",
-        {
-          position: "bottom-right",
-          style: {
-            fontFamily: "'Oswald', sans-serif",
-            padding: "16px 24px",
-          },
-        }
-      );
-      return newState;
-    });
-  };
-
   return (
-    <div className="flex flex-col min-h-screen bg-gray-50 font-sans antialiased">
+    <div className="flex flex-col min-h-screen bg-gray-50 font-oswald antialiased">
       <Hero />
 
       {/* Featured Wines Section */}
@@ -181,10 +146,9 @@ const HomePage = () => {
           <div className="text-center mb-10 md:mb-16">
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-4 md:mb-6 tracking-tight">
               <span className="relative inline-block">
-                <span className="relative z-10 font-oswald uppercase">
+                <span className="relative z-10 uppercase">
                   Nossos Vinhos Premiados
                 </span>
-                <span className="absolute bottom-0 left-0 w-full h-2 md:h-3 bg-[#89764b]/30 -z-0 transform -rotate-1"></span>
               </span>
             </h2>
             <p className="text-base md:text-lg text-gray-700 max-w-2xl mx-auto leading-relaxed font-light px-2">
@@ -198,31 +162,31 @@ const HomePage = () => {
             <div className="flex justify-center items-center py-12 md:py-20">
               <div className="flex flex-col items-center">
                 <Loader2 className="h-10 w-10 md:h-12 md:w-12 animate-spin text-[#89764b] mb-3 md:mb-4" />
-                <span className="text-sm md:text-base text-gray-600 font-oswald italic">
+                <span className="text-sm md:text-base text-gray-600 italic">
                   Carregando nossos melhores vinhos...
                 </span>
               </div>
             </div>
           ) : error ? (
             <div className="text-center py-12 md:py-20">
-              <p className="text-red-600 mb-4 md:mb-6 text-sm md:text-base font-medium font-oswald">
+              <p className="text-red-600 mb-4 md:mb-6 text-sm md:text-base font-medium">
                 {error}
               </p>
               <button
                 onClick={() => window.location.reload()}
-                className="px-6 py-2 md:px-8 md:py-3 bg-[#89764b] hover:bg-[#756343] text-white rounded-lg transition-all duration-300 shadow-md hover:shadow-lg font-medium font-oswald uppercase text-sm"
+                className="px-6 py-2 md:px-8 md:py-3 bg-[#89764b] hover:bg-[#756343] text-white rounded-lg transition-all duration-300 shadow-md hover:shadow-lg font-medium uppercase text-sm"
               >
                 Tentar novamente
               </button>
             </div>
           ) : featuredWines.length === 0 ? (
             <div className="text-center py-12 md:py-20">
-              <p className="text-gray-600 mb-4 md:mb-6 text-sm md:text-base font-oswald italic">
+              <p className="text-gray-600 mb-4 md:mb-6 text-sm md:text-base italic">
                 Nenhum vinho encontrado no momento.
               </p>
               <Link
                 to="/vinhos"
-                className="px-6 py-2 md:px-8 md:py-3 bg-[#89764b] hover:bg-[#756343] text-white rounded-lg transition-all duration-300 shadow-md hover:shadow-lg inline-block font-medium font-oswald uppercase text-sm"
+                className="px-6 py-2 md:px-8 md:py-3 bg-[#89764b] hover:bg-[#756343] text-white rounded-lg transition-all duration-300 shadow-md hover:shadow-lg inline-block font-medium uppercase text-sm"
               >
                 Descubra nossa coleção
               </Link>
@@ -235,7 +199,7 @@ const HomePage = () => {
                     key={wine.id}
                     className="group bg-white rounded-xl md:rounded-2xl overflow-hidden shadow-sm hover:shadow-md md:hover:shadow-xl transition-all duration-500 border border-gray-100 flex flex-col h-full transform hover:-translate-y-1 md:hover:-translate-y-2"
                   >
-                    {/* Image Container - Padronizado */}
+                    {/* Image Container */}
                     <div className="relative aspect-square bg-white p-4 flex items-center justify-center">
                       <Link
                         to={`/vinho/${wine.id}`}
@@ -244,12 +208,12 @@ const HomePage = () => {
                         <img
                           src={wine.images[0]?.src || wineImage}
                           alt={wine.images[0]?.alt || wine.name.pt}
-                          className="max-h-[180px] w-auto object-contain mix-blend-multiply"
+                          className="max-h-[220px] w-auto object-contain mix-blend-multiply"
                           loading="lazy"
                           onError={(e) => {
                             e.currentTarget.src = wineImage;
                             e.currentTarget.className =
-                              "max-h-[180px] w-auto object-contain";
+                              "max-h-[220px] w-auto object-contain";
                           }}
                         />
                       </Link>
@@ -257,43 +221,11 @@ const HomePage = () => {
                       {/* Badges */}
                       <div className="absolute top-2 left-2 md:top-4 md:left-4 flex flex-col space-y-1 md:space-y-2 z-10">
                         {wine.variants[0]?.stock === 0 && (
-                          <span className="bg-red-600 text-white text-xs px-2 py-0.5 md:px-3 md:py-1 rounded-full shadow-md font-medium tracking-wide font-oswald">
+                          <span className="bg-red-600 text-white text-xs px-2 py-0.5 md:px-3 md:py-1 rounded-full shadow-md font-medium tracking-wide">
                             Esgotado
                           </span>
                         )}
-                        {wine.rating && wine.rating >= 4.5 && (
-                          <span className="bg-amber-600/90 text-white text-xs px-2 py-0.5 md:px-3 md:py-1 rounded-full shadow-md flex items-center backdrop-blur-sm font-oswald">
-                            <Star className="h-3 w-3 mr-1 fill-current" />
-                            {wine.rating.toFixed(1)}
-                          </span>
-                        )}
-                        {wine.year && (
-                          <span className="bg-white/90 text-gray-800 text-xs px-2 py-0.5 md:px-3 md:py-1 rounded-full shadow-md font-medium font-oswald">
-                            Safra {wine.year}
-                          </span>
-                        )}
                       </div>
-
-                      {/* Wishlist button */}
-                      <button
-                        onClick={() => toggleWishlist(wine.id)}
-                        className={`absolute top-2 right-2 md:top-4 md:right-4 z-10 p-1 md:p-2 rounded-full transition-all duration-300 ${
-                          isWishlist[wine.id]
-                            ? "bg-red-500 text-white shadow-md"
-                            : "bg-white/90 text-gray-600 hover:bg-white shadow-sm"
-                        }`}
-                        aria-label={
-                          isWishlist[wine.id]
-                            ? "Remover dos favoritos"
-                            : "Adicionar aos favoritos"
-                        }
-                      >
-                        <Heart
-                          className={`h-4 w-4 md:h-5 md:w-5 ${
-                            isWishlist[wine.id] ? "fill-current" : ""
-                          }`}
-                        />
-                      </button>
 
                       {/* Action Overlay */}
                       <div className="absolute inset-0 bg-black/5 md:bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-center justify-center gap-2 md:gap-4">
@@ -326,11 +258,11 @@ const HomePage = () => {
                     <div className="p-4 md:p-6 flex flex-col flex-grow">
                       <div className="mb-2 md:mb-4">
                         <Link to={`/vinho/${wine.id}`}>
-                          <h3 className="text-lg md:text-xl text-gray-900 mb-1 md:mb-2 hover:text-[#89764b] transition-colors duration-300 line-clamp-1 font-oswald uppercase tracking-tight">
+                          <h3 className="text-lg md:text-xl text-gray-900 mb-1 md:mb-2 hover:text-[#89764b] transition-colors duration-300 line-clamp-1 uppercase tracking-tight">
                             {wine.name.pt}
                           </h3>
                         </Link>
-                        <p className="text-xs md:text-sm text-gray-600 uppercase tracking-wider font-light font-oswald">
+                        <p className="text-xs md:text-sm text-gray-600 uppercase tracking-wider font-light">
                           {wine.categories[0]?.name.pt || "Vinho"}
                         </p>
                       </div>
@@ -346,31 +278,20 @@ const HomePage = () => {
                       <div className="mt-auto">
                         <div className="flex items-center justify-between mb-2 md:mb-4">
                           <div className="flex items-baseline gap-1 md:gap-2">
-                            <span className="font-bold text-gray-900 text-lg md:text-xl font-oswald">
+                            <span className="font-bold text-gray-900 text-lg md:text-xl">
                               {wine.variants[0]?.price
                                 ? `R$ ${parseFloat(wine.variants[0].price)
                                     .toFixed(2)
                                     .replace(".", ",")}`
                                 : "---"}
                             </span>
-                            {Math.random() > 0.5 && (
-                              <span className="text-xs md:text-sm text-gray-500 line-through font-light">
-                                R${" "}
-                                {(
-                                  parseFloat(wine.variants[0]?.price || "0") *
-                                  1.2
-                                )
-                                  .toFixed(2)
-                                  .replace(".", ",")}
-                              </span>
-                            )}
                           </div>
                         </div>
 
                         <button
                           onClick={() => handleAddToCart(wine)}
                           disabled={wine.variants[0]?.stock === 0}
-                          className={`w-full py-2 px-3 md:py-3 md:px-4 rounded-lg transition-all duration-300 flex items-center justify-center gap-1 md:gap-2 font-oswald uppercase text-xs md:text-sm ${
+                          className={`w-full py-2 px-3 md:py-3 md:px-4 rounded-lg transition-all duration-300 flex items-center justify-center gap-1 md:gap-2 uppercase text-xs md:text-sm ${
                             wine.variants[0]?.stock === 0
                               ? "bg-gray-200 text-gray-600 cursor-not-allowed"
                               : "bg-[#89764b] hover:bg-[#756343] text-white hover:shadow-md"
@@ -391,7 +312,7 @@ const HomePage = () => {
               <div className="text-center mt-12 md:mt-20">
                 <Link
                   to="/vinhos"
-                  className="inline-flex items-center px-6 py-3 md:px-10 md:py-4 bg-[#89764b] hover:bg-[#756343] text-white rounded-lg transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl font-medium tracking-wide uppercase text-xs md:text-sm font-oswald"
+                  className="inline-flex items-center px-6 py-3 md:px-10 md:py-4 bg-[#89764b] hover:bg-[#756343] text-white rounded-lg transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl font-medium tracking-wide uppercase text-xs md:text-sm"
                 >
                   Explorar Todos os Vinhos
                   <ChevronRight className="ml-2 h-4 w-4 md:ml-3 md:h-5 md:w-5" />
@@ -403,131 +324,138 @@ const HomePage = () => {
       </section>
 
       {/* About Section */}
-      <div className="container mx-auto px-4 sm:px-6 py-12 md:py-16 lg:py-24">
+      <div className="container mx-auto px-4 sm:px-6 py-6 md:py-8 lg:py-10">
         <AboutSection />
       </div>
 
-      {/* Quick View Modal - Com imagens padronizadas */}
+      {/* Quick View Modal - Versão Profissional */}
       {quickViewProduct && (
-        <div className="fixed inset-0 bg-black/90 backdrop-blur-sm z-50 flex justify-center items-center p-2 sm:p-4 animate-fadeIn overflow-y-auto">
-          <div
-            className="bg-white rounded-xl md:rounded-3xl overflow-hidden w-full max-w-full md:max-w-6xl max-h-[95vh] md:max-h-[90vh] flex flex-col lg:flex-row shadow-2xl"
-            onClick={(e) => e.stopPropagation()}
-          >
+        <div className="fixed inset-0 bg-black/90 backdrop-blur-sm z-50 flex justify-center items-center p-4 animate-fadeIn overflow-y-auto">
+          <div className="bg-white rounded-xl overflow-hidden w-full max-w-6xl max-h-[90vh] flex flex-col lg:flex-row shadow-2xl border border-gray-200">
             {/* Close Button */}
             <button
               onClick={() => setQuickViewProduct(null)}
-              className="absolute top-2 right-2 sm:top-3 sm:right-3 md:top-6 md:right-6 z-10 bg-white/90 hover:bg-white rounded-full p-1 sm:p-2 shadow-lg transition-all hover:rotate-90"
+              className="absolute top-4 right-4 z-20 bg-white hover:bg-gray-100 rounded-full p-2 shadow-md transition-all"
               aria-label="Fechar visualização rápida"
             >
-              <X className="h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6 text-gray-800" />
+              <X className="h-5 w-5 text-gray-700" />
             </button>
 
-            {/* Image Gallery - Padronizada */}
-            <div className="lg:w-1/2 bg-white relative">
-              <div className="h-64 sm:h-80 md:h-full flex flex-col">
-                {/* Main Image */}
-                <div className="flex-1 flex items-center justify-center p-4 sm:p-6 md:p-10 bg-white">
-                  <div className="w-full h-full flex items-center justify-center">
-                    <img
-                      src={
-                        quickViewProduct.images[activeImageIndex]?.src ||
-                        wineImage
-                      }
-                      alt={
-                        quickViewProduct.images[activeImageIndex]?.alt ||
-                        quickViewProduct.name.pt
-                      }
-                      className="max-h-[300px] w-auto object-contain mix-blend-multiply"
-                      onError={(e) => {
-                        e.currentTarget.src = wineImage;
-                      }}
-                    />
-                  </div>
+            {/* Image Gallery */}
+            <div className="lg:w-[55%] flex flex-col lg:flex-row h-full">
+              {/* Thumbnails - Vertical */}
+              {quickViewProduct.images.length > 1 && (
+                <div className="hidden lg:flex flex-col items-center p-3 space-y-3 border-r border-gray-200 bg-gray-50 overflow-y-auto">
+                  {quickViewProduct.images.map((img, index) => (
+                    <button
+                      key={index}
+                      onClick={() => setActiveImageIndex(index)}
+                      className={`relative w-16 h-16 rounded-md overflow-hidden transition-all duration-200 ${
+                        activeImageIndex === index
+                          ? "ring-2 ring-[#89764b]"
+                          : "hover:ring-1 hover:ring-gray-300"
+                      }`}
+                    >
+                      <img
+                        src={img.src}
+                        alt={img.alt || `Miniatura ${index + 1}`}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          e.currentTarget.src = wineImage;
+                        }}
+                      />
+                      {activeImageIndex === index && (
+                        <div className="absolute inset-0 bg-black/10"></div>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              {/* Main Image */}
+              <div className="flex-1 flex flex-col h-[50vh] lg:h-auto">
+                <div className="flex-1 flex items-center justify-center p-8 bg-white relative">
+                  <img
+                    src={
+                      quickViewProduct.images[activeImageIndex]?.src ||
+                      wineImage
+                    }
+                    alt={
+                      quickViewProduct.images[activeImageIndex]?.alt ||
+                      quickViewProduct.name.pt
+                    }
+                    className="max-h-[60vh] max-w-full object-contain transition-opacity duration-300"
+                    onError={(e) => {
+                      e.currentTarget.src = wineImage;
+                    }}
+                  />
                 </div>
 
-                {/* Thumbnails */}
-                <div className="flex gap-2 p-3 sm:p-4 md:p-6 overflow-x-auto border-t border-gray-200">
-                  {quickViewProduct.images.length > 0 ? (
-                    quickViewProduct.images.map((img, index) => (
+                {/* Mobile Thumbnails */}
+                {quickViewProduct.images.length > 1 && (
+                  <div className="lg:hidden flex gap-3 p-4 overflow-x-auto border-t border-gray-200 bg-gray-50">
+                    {quickViewProduct.images.map((img, index) => (
                       <button
                         key={index}
                         onClick={() => setActiveImageIndex(index)}
-                        className={`w-10 h-10 sm:w-14 sm:h-14 md:w-20 md:h-20 flex-shrink-0 rounded-lg border-2 transition-all ${
+                        className={`flex-shrink-0 w-14 h-14 rounded-md overflow-hidden transition-all ${
                           activeImageIndex === index
-                            ? "border-[#89764b] shadow-md"
-                            : "border-transparent hover:border-gray-300"
-                        } overflow-hidden bg-white`}
+                            ? "ring-2 ring-[#89764b]"
+                            : "hover:ring-1 hover:ring-gray-300"
+                        }`}
                       >
                         <img
                           src={img.src}
                           alt={img.alt || `Miniatura ${index + 1}`}
-                          className="w-full h-full object-contain"
+                          className="w-full h-full object-cover"
                           onError={(e) => {
                             e.currentTarget.src = wineImage;
                           }}
                         />
                       </button>
-                    ))
-                  ) : (
-                    <div className="w-10 h-10 sm:w-14 sm:h-14 md:w-20 md:h-20 flex-shrink-0 rounded-lg border border-gray-200 bg-gray-100 flex items-center justify-center">
-                      <span className="text-xs text-gray-400">Sem imagem</span>
-                    </div>
-                  )}
-                </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
 
             {/* Product Details */}
-            <div className="lg:w-1/2 p-4 sm:p-6 md:p-8 lg:p-10 overflow-y-auto">
-              <div className="space-y-4 sm:space-y-6 md:space-y-8">
+            <div className="lg:w-[45%] p-6 overflow-y-auto border-t lg:border-t-0 lg:border-l border-gray-200">
+              <div className="space-y-5">
                 {/* Header */}
                 <div>
-                  <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 mb-2 sm:mb-3 tracking-tight font-oswald uppercase">
+                  <h2 className="text-2xl font-bold text-gray-900 mb-1 uppercase tracking-tight">
                     {quickViewProduct.name.pt}
                   </h2>
-                  <div className="flex items-center gap-2 sm:gap-3 md:gap-4">
-                    {quickViewProduct.rating && (
-                      <div className="flex items-center gap-1 sm:gap-2 bg-amber-100 px-2 py-1 sm:px-3 sm:py-1.5 md:px-4 rounded-full">
-                        <Star className="h-3 w-3 sm:h-4 sm:w-4 fill-amber-500 text-amber-500" />
-                        <span className="font-medium text-amber-800 text-xs sm:text-sm font-oswald">
-                          {quickViewProduct.rating.toFixed(1)}
-                        </span>
-                      </div>
-                    )}
-                    <span className="text-xs sm:text-sm text-gray-600 uppercase tracking-wider font-light font-oswald">
-                      {quickViewProduct.categories[0]?.name.pt || "Vinho"}
-                    </span>
-                  </div>
+                  <p className="text-xs text-gray-500 uppercase tracking-wider">
+                    {quickViewProduct.categories[0]?.name.pt || "Vinho"}
+                  </p>
                 </div>
 
                 {/* Price */}
-                <div className="flex items-baseline gap-2 sm:gap-3 md:gap-4">
-                  <span className="text-xl sm:text-2xl md:text-3xl font-bold text-[#89764b] font-oswald">
+                <div className="flex items-center justify-between">
+                  <span className="text-2xl font-bold text-[#89764b]">
                     R${" "}
                     {parseFloat(quickViewProduct.variants[0]?.price || "0")
                       .toFixed(2)
                       .replace(".", ",")}
                   </span>
-                  {Math.random() > 0.5 && (
-                    <span className="text-sm sm:text-lg text-gray-500 line-through font-light">
-                      R${" "}
-                      {(
-                        parseFloat(quickViewProduct.variants[0]?.price || "0") *
-                        1.2
-                      )
-                        .toFixed(2)
-                        .replace(".", ",")}
-                    </span>
+                  {quickViewProduct.rating && (
+                    <div className="flex items-center bg-gray-100 px-2 py-1 rounded">
+                      <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
+                      <span className="ml-1 text-sm font-medium">
+                        {quickViewProduct.rating.toFixed(1)}
+                      </span>
+                    </div>
                   )}
                 </div>
 
                 {/* Availability */}
                 <div
-                  className={`py-2 px-3 sm:py-3 sm:px-4 md:py-3 md:px-5 rounded-lg text-xs sm:text-sm font-medium font-oswald ${
+                  className={`py-2 px-3 rounded-md text-sm font-medium ${
                     quickViewProduct.variants[0]?.stock === 0
-                      ? "bg-red-100 text-red-800"
-                      : "bg-green-100 text-green-800"
+                      ? "bg-red-50 text-red-700"
+                      : "bg-green-50 text-green-700"
                   }`}
                 >
                   {quickViewProduct.variants[0]?.stock === 0
@@ -536,7 +464,7 @@ const HomePage = () => {
                 </div>
 
                 {/* Description */}
-                <div className="prose max-w-none text-gray-700 leading-relaxed font-light text-sm sm:text-base">
+                <div className="prose max-w-none text-gray-700 text-sm leading-relaxed border-b border-gray-200 pb-5">
                   <p>
                     {quickViewProduct.description?.pt
                       ? decodeHtmlEntities(
@@ -550,45 +478,37 @@ const HomePage = () => {
                 </div>
 
                 {/* Technical Details */}
-                <div className="grid grid-cols-2 gap-2 sm:gap-3 md:gap-4">
+                <div className="grid grid-cols-2 gap-3">
                   {quickViewProduct.year && (
-                    <div className="bg-gray-50 p-2 sm:p-3 md:p-4 rounded-lg border border-gray-100">
-                      <p className="text-xs text-gray-500 uppercase tracking-wider mb-1 font-oswald">
+                    <div className="bg-gray-50 p-3 rounded-lg">
+                      <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">
                         Safra
                       </p>
-                      <p className="font-medium font-oswald text-sm sm:text-base">
-                        {quickViewProduct.year}
-                      </p>
+                      <p className="font-medium">{quickViewProduct.year}</p>
                     </div>
                   )}
                   {quickViewProduct.alcohol && (
-                    <div className="bg-gray-50 p-2 sm:p-3 md:p-4 rounded-lg border border-gray-100">
-                      <p className="text-xs text-gray-500 uppercase tracking-wider mb-1 font-oswald">
+                    <div className="bg-gray-50 p-3 rounded-lg">
+                      <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">
                         Teor Alcoólico
                       </p>
-                      <p className="font-medium font-oswald text-sm sm:text-base">
-                        {quickViewProduct.alcohol}
-                      </p>
+                      <p className="font-medium">{quickViewProduct.alcohol}</p>
                     </div>
                   )}
                   {quickViewProduct.region && (
-                    <div className="bg-gray-50 p-2 sm:p-3 md:p-4 rounded-lg border border-gray-100">
-                      <p className="text-xs text-gray-500 uppercase tracking-wider mb-1 font-oswald">
+                    <div className="bg-gray-50 p-3 rounded-lg">
+                      <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">
                         Região
                       </p>
-                      <p className="font-medium font-oswald text-sm sm:text-base">
-                        {quickViewProduct.region}
-                      </p>
+                      <p className="font-medium">{quickViewProduct.region}</p>
                     </div>
                   )}
                   {quickViewProduct.sku && (
-                    <div className="bg-gray-50 p-2 sm:p-3 md:p-4 rounded-lg border border-gray-100">
-                      <p className="text-xs text-gray-500 uppercase tracking-wider mb-1 font-oswald">
+                    <div className="bg-gray-50 p-3 rounded-lg">
+                      <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">
                         Código
                       </p>
-                      <p className="font-medium font-oswald text-sm sm:text-base">
-                        {quickViewProduct.sku}
-                      </p>
+                      <p className="font-medium">{quickViewProduct.sku}</p>
                     </div>
                   )}
                 </div>
@@ -596,18 +516,18 @@ const HomePage = () => {
                 {/* Awards */}
                 {quickViewProduct.awards &&
                   quickViewProduct.awards.length > 0 && (
-                    <div className="space-y-2 sm:space-y-3">
-                      <h4 className="font-medium flex items-center gap-1 sm:gap-2 text-gray-900 font-oswald text-sm sm:text-base">
-                        <Award className="h-4 w-4 sm:h-5 sm:w-5 text-amber-600" />
+                    <div className="space-y-2 pt-2">
+                      <h4 className="font-medium flex items-center gap-2 text-gray-900 text-sm">
+                        <Award className="h-4 w-4 text-amber-600" />
                         Prêmios e Reconhecimentos
                       </h4>
-                      <ul className="space-y-1 sm:space-y-2">
+                      <ul className="space-y-1">
                         {quickViewProduct.awards.map((award, index) => (
                           <li
                             key={index}
-                            className="flex items-start gap-2 sm:gap-3 text-gray-700 text-xs sm:text-sm"
+                            className="flex items-start gap-2 text-gray-700 text-sm"
                           >
-                            <Star className="h-3 w-3 sm:h-4 sm:w-4 fill-amber-400 text-amber-400 mt-0.5 flex-shrink-0" />
+                            <Star className="h-3 w-3 fill-amber-400 text-amber-400 mt-0.5 flex-shrink-0" />
                             <span>{award}</span>
                           </li>
                         ))}
@@ -616,28 +536,28 @@ const HomePage = () => {
                   )}
 
                 {/* Actions */}
-                <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 md:gap-4 pt-4 sm:pt-5 md:pt-6">
+                <div className="flex flex-col sm:flex-row gap-3 pt-4">
                   <button
                     onClick={() => {
                       handleAddToCart(quickViewProduct);
                       setQuickViewProduct(null);
                     }}
                     disabled={quickViewProduct.variants[0]?.stock === 0}
-                    className={`py-2 px-4 sm:py-3 sm:px-5 md:py-4 md:px-6 rounded-lg transition-all duration-300 flex items-center justify-center gap-2 font-oswald uppercase text-xs sm:text-sm ${
+                    className={`flex-1 py-3 px-4 rounded-md transition-all duration-300 flex items-center justify-center gap-2 uppercase text-sm font-medium ${
                       quickViewProduct.variants[0]?.stock === 0
                         ? "bg-gray-200 text-gray-600 cursor-not-allowed"
                         : "bg-[#89764b] hover:bg-[#756343] text-white hover:shadow-md"
                     }`}
                   >
-                    <ShoppingCart className="h-3 w-3 sm:h-4 sm:w-4 md:h-5 md:w-5" />
+                    <ShoppingCart className="h-4 w-4" />
                     Adicionar ao Carrinho
                   </button>
                   <Link
                     to={`/produto/${quickViewProduct.id}`}
-                    className="py-2 px-4 sm:py-3 sm:px-5 md:py-4 md:px-6 rounded-lg border-2 border-[#89764b] text-[#89764b] hover:bg-[#89764b]/5 transition-all duration-300 flex items-center justify-center gap-2 font-oswald uppercase text-xs sm:text-sm"
+                    className="flex-1 py-3 px-4 rounded-md border border-[#89764b] text-[#89764b] hover:bg-[#f8f5f0] transition-all duration-300 flex items-center justify-center gap-2 uppercase text-sm font-medium"
                     onClick={() => setQuickViewProduct(null)}
                   >
-                    <Info className="h-3 w-3 sm:h-4 sm:w-4 md:h-5 md:w-5" />
+                    <Info className="h-4 w-4" />
                     Ver Detalhes
                   </Link>
                 </div>

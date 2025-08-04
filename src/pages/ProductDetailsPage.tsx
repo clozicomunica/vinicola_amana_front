@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useParams, Link } from "react-router-dom";
 import {
   ArrowLeft,
@@ -6,6 +6,7 @@ import {
   Star,
   ChevronRight,
   Wine,
+  Utensils,
 } from "lucide-react";
 
 import { useCart } from "../context/useCart";
@@ -28,15 +29,23 @@ interface Props {
 }
 
 const ProductDetailsPage = ({ recommendations }: Props) => {
-  const { id } = useParams();
+  const { id } = useParams<{ id: string }>();
   const { addToCart } = useCart();
+
   const [wine, setWine] = useState<Wine | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const [similarProducts, setSimilarProducts] = useState<Wine[]>([]);
 
-  const handleAddToCart = () => {
-    if (!wine) return;
+  // Formata preço para "xx,xx"
+  const formatPrice = (price: string) =>
+    parseFloat(price).toFixed(2).replace(".", ",");
+
+  // Função para adicionar ao carrinho, memoizada para evitar re-criações desnecessárias
+  const handleAddToCart = useCallback(() => {
+    if (!wine || wine.variants.length === 0) return;
+
     addToCart({
       id: wine.id,
       name: wine.name.pt,
@@ -45,19 +54,30 @@ const ProductDetailsPage = ({ recommendations }: Props) => {
       image: wine.images[0]?.src || "/placeholder-wine.jpg",
       category: wine.categories[0]?.name.pt || "Vinho",
     });
-  };
+  }, [addToCart, wine]);
 
   useEffect(() => {
+    if (!id) {
+      setError("ID do produto não informado");
+      setLoading(false);
+      return;
+    }
+
     const fetchWineDetails = async () => {
       try {
         setLoading(true);
+        setError(null);
+
+        // Busca detalhes do vinho pelo id
         const response = await fetch(
           `https://vinicola-amana-back.onrender.com/api/products/${id}`
         );
+
         if (!response.ok) throw new Error("Produto não encontrado");
+
         const data = await response.json();
 
-        // Adiciona dados fictícios para demonstração
+        // Preenche dados fictícios caso não existam
         const enhancedData = {
           ...data,
           rating: data.rating || +(4.0 + Math.random() * 1.0).toFixed(1),
@@ -70,22 +90,41 @@ const ProductDetailsPage = ({ recommendations }: Props) => {
         };
 
         setWine(enhancedData);
+
+        // Busca similares pela categoria principal, pegando nome slug ou pt
+        const categoryName = enhancedData.categories[0]?.name.pt || "";
+        if (categoryName) {
+          const similarResponse = await fetch(
+            `https://vinicola-amana-back.onrender.com/api/products?category=${encodeURIComponent(
+              categoryName
+            )}`
+          );
+          if (similarResponse.ok) {
+            const similarData = await similarResponse.json();
+            // Filtra o produto atual e limita 4
+            setSimilarProducts(
+              similarData
+                .filter((item: Wine) => item.id !== enhancedData.id)
+                .slice(0, 4)
+            );
+          }
+        } else {
+          setSimilarProducts([]);
+        }
       } catch (err) {
         setError(err instanceof Error ? err.message : "Erro desconhecido");
+        setWine(null);
       } finally {
         setLoading(false);
       }
     };
+
     fetchWineDetails();
   }, [id]);
 
-  const formatPrice = (price: string) => {
-    return parseFloat(price).toFixed(2).replace(".", ",");
-  };
-
   if (loading) {
     return (
-      <div className="min-h-screen flex justify-center items-center bg-[#f8f5f0]">
+      <div className="min-h-screen flex justify-center items-center bg-gray-100">
         <div className="animate-pulse flex flex-col items-center">
           <div className="w-32 h-32 bg-[#89764b]/20 rounded-full mb-4"></div>
           <div className="h-6 bg-gray-200 rounded w-48 mb-2"></div>
@@ -97,7 +136,7 @@ const ProductDetailsPage = ({ recommendations }: Props) => {
 
   if (error) {
     return (
-      <div className="min-h-screen flex flex-col justify-center items-center bg-[#f8f5f0] p-6 text-center">
+      <div className="min-h-screen flex flex-col justify-center items-center bg-gray-100 p-6 text-center">
         <div className="bg-white p-8 rounded-xl shadow-md max-w-md">
           <h2 className="text-2xl font-bold text-[#9a3324] mb-4">
             Ocorreu um erro
@@ -117,7 +156,7 @@ const ProductDetailsPage = ({ recommendations }: Props) => {
 
   if (!wine) {
     return (
-      <div className="min-h-screen flex flex-col justify-center items-center bg-[#f8f5f0] p-6 text-center">
+      <div className="min-h-screen flex flex-col justify-center items-center bg-gray-100 p-6 text-center">
         <div className="bg-white p-8 rounded-xl shadow-md max-w-md">
           <Wine className="h-12 w-12 mx-auto text-[#89764b] mb-4" />
           <h2 className="text-2xl font-bold text-gray-900 mb-4">
@@ -139,7 +178,7 @@ const ProductDetailsPage = ({ recommendations }: Props) => {
   }
 
   return (
-    <div className="bg-[#f8f5f0] min-h-screen">
+    <div className="bg-gray-100 min-h-screen">
       {/* Voltar */}
       <div className="container mx-auto px-4 lg:px-8 pt-8">
         <Link
@@ -183,6 +222,7 @@ const ProductDetailsPage = ({ recommendations }: Props) => {
                         ? "border-[#89764b]"
                         : "border-transparent hover:border-gray-300"
                     }`}
+                    aria-label={`Selecionar imagem ${index + 1}`}
                   >
                     <img
                       src={img.src}
@@ -196,13 +236,13 @@ const ProductDetailsPage = ({ recommendations }: Props) => {
           </div>
 
           {/* Detalhes do Produto */}
-          <div className="bg-white rounded-xl shadow-sm p-8">
+          <div className="bg-white rounded-xl shadow-sm p-8 flex flex-col">
             <div className="mb-6">
-              <div className="flex items-center gap-3 mb-4">
-                {wine.rating && (
-                  <div className="flex items-center bg-amber-100 px-3 py-1 rounded-full">
-                    <Star className="h-4 w-4 fill-amber-500 text-amber-500 mr-1" />
-                    <span className="font-medium text-amber-800 text-sm">
+              <div className="flex items-center gap-3 mb-4 flex-wrap">
+                {wine.rating !== undefined && (
+                  <div className="flex items-center bg-black px-3 py-1 rounded-full">
+                    <Star className="h-4 w-4 fill-[#d4af37] text-[#d4af37] mr-1" />
+                    <span className="font-medium text-[#d4af37] text-sm">
                       {wine.rating.toFixed(1)}
                     </span>
                   </div>
@@ -216,7 +256,7 @@ const ProductDetailsPage = ({ recommendations }: Props) => {
                 {wine.name.pt}
               </h1>
 
-              <div className="flex items-center gap-4 text-sm text-gray-600 mb-6">
+              <div className="flex items-center gap-4 text-sm text-gray-600 mb-6 flex-wrap">
                 {wine.region && (
                   <span className="flex items-center">
                     <svg
@@ -243,19 +283,11 @@ const ProductDetailsPage = ({ recommendations }: Props) => {
                 )}
                 {wine.alcohol && (
                   <span className="flex items-center">
-                    <svg
-                      className="h-4 w-4 mr-1"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                      />
-                    </svg>
+                    <div className="relative mr-1 flex space-x-1">
+                      <div className="h-2 w-2 rounded-full bg-[#89764b]"></div>
+                      <div className="h-2 w-2 rounded-full bg-[#89764b]"></div>
+                      <div className="h-2 w-2 rounded-full bg-[#89764b]"></div>
+                    </div>
                     {wine.alcohol}
                   </span>
                 )}
@@ -282,7 +314,7 @@ const ProductDetailsPage = ({ recommendations }: Props) => {
 
             {/* Preço */}
             <div className="mb-8">
-              <div className="flex items-baseline gap-4 mb-2">
+              <div className="flex items-baseline gap-4 mb-2 flex-wrap">
                 <span className="text-3xl font-bold text-[#89764b]">
                   R$ {formatPrice(wine.variants[0].price)}
                 </span>
@@ -306,9 +338,10 @@ const ProductDetailsPage = ({ recommendations }: Props) => {
             </div>
 
             {/* Descrição */}
-            <div className="prose max-w-none text-gray-700 mb-8">
-              <div dangerouslySetInnerHTML={{ __html: wine.description.pt }} />
-            </div>
+            <div
+              className="prose max-w-none text-gray-700 mb-8"
+              dangerouslySetInnerHTML={{ __html: wine.description.pt }}
+            />
 
             {/* Botão de compra */}
             <button
@@ -319,7 +352,7 @@ const ProductDetailsPage = ({ recommendations }: Props) => {
               Adicionar ao Carrinho
             </button>
 
-            {/* Entrega e Garantia */}
+            {/* Entrega e Harmonização */}
             <div className="mt-8 grid grid-cols-2 gap-4 text-sm">
               <div className="flex items-start gap-3">
                 <svg
@@ -341,34 +374,81 @@ const ProductDetailsPage = ({ recommendations }: Props) => {
                 </div>
               </div>
               <div className="flex items-start gap-3">
-                <svg
-                  className="h-5 w-5 text-[#89764b] mt-0.5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-                </svg>
+                <Utensils className="h-5 w-5 text-[#89764b] mt-0.5" />
                 <div>
-                  <p className="font-medium">Garantia</p>
-                  <p className="text-gray-600">7 dias para devolução</p>
+                  <p className="font-medium">Harmonização</p>
+                  <p className="text-gray-600">Sugestões de acompanhamento</p>
                 </div>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Recomendações */}
-        {recommendations && recommendations.length > 0 && (
+        {/* Produtos Similares */}
+        {similarProducts.length > 0 && (
           <section className="mt-16">
             <div className="flex items-center justify-between mb-8">
               <h2 className="text-2xl font-bold text-gray-900 font-oswald uppercase tracking-tight">
-                Você também pode gostar
+                Produtos Similares
+              </h2>
+              <Link
+                to="/vinhos"
+                className="flex items-center text-[#89764b] hover:text-[#756343] font-medium"
+              >
+                Ver todos <ChevronRight className="h-4 w-4 ml-1" />
+              </Link>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {similarProducts.map((product) => (
+                <div
+                  key={product.id}
+                  className="group bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1"
+                >
+                  <Link to={`/vinho/${product.id}`} className="block">
+                    <div className="relative h-64 bg-gradient-to-b from-gray-50 to-gray-100 flex items-center justify-center p-6">
+                      <img
+                        src={product.images[0]?.src || "/placeholder-wine.jpg"}
+                        alt={product.images[0]?.alt || product.name.pt}
+                        className="max-h-full max-w-full object-contain"
+                        style={{
+                          mixBlendMode: "multiply",
+                          filter: "drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1))",
+                        }}
+                      />
+                    </div>
+                    <div className="p-5">
+                      <h3 className="font-bold text-gray-900 mb-1 font-oswald uppercase tracking-tight line-clamp-1">
+                        {product.name.pt}
+                      </h3>
+                      <p className="text-sm text-gray-600 mb-3 font-oswald uppercase tracking-tight">
+                        {product.categories[0]?.name.pt || "Vinho"}
+                      </p>
+                      <div className="flex items-center justify-between">
+                        <span className="font-bold text-[#89764b]">
+                          R$ {formatPrice(product.variants[0].price)}
+                        </span>
+                        {product.rating !== undefined && (
+                          <div className="flex items-center text-sm text-gray-600">
+                            <Star className="h-3 w-3 fill-amber-500 text-amber-500 mr-1" />
+                            {product.rating.toFixed(1)}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </Link>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* Recomendações */}
+        {recommendations.length > 0 && (
+          <section className="mt-16">
+            <div className="flex items-center justify-between mb-8">
+              <h2 className="text-2xl font-bold text-gray-900 font-oswald uppercase tracking-tight">
+                Outras recomendações
               </h2>
               <Link
                 to="/vinhos"
@@ -407,7 +487,7 @@ const ProductDetailsPage = ({ recommendations }: Props) => {
                         <span className="font-bold text-[#89764b]">
                           R$ {formatPrice(rec.variants[0].price)}
                         </span>
-                        {rec.rating && (
+                        {rec.rating !== undefined && (
                           <div className="flex items-center text-sm text-gray-600">
                             <Star className="h-3 w-3 fill-amber-500 text-amber-500 mr-1" />
                             {rec.rating.toFixed(1)}

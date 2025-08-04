@@ -4,27 +4,27 @@ import wineTasting from "../assets/taças-bg.jpg";
 const features = [
   {
     icon: Grape,
-    title: "Tradição Familiar",
+    title: "Nossas Uvas",
     description:
-      "Três gerações dedicadas à arte da vinicultura, mantendo técnicas tradicionais com inovação moderna.",
+      "Atualmente, abrangemos quase 100 hectares de terras, com 11 hectares já dedicados ao cultivo de videiras francesas, incluindo variedades como Syrah, Cabernet Sauvignon, Cabernet Franc, Malbec, Sauvignon Blanc e Chenin Blanc. Além dos vinhedos em crescimento, nossas terras são ocupadas pela cultura de cafés especiais, oliveiras e áreas de matas nativas preservadas.",
   },
   {
     icon: Award,
     title: "Vinhos Premiados",
     description:
-      "Reconhecidos nacionalmente e internacionalmente por nossa qualidade e excelência.",
+      "Alguns de nossos rótulos foram premiados com medalhas de Prata e Bronze na Decanter 2024 e 2025. Confira-os na sessão premiados.",
   },
   {
     icon: Heart,
     title: "Paixão pelo Terroir",
     description:
-      "Respeitamos nossa terra e o clima único que tornam nossos vinhos especiais.",
+      "Somos uma vinícola focada na experiência do cliente. Por isso, desde a escolha do local, a arquitetura, a escolha de cardápio e uvas plantadas; tudo isso é pensado em uma imersão na cultura Amana..",
   },
   {
     icon: Users,
     title: "Experiências Únicas",
     description:
-      "Oferecemos degustações e visitas guiadas para compartilhar nossa paixão.",
+      "Visitas Guiadas, Vindimas, Eventos e outras experiências fazem parte do nosso dia a dia. Acesse a aba Agenda e fique por dentro de nosso calendário.",
   },
 ];
 
@@ -37,21 +37,18 @@ const AboutSection = () => {
           <div className="order-2 lg:order-1 w-full space-y-6 lg:space-y-8">
             <div>
               <h2 className="text-black text-2xl sm:text-3xl lg:text-4xl font-bold mb-4 lg:mb-6">
-                Nossa História de
-                <span className="text-black block">Paixão e Tradição</span>
+                Somos apaixonados pela Mantiqueira e comprometidos com a
+                excelência
               </h2>
 
               <div className="space-y-3 lg:space-y-4">
                 <p className="text-black text-base lg:text-lg leading-relaxed">
-                  Desde 1952, a família Mana cultiva as melhores uvas em nosso
-                  terroir único, criando vinhos que expressam a essência de
-                  nossa terra e tradição.
-                </p>
-
-                <p className="text-black text-base leading-relaxed">
-                  Nossa vinícola combina métodos tradicionais com tecnologia
-                  moderna, garantindo que cada garrafa carregue a assinatura
-                  inconfundível da qualidade Mana.
+                  Localizada nas encostas de Espírito Santo do Pinhal, a
+                  Vinícola Amana é a máxima homenagem à Serra da Mantiqueira ou
+                  Amana-Tykyra em tupi. Um tributo a esse terroir único que,
+                  unido à técnica da dupla poda, cria condições perfeitas para a
+                  elaboração de vinhos tão inesquecíveis quanto as paisagens da
+                  região.
                 </p>
               </div>
             </div>
@@ -84,14 +81,26 @@ const AboutSection = () => {
 
             {/* Botões - Stack em mobile */}
             <div className="flex flex-col sm:flex-row gap-3 w-full">
-              <button className="inline-flex items-center justify-center px-6 py-3 md:px-10 md:py-4 bg-[#89764b] hover:bg-[#756343] text-white rounded-lg transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl font-medium tracking-wide uppercase text-xs md:text-sm w-full sm:w-auto">
-                Nossa História Completa
-                <ChevronRight className="ml-2 h-4 w-4 md:ml-3 md:h-5 md:w-5" />
-              </button>
-              <button className="inline-flex items-center justify-center px-6 py-3 md:px-10 md:py-4 border border-[#89764b] text-[#89764b] hover:bg-[#9a3324]/10 rounded-lg transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl font-medium tracking-wide uppercase text-xs md:text-sm w-full sm:w-auto">
-                Agende uma Visita
-                <ChevronRight className="ml-2 h-4 w-4 md:ml-3 md:h-5 md:w-5" />
-              </button>
+              <a
+                href="https://www.vinicolaamana.com.br/"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <button className="cursor-pointer inline-flex items-center justify-center px-6 py-3 md:px-10 md:py-4 bg-[#89764b] hover:bg-[#756343] text-white rounded-lg transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl font-medium tracking-wide uppercase text-xs md:text-sm w-full sm:w-auto">
+                  Nossa História Completa
+                  <ChevronRight className="ml-2 h-4 w-4 md:ml-3 md:h-5 md:w-5" />
+                </button>
+              </a>
+              <a
+                href="https://widget.getinapp.com.br/zPQjaD1Y"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <button className="cursor-pointer inline-flex items-center justify-center px-6 py-3 md:px-10 md:py-4 border border-[#89764b] text-[#89764b] hover:bg-[#9a3324]/10 rounded-lg transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl font-medium tracking-wide uppercase text-xs md:text-sm w-full sm:w-auto">
+                  Agende uma Visita
+                  <ChevronRight className="ml-2 h-4 w-4 md:ml-3 md:h-5 md:w-5" />
+                </button>
+              </a>
             </div>
           </div>
 
