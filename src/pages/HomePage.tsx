@@ -359,7 +359,7 @@ const HomePage = () => {
                       <img
                         src={img.src}
                         alt={img.alt || `Miniatura ${index + 1}`}
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-contain bg-white rounded-md"
                         onError={(e) => {
                           e.currentTarget.src = wineImage;
                         }}
@@ -407,7 +407,7 @@ const HomePage = () => {
                         <img
                           src={img.src}
                           alt={img.alt || `Miniatura ${index + 1}`}
-                          className="w-full h-full object-cover"
+                          className="w-full h-full object-contain"
                           onError={(e) => {
                             e.currentTarget.src = wineImage;
                           }}
