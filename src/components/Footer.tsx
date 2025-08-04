@@ -234,21 +234,6 @@ const Footer = () => {
                 Termos de Uso
               </Link>
             </div>
-
-            <div className="md:hidden flex items-center justify-center gap-1 text-sm text-white order-4 md:order-none w-full mt-2">
-              <a
-                href="https://clozicomunica.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="font-medium hover:text-[#9a3324] text-white flex items-center"
-              >
-                <img
-                  src={developedby}
-                  alt="Clozi Comunica"
-                  className="h-8 w-auto ml-1 object-contain"
-                />
-              </a>
-            </div>
           </div>
         </div>
       </div>
