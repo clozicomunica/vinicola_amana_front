@@ -4,6 +4,16 @@ import { ShoppingCart, X, ArrowLeft, Wine, ChevronRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import type { CartItem } from "../context/CartProvider";
 
+// Interface para a resposta do pedido
+interface OrderSummary {
+  id?: number;
+  number?: string;
+  contact_name?: string;
+  contact_email?: string;
+  products?: { name: string; quantity: number; image?: { src: string } }[];
+  total?: number;
+}
+
 const CartPage = () => {
   const { cart, removeFromCart, clearCart, addToCart } = useCart();
   const [customer, setCustomer] = useState({
@@ -16,7 +26,7 @@ const CartPage = () => {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [orderSummary, setOrderSummary] = useState(null);
+  const [orderSummary, setOrderSummary] = useState<OrderSummary | null>(null);
 
   // Calcula o total do carrinho
   const total = cart.reduce(
@@ -73,20 +83,20 @@ const CartPage = () => {
       gateway: "mercadopago",
       payment_status: "pending",
       products: cart.map((item) => ({
-        variant_id: item.variant_id || "", // Garante que variant_id não seja undefined
+        variant_id: item.variant_id || 0, // Garante que variant_id esteja presente
         quantity: item.quantity || 1,
       })),
       customer: {
         email: customer.email,
         name: customer.name,
         document: customer.document,
-        phone: "+55 11 99999-9999", // Substitua por campo dinâmico se possível
+        phone: "+55 11 99999-9999",
       },
       billing_address: {
         first_name: customer.name.split(" ")[0] || "Cliente",
         last_name: customer.name.split(" ").slice(1).join(" ") || "Sobrenome",
         address: customer.address,
-        number: "s/n", // Substitua por campo dinâmico se possível
+        number: "s/n",
         city: customer.city,
         province: "SP",
         zipcode: customer.zipcode,
@@ -112,8 +122,8 @@ const CartPage = () => {
       checkout_enabled: true,
     };
 
-    console.log("Cart items:", cart); // Depuração
-    console.log("Order data sent:", orderData); // Depuração
+    console.log("Cart items:", cart);
+    console.log("Order data sent:", orderData);
 
     try {
       const response = await fetch(
@@ -136,7 +146,6 @@ const CartPage = () => {
         if (data.checkout_url) {
           window.location.href = data.checkout_url;
         } else if (data.id) {
-          // Fallback manual com base no domínio da loja
           const fallbackUrl = `https://vinicolaamana.lojavirtualnuvem.com.br/checkout/${data.id}`;
           window.location.href = fallbackUrl;
         } else {
@@ -432,7 +441,9 @@ const CartPage = () => {
                   </h3>
                   <p>
                     <strong>Número do Pedido:</strong>{" "}
-                    {orderSummary.number || orderSummary.id}
+                    {orderSummary.number ||
+                      orderSummary.id?.toString() ||
+                      "N/A"}
                   </p>
                   <p>
                     <strong>Cliente:</strong>{" "}
@@ -452,14 +463,14 @@ const CartPage = () => {
                   </p>
                   <p>
                     <strong>Total:</strong> R${" "}
-                    {parseFloat(orderSummary.total || total + 20)
+                    {parseFloat((orderSummary.total || total + 20).toString())
                       .toFixed(2)
                       .replace(".", ",")}
                   </p>
                   {orderSummary?.products?.[0]?.image?.src && (
                     <img
                       src={orderSummary.products[0].image.src}
-                      alt={orderSummary.products[0].name}
+                      alt={orderSummary.products[0].name || "Produto"}
                       style={{ maxWidth: "200px" }}
                     />
                   )}
