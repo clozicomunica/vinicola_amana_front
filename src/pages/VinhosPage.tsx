@@ -56,7 +56,7 @@ const VinhosPage = () => {
 
     if (isFirstPage) {
       setLoading(true);
-      setWines([]); // Limpa a lista ao buscar novos resultados
+      setWines([]);
     } else {
       setLoadingMore(true);
     }
@@ -80,8 +80,6 @@ const VinhosPage = () => {
 
       if (isFirstPage) {
         setWines(data);
-        console.log("Primeiro vinho:", data[0]);
-        console.log("Primeiro variant:", data[0]?.variants?.[0]);
       } else {
         setWines((prev) => [...prev, ...data]);
       }
@@ -94,13 +92,11 @@ const VinhosPage = () => {
     }
   };
 
-  // Efeito para buscar quando categoria ou termo de busca mudam
   useEffect(() => {
-    setPage(1); // Resetar para a primeira página
+    setPage(1);
     fetchWines(1);
   }, [selectedCategory, searchTerm]);
 
-  // Efeito para carregar mais itens quando a página muda
   useEffect(() => {
     if (page > 1) {
       fetchWines(page);
@@ -110,12 +106,12 @@ const VinhosPage = () => {
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setSearchTerm(searchInput.trim());
-    setPage(1); // Resetar para a primeira página ao fazer nova busca
+    setPage(1);
   };
 
   const handleCategoryChange = (categoryId: string) => {
     setSelectedCategory(categoryId);
-    setPage(1); // Resetar para a primeira página ao mudar categoria
+    setPage(1);
   };
 
   const handleClearFilters = () => {
@@ -129,7 +125,7 @@ const VinhosPage = () => {
     if (!wine.variants[0]) return;
     addToCart({
       id: wine.id,
-      variant_id: wine.variants[0]?.id || wine.id, // garante fallback
+      variant_id: wine.variants[0]?.id || wine.id,
       name: wine.name.pt,
       price: parseFloat(wine.variants[0].price),
       quantity: 1,
@@ -148,9 +144,9 @@ const VinhosPage = () => {
     return wines.map((wine) => (
       <div
         key={wine.id}
-        className="group bg-white rounded-xl overflow-hidden border border-gray-200 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 flex flex-col h-full"
+        className="group bg-white rounded-xl overflow-hidden border border-[#9c9c9c]/30 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 flex flex-col h-full font-['Oswald']"
       >
-        <div className="relative flex items-center justify-center h-80 bg-gradient-to-b from-gray-50 to-gray-100 p-6">
+        <div className="relative flex items-center justify-center h-80 bg-gradient-to-b from-[#f5f5f5] to-[#e5e5e5] p-6">
           <img
             src={wine.images[0]?.src || wineImage}
             alt={wine.images[0]?.alt?.[0] || wine.name.pt}
@@ -162,7 +158,7 @@ const VinhosPage = () => {
             }}
           />
           {wine.variants[0]?.compare_at_price && (
-            <span className="absolute top-3 left-3 bg-[#9a3324] text-white text-xs px-3 py-1 rounded-full shadow-md font-oswald uppercase tracking-tight">
+            <span className="absolute top-3 left-3 bg-[#9a3324] text-white text-xs px-3 py-1 rounded-full shadow-md uppercase tracking-tight">
               Oferta
             </span>
           )}
@@ -171,7 +167,7 @@ const VinhosPage = () => {
               to={`/produto/${wine.id}`}
               className="p-3 bg-white/90 rounded-full hover:bg-white transition transform hover:scale-110 shadow-lg"
             >
-              <Eye className="h-5 w-5 text-gray-800" />
+              <Eye className="h-5 w-5 text-[#000000]" />
             </Link>
             <button
               onClick={() => handleAddToCart(wine)}
@@ -183,34 +179,34 @@ const VinhosPage = () => {
         </div>
         <div className="p-6 flex flex-col flex-grow">
           <div className="mb-4">
-            <h3 className="font-bold text-gray-900 text-lg uppercase tracking-tight font-oswald mb-2">
+            <h3 className="text-[#000000] text-lg uppercase tracking-tight mb-2">
               {wine.name.pt}
             </h3>
             <div className="flex items-center gap-3 mb-3">
-              <span className="text-sm text-gray-600 font-oswald">
+              <span className="text-sm text-[#000000]">
                 {wine.categories[0]?.name.pt || "Vinho"}
               </span>
-              <span className="w-1 h-1 bg-gray-400 rounded-full"></span>
-              <span className="text-sm text-gray-600 font-oswald">
+              <span className="w-1 h-1 bg-[#9c9c9c] rounded-full"></span>
+              <span className="text-sm text-[#000000]">
                 Safra {new Date(wine.created_at).getFullYear()}
               </span>
             </div>
           </div>
 
-          <p className="text-sm text-gray-700 line-clamp-3 mb-6 flex-grow">
+          <p className="text-sm text-[#000000] line-clamp-3 mb-6 flex-grow">
             {decodeHtmlEntities(wine.description.pt.replace(/<[^>]*>/g, ""))}
           </p>
 
           <div className="mt-auto">
             <div className="flex items-center justify-between mb-4">
-              <span className="font-bold text-gray-900 text-xl font-oswald">
+              <span className="text-[#000000] text-xl">
                 R${" "}
                 {parseFloat(wine.variants[0]?.price ?? "0")
                   .toFixed(2)
                   .replace(".", ",")}
               </span>
               {wine.variants[0]?.compare_at_price && (
-                <span className="text-sm text-gray-500 line-through font-oswald">
+                <span className="text-sm text-[#000000] line-through">
                   R${" "}
                   {parseFloat(wine.variants[0].compare_at_price)
                     .toFixed(2)
@@ -220,7 +216,7 @@ const VinhosPage = () => {
             </div>
             <button
               onClick={() => handleAddToCart(wine)}
-              className="w-full px-4 py-3 bg-[#89764b] hover:bg-[#756343] text-white rounded-lg transition-all duration-300 font-oswald uppercase tracking-wide text-sm flex items-center justify-center gap-2"
+              className="w-full px-4 py-3 bg-[#89764b] hover:bg-[#756343] text-white rounded-lg transition-all duration-300 uppercase tracking-wide text-sm flex items-center justify-center gap-2"
             >
               <ShoppingCart className="h-4 w-4" />
               Adicionar
@@ -232,19 +228,17 @@ const VinhosPage = () => {
   }, [wines]);
 
   return (
-    <div className="min-h-screen bg-[#f8f5f0]">
+    <div className="min-h-screen bg-[#f8f5f0] font-['Oswald']">
       {/* Hero Section */}
-      <section className="relative py-24 lg:py-32 text-center text-white overflow-hidden">
+      <section className="relative pt-32 pb-16 lg:pt-40 lg:pb-20 text-center text-white overflow-hidden">
         <div className="absolute inset-0 bg-black/90">
           <div className="absolute inset-0 bg-black bg-cover bg-center opacity-30"></div>
         </div>
         <div className="container mx-auto px-4 relative z-10">
-          <h1 className="text-4xl lg:text-5xl font-bold mb-6 font-oswald uppercase tracking-tight">
-            <span className="bg-clip-text text-center text-white">
-              Nossos Produtos
-            </span>
+          <h1 className="text-4xl lg:text-5xl mb-6 uppercase tracking-tight">
+            <span className="text-center text-white">Nossos Produtos</span>
           </h1>
-          <p className="text-lg max-w-3xl mx-auto text-gray-300 leading-relaxed">
+          <p className="text-lg max-w-3xl mx-auto text-[#9c9c9c] leading-relaxed">
             Vinhos, cafés e acessórios para garantir uma experiência Amana
             completa em sua casa.
           </p>
@@ -252,16 +246,16 @@ const VinhosPage = () => {
       </section>
 
       {/* Filtros e Busca */}
-      <section className="top-0 z-10 py-6 bg-black/95 backdrop-blur-sm border-b border-white/10">
+      <section className="top-0 z-10 py-4 bg-black/95 backdrop-blur-sm border-b border-white/10">
         <div className="container mx-auto px-4">
-          <div className="flex flex-col lg:flex-row gap-4 items-center justify-between">
+          <div className="flex flex-col lg:flex-row gap-3 items-center justify-between">
             <div className="flex flex-wrap gap-2">
               {CATEGORIES.map((category) => (
                 <button
                   key={category.id}
                   type="button"
                   onClick={() => handleCategoryChange(category.id)}
-                  className={`px-4 py-2 text-sm rounded-full transition-all duration-200 font-oswald uppercase tracking-tight ${
+                  className={`px-3 py-1.5 text-sm rounded-full transition-all duration-200 uppercase tracking-tight ${
                     selectedCategory === category.id
                       ? "bg-[#89764b] text-white"
                       : "bg-black text-white/90 hover:bg-white/10 hover:text-white"
@@ -281,7 +275,7 @@ const VinhosPage = () => {
                     placeholder="Buscar..."
                     value={searchInput}
                     onChange={(e) => setSearchInput(e.target.value)}
-                    className="w-full pl-12 pr-4 py-3 bg-black/70 text-white border border-white/20 rounded-full focus:border-[#89764b] focus:ring-2 focus:ring-[#89764b]/50 transition-all font-oswald"
+                    className="w-full pl-12 pr-4 py-3 bg-black/70 text-white border border-white/20 rounded-full focus:border-[#89764b] focus:ring-2 focus:ring-[#89764b]/50 transition-all"
                   />
                 </div>
               </form>
@@ -292,7 +286,7 @@ const VinhosPage = () => {
             <div className="text-center mt-6">
               <button
                 onClick={handleClearFilters}
-                className="px-6 py-2 bg-[#89764b] hover:bg-[#756343] text-white rounded-lg transition-colors font-oswald uppercase text-sm"
+                className="px-6 py-2 bg-[#89764b] hover:bg-[#756343] text-white rounded-lg transition-colors uppercase text-sm"
               >
                 Limpar busca e filtros
               </button>
@@ -309,25 +303,25 @@ const VinhosPage = () => {
               {[...Array(8)].map((_, i) => (
                 <div
                   key={i}
-                  className="bg-white rounded-xl overflow-hidden border border-gray-200 animate-pulse"
+                  className="bg-white rounded-xl overflow-hidden border border-[#9c9c9c]/30 animate-pulse"
                 >
-                  <div className="h-80 bg-gray-200"></div>
+                  <div className="h-80 bg-[#e5e5e5]"></div>
                   <div className="p-6">
-                    <div className="h-6 bg-gray-200 rounded mb-4"></div>
-                    <div className="h-4 bg-gray-200 rounded mb-2 w-3/4"></div>
-                    <div className="h-16 bg-gray-200 rounded mb-6"></div>
-                    <div className="h-10 bg-gray-200 rounded"></div>
+                    <div className="h-6 bg-[#e5e5e5] rounded mb-4"></div>
+                    <div className="h-4 bg-[#e5e5e5] rounded mb-2 w-3/4"></div>
+                    <div className="h-16 bg-[#e5e5e5] rounded mb-6"></div>
+                    <div className="h-10 bg-[#e5e5e5] rounded"></div>
                   </div>
                 </div>
               ))}
             </div>
           ) : error ? (
             <div className="text-center py-16">
-              <div className="bg-red-100 text-red-700 p-6 rounded-xl max-w-md mx-auto">
-                <p className="font-medium font-oswald mb-4">{error}</p>
+              <div className="bg-[#f5f5f5] text-[#9a3324] p-6 rounded-xl max-w-md mx-auto border border-[#9a3324]/30">
+                <p className="mb-4">{error}</p>
                 <button
                   onClick={() => fetchWines(1)}
-                  className="px-6 py-2 bg-[#89764b] hover:bg-[#756343] text-white rounded-lg transition-colors font-oswald uppercase text-sm"
+                  className="px-6 py-2 bg-[#89764b] hover:bg-[#756343] text-white rounded-lg transition-colors uppercase text-sm"
                 >
                   Tentar novamente
                 </button>
@@ -336,10 +330,10 @@ const VinhosPage = () => {
           ) : wines.length === 0 ? (
             <div className="text-center py-16">
               <div className="max-w-md mx-auto">
-                <h3 className="text-xl font-bold text-gray-900 mb-3 font-oswald">
+                <h3 className="text-xl text-[#000000] mb-3">
                   Nenhum produto encontrado
                 </h3>
-                <p className="text-gray-600 mb-6">
+                <p className="text-[#9c9c9c] mb-6">
                   Tente ajustar seus filtros de busca
                 </p>
               </div>
@@ -355,7 +349,7 @@ const VinhosPage = () => {
               <button
                 onClick={() => setPage((p) => p + 1)}
                 disabled={loadingMore}
-                className="px-10 py-4 bg-transparent text-[#89764b] border-2 border-[#89764b] rounded-lg hover:bg-[#89764b]/10 transition-all font-oswald uppercase tracking-wider flex items-center justify-center gap-2 mx-auto"
+                className="px-10 py-4 bg-transparent text-[#89764b] border-2 border-[#89764b] rounded-lg hover:bg-[#89764b]/10 transition-all uppercase tracking-wider flex items-center justify-center gap-2 mx-auto"
               >
                 {loadingMore ? (
                   <>

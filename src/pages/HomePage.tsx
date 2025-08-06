@@ -144,7 +144,7 @@ const HomePage = () => {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
           {/* Section Header */}
           <div className="text-center mb-10 md:mb-16">
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-4 md:mb-6 tracking-tight">
+            <h2 className="text-3xl md:text-4xl lg:text-5xl text-black mb-4 md:mb-6 tracking-tight">
               <span className="relative inline-block">
                 <span className="relative z-10 uppercase">
                   Nossos Vinhos Premiados
@@ -278,7 +278,7 @@ const HomePage = () => {
                       <div className="mt-auto">
                         <div className="flex items-center justify-between mb-2 md:mb-4">
                           <div className="flex items-baseline gap-1 md:gap-2">
-                            <span className="font-bold text-gray-900 text-lg md:text-xl">
+                            <span className=" text-black text-lg md:text-xl">
                               {wine.variants[0]?.price
                                 ? `R$ ${parseFloat(wine.variants[0].price)
                                     .toFixed(2)
@@ -424,7 +424,7 @@ const HomePage = () => {
               <div className="space-y-5">
                 {/* Header */}
                 <div>
-                  <h2 className="text-2xl font-bold text-gray-900 mb-1 uppercase tracking-tight">
+                  <h2 className="text-2xl text-black mb-1 uppercase tracking-tight">
                     {quickViewProduct.name.pt}
                   </h2>
                   <p className="text-xs text-gray-500 uppercase tracking-wider">
@@ -434,7 +434,7 @@ const HomePage = () => {
 
                 {/* Price */}
                 <div className="flex items-center justify-between">
-                  <span className="text-2xl font-bold text-[#89764b]">
+                  <span className="text-2xl text-[#89764b]">
                     R${" "}
                     {parseFloat(quickViewProduct.variants[0]?.price || "0")
                       .toFixed(2)

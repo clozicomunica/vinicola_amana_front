@@ -33,7 +33,7 @@ const Header = () => {
 
   return (
     <header
-      className={`fixed w-full top-0 z-50 transition-all duration-500 ${
+      className={`fixed w-full top-0 z-50 transition-all duration-500 font-['Oswald'] ${
         isScrolled
           ? "bg-black/90 backdrop-blur-md py-2 border-b border-[#89764b]/20"
           : "bg-black py-3"
@@ -64,7 +64,7 @@ const Header = () => {
                 key={item.path}
                 to={item.path}
                 onClick={closeMenu}
-                className={`relative px-5 py-2 font-medium transition-all duration-300 ${
+                className={`relative px-5 py-2 transition-all duration-300 ${
                   activeLink === item.path
                     ? "text-[#89764b]"
                     : "text-gray-300 hover:text-white"
@@ -101,7 +101,7 @@ const Header = () => {
                   }`}
                 />
                 {totalQuantity > 0 && (
-                  <span className="absolute -top-2 -right-2 bg-[#9a3324] text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-medium group-hover:scale-110 transition-transform duration-200 shadow-md">
+                  <span className="absolute -top-2 -right-2 bg-[#9a3324] text-white text-xs rounded-full h-5 w-5 flex items-center justify-center group-hover:scale-110 transition-transform duration-200 shadow-md">
                     {totalQuantity}
                   </span>
                 )}
@@ -143,7 +143,7 @@ const Header = () => {
                 <Link
                   key={item.path}
                   to={item.path}
-                  className={`px-6 py-4 font-medium transition-all duration-200 flex items-center gap-3 ${
+                  className={`px-6 py-4 transition-all duration-200 flex items-center gap-3 ${
                     activeLink === item.path
                       ? "text-[#89764b] bg-[#ffffff05]"
                       : "text-gray-300 hover:text-white hover:bg-[#ffffff08]"

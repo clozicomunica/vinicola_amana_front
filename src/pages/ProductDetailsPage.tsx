@@ -12,7 +12,7 @@ import {
 import { useCart } from "../context/useCart";
 
 interface Variant {
-  id: number; // Incluído o id aqui, que estava faltando
+  id: number;
   price: string;
   compare_at_price?: string;
 }
@@ -20,7 +20,7 @@ interface Variant {
 interface Wine {
   id: number;
   name: { pt: string };
-  variants: Variant[]; // Usando o tipo Variant com id
+  variants: Variant[];
   images: { src: string; alt?: string }[];
   categories: { name: { pt: string } }[];
   description: { pt: string };
@@ -45,11 +45,9 @@ const ProductDetailsPage = ({ recommendations }: Props) => {
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [similarProducts, setSimilarProducts] = useState<Wine[]>([]);
 
-  // Formata preço para "xx,xx"
   const formatPrice = (price: string) =>
     parseFloat(price).toFixed(2).replace(".", ",");
 
-  // Função para adicionar ao carrinho
   const handleAddToCart = useCallback(() => {
     if (!wine || wine.variants.length === 0) return;
 
@@ -60,7 +58,7 @@ const ProductDetailsPage = ({ recommendations }: Props) => {
       quantity: 1,
       image: wine.images[0]?.src || "/placeholder-wine.jpg",
       category: wine.categories[0]?.name.pt || "Vinho",
-      variant_id: wine.variants[0].id, // Aqui já temos certeza que id existe
+      variant_id: wine.variants[0].id,
     });
   }, [addToCart, wine]);
 
@@ -76,7 +74,6 @@ const ProductDetailsPage = ({ recommendations }: Props) => {
         setLoading(true);
         setError(null);
 
-        // Busca detalhes do vinho pelo id
         const response = await fetch(
           `https://vinicola-amana-back.onrender.com/api/products/${id}`
         );
@@ -85,7 +82,6 @@ const ProductDetailsPage = ({ recommendations }: Props) => {
 
         const data = await response.json();
 
-        // Preenche dados fictícios caso não existam
         const enhancedData = {
           ...data,
           rating: data.rating || +(4.0 + Math.random() * 1.0).toFixed(1),
@@ -108,7 +104,6 @@ const ProductDetailsPage = ({ recommendations }: Props) => {
 
         setWine(enhancedData);
 
-        // Busca similares pela categoria principal
         const categoryName = enhancedData.categories[0]?.name.pt || "";
         if (categoryName) {
           const similarResponse = await fetch(
@@ -138,11 +133,11 @@ const ProductDetailsPage = ({ recommendations }: Props) => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex justify-center items-center bg-gray-100">
+      <div className="min-h-screen flex justify-center items-center bg-[#9c9c9c]">
         <div className="animate-pulse flex flex-col items-center">
           <div className="w-32 h-32 bg-[#89764b]/20 rounded-full mb-4"></div>
-          <div className="h-6 bg-gray-200 rounded w-48 mb-2"></div>
-          <div className="h-4 bg-gray-200 rounded w-32"></div>
+          <div className="h-6 bg-[#000000] rounded w-48 mb-2"></div>
+          <div className="h-4 bg-[#000000] rounded w-32"></div>
         </div>
       </div>
     );
@@ -150,15 +145,15 @@ const ProductDetailsPage = ({ recommendations }: Props) => {
 
   if (error) {
     return (
-      <div className="min-h-screen flex flex-col justify-center items-center bg-gray-100 p-6 text-center">
-        <div className="bg-white p-8 rounded-xl shadow-md max-w-md">
-          <h2 className="text-2xl font-bold text-[#9a3324] mb-4">
+      <div className="min-h-screen flex flex-col justify-center items-center bg-[#9c9c9c] p-6 text-center">
+        <div className="bg-[#ffffff] p-8 rounded-xl shadow-md max-w-md">
+          <h2 className="text-2xl font-oswald text-[#9a3324] mb-4 uppercase tracking-tight">
             Ocorreu um erro
           </h2>
-          <p className="text-gray-700 mb-6">{error}</p>
+          <p className="text-[#000000] mb-6">{error}</p>
           <Link
             to="/vinhos"
-            className="inline-flex items-center px-6 py-3 bg-[#89764b] hover:bg-[#756343] text-white rounded-lg transition-all font-medium"
+            className="inline-flex items-center px-6 py-3 bg-[#89764b] hover:bg-[#756343] text-[#ffffff] rounded-lg transition-all font-oswald uppercase tracking-tight"
           >
             <ArrowLeft className="mr-2" />
             Voltar para a loja
@@ -170,18 +165,18 @@ const ProductDetailsPage = ({ recommendations }: Props) => {
 
   if (!wine) {
     return (
-      <div className="min-h-screen flex flex-col justify-center items-center bg-gray-100 p-6 text-center">
-        <div className="bg-white p-8 rounded-xl shadow-md max-w-md">
+      <div className="min-h-screen flex flex-col justify-center items-center bg-[#9c9c9c] p-6 text-center">
+        <div className="bg-[#ffffff] p-8 rounded-xl shadow-md max-w-md">
           <Wine className="h-12 w-12 mx-auto text-[#89764b] mb-4" />
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">
+          <h2 className="text-2xl font-oswald text-[#000000] mb-4 uppercase tracking-tight">
             Produto não encontrado
           </h2>
-          <p className="text-gray-700 mb-6">
+          <p className="text-[#000000] mb-6">
             O vinho que você está procurando não está disponível no momento.
           </p>
           <Link
             to="/vinhos"
-            className="inline-flex items-center px-6 py-3 bg-[#89764b] hover:bg-[#756343] text-white rounded-lg transition-all font-medium"
+            className="inline-flex items-center px-6 py-3 bg-[#89764b] hover:bg-[#756343] text-[#ffffff] rounded-lg transition-all font-oswald uppercase tracking-tight"
           >
             <ArrowLeft className="mr-2" />
             Explorar nossa coleção
@@ -192,15 +187,15 @@ const ProductDetailsPage = ({ recommendations }: Props) => {
   }
 
   return (
-    <div className="bg-gray-100 min-h-screen">
+    <div className="bg-[#f5f5f5c9] min-h-screen">
       {/* Voltar */}
       <div className="container mx-auto px-4 lg:px-8 pt-8">
         <Link
           to="/vinhos"
-          className="inline-flex items-center text-[#89764b] hover:text-[#756343] group transition-all"
+          className="inline-flex items-center text-[#89764b] hover:text-[#756343] group transition-all font-oswald uppercase tracking-tight"
         >
           <ArrowLeft className="mr-2 group-hover:-translate-x-1 transition-transform" />
-          <span className="font-medium">Voltar para a loja</span>
+          <span>Voltar para a loja</span>
         </Link>
       </div>
 
@@ -208,9 +203,9 @@ const ProductDetailsPage = ({ recommendations }: Props) => {
       <div className="container mx-auto px-4 lg:px-8 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           {/* Galeria de Imagens */}
-          <div className="bg-white rounded-xl shadow-sm p-6">
+          <div className="bg-[#ffffff] rounded-xl shadow-sm p-6">
             {/* Imagem Principal */}
-            <div className="flex items-center justify-center h-[400px] mb-6 bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg overflow-hidden">
+            <div className="flex items-center justify-center h-[400px] mb-6 bg-[#ffffff] rounded-lg overflow-hidden">
               <img
                 src={
                   wine.images[activeImageIndex]?.src || "/placeholder-wine.jpg"
@@ -231,10 +226,10 @@ const ProductDetailsPage = ({ recommendations }: Props) => {
                   <button
                     key={index}
                     onClick={() => setActiveImageIndex(index)}
-                    className={`w-20 h-20 rounded-lg overflow-hidden border-2 transition-all flex items-center justify-center bg-white ${
+                    className={`w-20 h-20 rounded-lg overflow-hidden border-2 transition-all flex items-center justify-center bg-[#ffffff] ${
                       activeImageIndex === index
                         ? "border-[#89764b]"
-                        : "border-transparent hover:border-gray-300"
+                        : "border-transparent hover:border-[#9c9c9c]"
                     }`}
                     aria-label={`Selecionar imagem ${index + 1}`}
                   >
@@ -250,27 +245,27 @@ const ProductDetailsPage = ({ recommendations }: Props) => {
           </div>
 
           {/* Detalhes do Produto */}
-          <div className="bg-white rounded-xl shadow-sm p-8 flex flex-col">
+          <div className="bg-[#ffffff] rounded-xl shadow-sm p-8 flex flex-col">
             <div className="mb-6">
               <div className="flex items-center gap-3 mb-4 flex-wrap">
                 {wine.rating !== undefined && (
-                  <div className="flex items-center bg-black px-3 py-1 rounded-full">
+                  <div className="flex items-center bg-[#000000] px-3 py-1 rounded-full">
                     <Star className="h-4 w-4 fill-[#89764b] text-[#89764b] mr-1" />
-                    <span className="font-medium text-[#d4af37] text-sm">
+                    <span className="font-oswald text-[#89764b] text-sm uppercase tracking-tight">
                       {wine.rating.toFixed(1)}
                     </span>
                   </div>
                 )}
-                <span className="text-sm bg-black rounded-full text-[#89764b] py-1 px-3 flex items-center uppercase tracking-wider">
+                <span className="text-sm bg-[#000000] rounded-full text-[#89764b] py-1 px-3 flex items-center uppercase tracking-wider font-oswald">
                   {wine.categories[0]?.name.pt || "Vinho"}
                 </span>
               </div>
 
-              <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-3 font-oswald uppercase tracking-tight">
+              <h1 className="text-3xl lg:text-4xl font-oswald text-[#000000] mb-3 uppercase tracking-tight">
                 {wine.name.pt}
               </h1>
 
-              <div className="flex items-center gap-4 text-sm text-gray-600 mb-6 flex-wrap">
+              <div className="flex items-center gap-4 text-sm text-[#9c9c9c] mb-6 flex-wrap font-oswald uppercase tracking-tight">
                 {wine.region && (
                   <span className="flex items-center">
                     <svg
@@ -343,17 +338,17 @@ const ProductDetailsPage = ({ recommendations }: Props) => {
             {/* Preço */}
             <div className="mb-8">
               <div className="flex items-baseline gap-4 mb-2 flex-wrap">
-                <span className="text-3xl font-bold text-[#89764b]">
+                <span className="text-3xl font-oswald text-[#89764b] uppercase tracking-tight">
                   R$ {formatPrice(wine.variants[0].price)}
                 </span>
                 {wine.variants[0]?.compare_at_price && (
-                  <span className="text-lg text-gray-500 line-through">
+                  <span className="text-lg text-[#9c9c9c] line-through font-oswald uppercase tracking-tight">
                     R$ {formatPrice(wine.variants[0].compare_at_price)}
                   </span>
                 )}
               </div>
               {wine.variants[0]?.compare_at_price && (
-                <span className="inline-block bg-[#89764b]/10 text-[#89764b] px-2 py-1 rounded text-sm font-medium">
+                <span className="inline-block bg-[#89764b]/10 text-[#89764b] px-2 py-1 rounded text-sm font-oswald uppercase tracking-tight">
                   Economize R${" "}
                   {(
                     parseFloat(wine.variants[0].compare_at_price) -
@@ -367,21 +362,21 @@ const ProductDetailsPage = ({ recommendations }: Props) => {
 
             {/* Descrição */}
             <div
-              className="prose max-w-none text-gray-700 mb-8"
+              className="prose max-w-none text-[#000000] mb-8 font-oswald"
               dangerouslySetInnerHTML={{ __html: wine.description.pt }}
             />
 
             {/* Botão de compra */}
             <button
               onClick={handleAddToCart}
-              className="w-full py-4 bg-gradient-to-r from-[#89764b] to-[#a08d5f] hover:from-[#756343] hover:to-[#89764b] text-white rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl font-oswald uppercase tracking-wider text-sm flex items-center justify-center gap-3"
+              className="w-full py-4 bg-[#89764b] hover:bg-[#756343] text-[#ffffff] rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl font-oswald uppercase tracking-tight text-sm flex items-center justify-center gap-3"
             >
               <ShoppingCart className="h-5 w-5" />
               Adicionar ao Carrinho
             </button>
 
             {/* Entrega e Harmonização */}
-            <div className="mt-8 grid grid-cols-2 gap-4 text-sm">
+            <div className="mt-8 grid grid-cols-2 gap-4 text-sm font-oswald uppercase tracking-tight">
               <div className="flex items-start gap-3">
                 <svg
                   className="h-5 w-5 text-[#89764b] mt-0.5"
@@ -397,15 +392,15 @@ const ProductDetailsPage = ({ recommendations }: Props) => {
                   />
                 </svg>
                 <div>
-                  <p className="font-medium">Frete Grátis</p>
-                  <p className="text-gray-600">Para todo o Brasil</p>
+                  <p className="text-[#000000]">Frete Grátis</p>
+                  <p className="text-[#9c9c9c]">Para todo o Brasil</p>
                 </div>
               </div>
               <div className="flex items-start gap-3">
                 <Utensils className="h-5 w-5 text-[#89764b] mt-0.5" />
                 <div>
-                  <p className="font-medium">Harmonização</p>
-                  <p className="text-gray-600">
+                  <p className="text-[#000000]">Harmonização</p>
+                  <p className="text-[#9c9c9c]">
                     {wine.pairing || "Sugestões de acompanhamento"}
                   </p>
                 </div>
@@ -418,12 +413,12 @@ const ProductDetailsPage = ({ recommendations }: Props) => {
         {similarProducts.length > 0 && (
           <section className="mt-16">
             <div className="flex items-center justify-between mb-8">
-              <h2 className="text-2xl font-bold text-gray-900 font-oswald uppercase tracking-tight">
+              <h2 className="text-2xl font-oswald text-[#000000] uppercase tracking-tight">
                 Você também pode gostar
               </h2>
               <Link
                 to="/vinhos"
-                className="flex items-center text-[#89764b] hover:text-[#756343] font-medium"
+                className="flex items-center text-[#89764b] hover:text-[#756343] font-oswald uppercase tracking-tight"
               >
                 Ver todos <ChevronRight className="h-4 w-4 ml-1" />
               </Link>
@@ -433,10 +428,10 @@ const ProductDetailsPage = ({ recommendations }: Props) => {
               {similarProducts.map((product) => (
                 <div
                   key={product.id}
-                  className="group bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1"
+                  className="group bg-[#ffffff] rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1"
                 >
                   <Link to={`/produto/${product.id}`} className="block">
-                    <div className="relative h-64 bg-gradient-to-b from-gray-50 to-gray-100 flex items-center justify-center p-6">
+                    <div className="relative h-64 bg-[#ffffff] flex items-center justify-center p-6">
                       <img
                         src={product.images[0]?.src || "/placeholder-wine.jpg"}
                         alt={product.images[0]?.alt || product.name.pt}
@@ -448,19 +443,19 @@ const ProductDetailsPage = ({ recommendations }: Props) => {
                       />
                     </div>
                     <div className="p-5">
-                      <h3 className="font-bold text-gray-900 mb-1 font-oswald uppercase tracking-tight line-clamp-1">
+                      <h3 className="font-oswald text-[#000000] mb-1 uppercase tracking-tight line-clamp-1">
                         {product.name.pt}
                       </h3>
-                      <p className="text-sm text-gray-600 mb-3 font-oswald uppercase tracking-tight">
+                      <p className="text-sm text-[#9c9c9c] mb-3 font-oswald uppercase tracking-tight">
                         {product.categories[0]?.name.pt || "Vinho"}
                       </p>
                       <div className="flex items-center justify-between">
-                        <span className="font-bold text-[#89764b]">
+                        <span className="font-oswald text-[#89764b] uppercase tracking-tight">
                           R$ {formatPrice(product.variants[0].price)}
                         </span>
                         {product.rating !== undefined && (
-                          <div className="flex items-center text-sm text-gray-600">
-                            <Star className="h-3 w-3 fill-amber-500 text-amber-500 mr-1" />
+                          <div className="flex items-center text-sm text-[#9c9c9c] font-oswald uppercase tracking-tight">
+                            <Star className="h-3 w-3 fill-[#89764b] text-[#89764b] mr-1" />
                             {product.rating.toFixed(1)}
                           </div>
                         )}
@@ -477,12 +472,12 @@ const ProductDetailsPage = ({ recommendations }: Props) => {
         {recommendations.length > 0 && (
           <section className="mt-16">
             <div className="flex items-center justify-between mb-8">
-              <h2 className="text-2xl font-bold text-gray-900 font-oswald uppercase tracking-tight">
+              <h2 className="text-2xl font-oswald text-[#000000] uppercase tracking-tight">
                 Outras recomendações
               </h2>
               <Link
                 to="/vinhos"
-                className="flex items-center text-[#89764b] hover:text-[#756343] font-medium"
+                className="flex items-center text-[#89764b] hover:text-[#756343] font-oswald uppercase tracking-tight"
               >
                 Ver todos <ChevronRight className="h-4 w-4 ml-1" />
               </Link>
@@ -492,10 +487,10 @@ const ProductDetailsPage = ({ recommendations }: Props) => {
               {recommendations.map((rec) => (
                 <div
                   key={rec.id}
-                  className="group bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1"
+                  className="group bg-[#ffffff] rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1"
                 >
                   <Link to={`/produto/${rec.id}`} className="block">
-                    <div className="relative h-64 bg-gradient-to-b from-gray-50 to-gray-100 flex items-center justify-center p-6">
+                    <div className="relative h-64 bg-[#ffffff] flex items-center justify-center p-6">
                       <img
                         src={rec.images[0]?.src || "/placeholder-wine.jpg"}
                         alt={rec.images[0]?.alt || rec.name.pt}
@@ -507,19 +502,19 @@ const ProductDetailsPage = ({ recommendations }: Props) => {
                       />
                     </div>
                     <div className="p-5">
-                      <h3 className="font-bold text-gray-900 mb-1 font-oswald uppercase tracking-tight line-clamp-1">
+                      <h3 className="font-oswald text-[#000000] mb-1 uppercase tracking-tight line-clamp-1">
                         {rec.name.pt}
                       </h3>
-                      <p className="text-sm text-gray-600 mb-3 font-oswald uppercase tracking-tight">
+                      <p className="text-sm text-[#9c9c9c] mb-3 font-oswald uppercase tracking-tight">
                         {rec.categories[0]?.name.pt || "Vinho"}
                       </p>
                       <div className="flex items-center justify-between">
-                        <span className="font-bold text-[#89764b]">
+                        <span className="font-oswald text-[#89764b] uppercase tracking-tight">
                           R$ {formatPrice(rec.variants[0].price)}
                         </span>
                         {rec.rating !== undefined && (
-                          <div className="flex items-center text-sm text-gray-600">
-                            <Star className="h-3 w-3 fill-amber-500 text-amber-500 mr-1" />
+                          <div className="flex items-center text-sm text-[#9c9c9c] font-oswald uppercase tracking-tight">
+                            <Star className="h-3 w-3 fill-[#89764b] text-[#89764b] mr-1" />
                             {rec.rating.toFixed(1)}
                           </div>
                         )}

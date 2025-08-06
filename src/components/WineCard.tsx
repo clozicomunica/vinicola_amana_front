@@ -43,7 +43,6 @@ const WineCard = ({ wine }: { wine: Wine }) => {
   };
 
   const handleQuickView = () => {
-    // Aqui você pode implementar um modal de visualização rápida
     toast(`Visualizando ${wine.name}`, {
       icon: "🔍",
       position: "top-center",
@@ -51,7 +50,7 @@ const WineCard = ({ wine }: { wine: Wine }) => {
   };
 
   return (
-    <div className="group overflow-hidden border border-gray-200 rounded-lg hover:shadow-xl transition-all duration-300 bg-white flex flex-col h-full">
+    <div className="group overflow-hidden border border-gray-200 rounded-lg hover:shadow-xl transition-all duration-300 bg-white flex flex-col h-full font-oswald">
       {/* Badges */}
       <div className="absolute top-3 left-3 z-10 flex flex-col space-y-2">
         {wine.discount && (
@@ -72,7 +71,7 @@ const WineCard = ({ wine }: { wine: Wine }) => {
         className="absolute top-3 right-3 z-10 p-2 bg-white/80 backdrop-blur-sm rounded-full hover:bg-white transition-all duration-200 shadow-sm hover:shadow-md"
         aria-label="Adicionar à lista de desejos"
       >
-        <Heart className="h-4 w-4 text-gray-600 hover:text-red-500 transition-colors" />
+        <Heart className="h-4 w-4 text-[#9c9c9c] hover:text-red-500 transition-colors" />
       </button>
 
       {/* Wine Image */}
@@ -93,11 +92,11 @@ const WineCard = ({ wine }: { wine: Wine }) => {
             className="p-3 bg-white/90 rounded-full hover:bg-white transition-all duration-200 transform hover:scale-110 shadow-md"
             aria-label="Visualização rápida"
           >
-            <Eye className="h-5 w-5 text-gray-800" />
+            <Eye className="h-5 w-5 text-[#9c9c9c]" />
           </button>
           <button
             onClick={handleAddToCart}
-            className="p-3 bg-[#89764b] text-white rounded-full hover:bg-[#756343] transition-all duration-200 transform hover:scale-110 shadow-md"
+            className="p-3 bg-[#89764b] text-white rounded-full hover:bg-[#9a3324] transition-all duration-200 transform hover:scale-110 shadow-md"
             aria-label="Adicionar ao carrinho"
           >
             <ShoppingCart className="h-5 w-5" />
@@ -109,37 +108,48 @@ const WineCard = ({ wine }: { wine: Wine }) => {
       <div className="p-5 flex flex-col flex-grow">
         <div className="mb-2">
           <Link to={`/vinhos/${wine.id}`}>
-            <h3 className="font-semibold text-lg mb-1 hover:text-[#89764b] transition-colors line-clamp-1">
+            <h3 className="text-lg mb-1 hover:text-[#89764b] transition-colors line-clamp-1">
               {wine.name}
             </h3>
           </Link>
           <div className="flex items-center justify-between">
-            <span className="text-sm text-gray-500 capitalize">
+            <span style={{ color: "#9c9c9c" }} className="text-sm capitalize">
               {wine.category}
             </span>
             {wine.year && (
-              <span className="text-xs bg-gray-100 px-2 py-1 rounded">
+              <span
+                style={{ backgroundColor: "#f9f9f9", color: "#9c9c9c" }}
+                className="text-xs px-2 py-1 rounded"
+              >
                 Safra {wine.year}
               </span>
             )}
           </div>
         </div>
 
-        <p className="text-sm my-2 line-clamp-2 text-gray-600 flex-grow">
+        <p
+          className="text-sm my-2 line-clamp-2 flex-grow"
+          style={{ color: "#9c9c9c" }}
+        >
           {wine.description}
         </p>
 
         <div className="flex justify-between items-center mt-4">
           <div className="flex items-center gap-2">
             <span
-              className={`font-bold text-lg ${
-                wine.discount ? "text-gray-400 line-through" : "text-[#89764b]"
-              }`}
+              className={`text-lg ${wine.discount ? "line-through" : ""}`}
+              style={{
+                color: wine.discount ? "#9c9c9c" : "#89764b",
+                fontWeight: "normal",
+              }}
             >
               R$ {wine.price.toFixed(2).replace(".", ",")}
             </span>
             {wine.discount && (
-              <span className="font-bold text-lg text-[#89764b]">
+              <span
+                className="text-lg"
+                style={{ color: "#89764b", fontWeight: "normal" }}
+              >
                 R${" "}
                 {(wine.price * (1 - wine.discount / 100))
                   .toFixed(2)
@@ -149,7 +159,7 @@ const WineCard = ({ wine }: { wine: Wine }) => {
           </div>
           <button
             onClick={handleAddToCart}
-            className="px-4 py-2 bg-[#89764b] hover:bg-[#756343] text-white rounded text-sm transition-colors duration-300 flex items-center gap-1"
+            className="px-4 py-2 bg-[#89764b] hover:bg-[#9a3324] text-white rounded text-sm transition-colors duration-300 flex items-center gap-1"
           >
             <ShoppingCart className="h-4 w-4" />
             <span>Add</span>

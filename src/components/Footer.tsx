@@ -12,12 +12,16 @@ import developedby from "../assets/developedby.png";
 
 const Footer = () => {
   return (
-    <footer className="bg-black text-white">
+    <footer className="bg-black text-white font-['Oswald']">
+      {" "}
+      {/* Adicionei a fonte aqui */}
       <div className="container mx-auto px-4">
         {/* Newsletter Section */}
         <div className="py-8 md:py-12 border-b border-white/20">
           <div className="max-w-4xl mx-auto text-center px-2 md:px-0">
-            <h3 className="text-xl md:text-2xl font-bold mb-3 md:mb-4 text-white">
+            <h3 className="text-xl md:text-2xl mb-3 md:mb-4 text-white">
+              {" "}
+              {/* Removi font-bold */}
               Receba Novidades Exclusivas
             </h3>
             <p className="text-white/80 mb-4 md:mb-6 max-w-2xl mx-auto text-sm md:text-base">
@@ -39,14 +43,14 @@ const Footer = () => {
 
         {/* Main Footer Content */}
         <div className="py-8 md:py-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-12">
-          {/* Company Info - Área ajustada */}
+          {/* Company Info */}
           <div className="lg:col-span-2">
             <div className="mb-6 flex flex-col items-start gap-4">
               <div className="flex-shrink-0">
                 <img
                   src={logo}
                   alt="Logo da Vinícola"
-                  className="w-32 h-auto max-h-20 object-contain" // Tamanho ajustado e proporcional
+                  className="w-32 h-auto max-h-20 object-contain"
                 />
               </div>
               <p className="text-white/80 leading-relaxed max-w-md text-sm md:text-base mt-2">
@@ -103,10 +107,11 @@ const Footer = () => {
             </div>
           </div>
 
-          {/* Restante do código permanece igual */}
           {/* Quick Links */}
           <div>
-            <h3 className="font-semibold mb-4 text-white/70 text-base">
+            <h3 className="mb-4 text-white/70 text-base">
+              {" "}
+              {/* Removi font-semibold */}
               Navegação
             </h3>
             <ul className="space-y-3">
@@ -147,7 +152,9 @@ const Footer = () => {
 
           {/* Wine Categories */}
           <div>
-            <h3 className="font-semibold mb-4 text-white/70 text-base">
+            <h3 className="mb-4 text-white/70 text-base">
+              {" "}
+              {/* Removi font-semibold */}
               Categorias
             </h3>
             <ul className="space-y-3">
@@ -215,7 +222,9 @@ const Footer = () => {
                   alt="Clozi Comunica"
                   className="h-5 w-auto object-contain"
                 />
-                <span className="font-semibold tracking-tight">
+                <span className="tracking-tight">
+                  {" "}
+                  {/* Removi font-semibold */}
                   CLOZI COMUNICAÇÃO E IMAGEM
                 </span>
               </a>

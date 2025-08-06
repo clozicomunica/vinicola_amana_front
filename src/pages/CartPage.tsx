@@ -164,7 +164,7 @@ const CartPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#f8f5f0] pb-20">
+    <div className="min-h-screen bg-[#ffffffdc] pb-20">
       {/* Header do Carrinho */}
       <div className="bg-gradient-to-r from-[#89764b] to-[#756343] text-white py-6 shadow-lg sticky top-0 z-10">
         <div className="container mx-auto px-4">
@@ -176,7 +176,7 @@ const CartPage = () => {
               <ArrowLeft className="h-4 w-4 mr-1 sm:mr-2" />
               <span className="hidden sm:inline">Continuar Comprando</span>
             </Link>
-            <h1 className="text-lg sm:text-xl font-bold flex items-center font-oswald uppercase tracking-tight">
+            <h1 className="text-lg sm:text-xl font flex items-center font-oswald uppercase tracking-tight">
               <ShoppingCart className="h-5 w-5 sm:h-6 sm:w-6 mr-2" />
               <span className="hidden sm:inline">Seu Carrinho</span>
               <span className="sm:hidden">Carrinho</span>
@@ -198,7 +198,7 @@ const CartPage = () => {
             <div className="mx-auto w-24 h-24 sm:w-32 sm:h-32 bg-gradient-to-br from-[#89764b] to-[#a08d5f] rounded-full flex items-center justify-center mb-4 sm:mb-6 shadow-lg">
               <ShoppingCart className="h-12 w-12 sm:h-16 sm:w-16 text-white" />
             </div>
-            <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-800 mb-3 font-oswald uppercase tracking-tight">
+            <h2 className="text-xl sm:text-2xl lg:text-3xl text-gray-800 mb-3 font-oswald uppercase tracking-tight">
               Seu carrinho está vazio
             </h2>
             <p className="text-gray-600 mb-6 sm:mb-8 max-w-md mx-auto leading-relaxed text-sm sm:text-base">
@@ -244,7 +244,7 @@ const CartPage = () => {
                           )}
                         </div>
                         <div className="flex-1">
-                          <h3 className="font-bold text-gray-900 text-sm sm:text-base font-oswald uppercase tracking-tight">
+                          <h3 className=" text-gray-900 text-sm sm:text-base font-oswald uppercase tracking-tight">
                             {item.name}
                           </h3>
                           <p className="text-xs sm:text-sm text-gray-500 font-oswald uppercase tracking-tight mt-1">
@@ -516,7 +516,7 @@ const CartPage = () => {
                 <span className="font-bold text-base sm:text-lg font-oswald uppercase tracking-tight">
                   Total
                 </span>
-                <span className="font-bold text-lg sm:text-xl text-[#89764b]">
+                <span className=" text-lg sm:text-xl text-[#89764b]">
                   R${(total + 20).toFixed(2).replace(".", ",")}
                 </span>
               </div>
