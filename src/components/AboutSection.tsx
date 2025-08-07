@@ -117,12 +117,12 @@ const AboutSection = () => {
           </div>
 
           {/* Image */}
-          <div className="order-1 lg:order-2 relative w-full">
+          <div className="order-1 lg:order-2 relative w-full h-full">
             <div className="relative overflow-hidden rounded-xl sm:rounded-2xl shadow-lg w-full">
               <img
                 src={wineTasting}
                 alt="Degustação de vinhos na Vinícola Amana"
-                className="w-full h-auto sm:h-[400px] lg:h-[600px] object-cover max-w-full"
+                className="w-full h-full object-cover max-w-full"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
             </div>
@@ -132,12 +132,9 @@ const AboutSection = () => {
               <div className="text-center">
                 <div className="text-lg sm:text-xl lg:text-2xl text-black">
                   {" "}
-                  {/* Removi font-bold */}
-                  70+
+                  {/* Removi font-bold */}6
                 </div>
-                <div className="text-xs sm:text-sm text-[#9c9c9c]">
-                  Anos
-                </div>{" "}
+                <div className="text-xs sm:text-sm text-[#9c9c9c]">Rótulos</div>{" "}
                 {/* Ajuste de cor */}
               </div>
             </div>
@@ -146,12 +143,9 @@ const AboutSection = () => {
               <div className="text-center">
                 <div className="text-lg sm:text-xl lg:text-2xl text-black">
                   {" "}
-                  {/* Removi font-bold */}
-                  25+
+                  {/* Removi font-bold */}6
                 </div>
-                <div className="text-xs sm:text-sm text-[#9c9c9c]">
-                  Prêmios
-                </div>{" "}
+                <div className="text-xs sm:text-sm text-[#9c9c9c]">Prêmios</div>{" "}
                 {/* Ajuste de cor */}
               </div>
             </div>

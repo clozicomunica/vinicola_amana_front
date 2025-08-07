@@ -87,19 +87,25 @@ const Footer = () => {
             {/* Social Media */}
             <div className="flex gap-4 mt-6">
               <a
-                href="#"
+                href="https://www.facebook.com/vinicolaamana/"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="p-2 text-white/80 hover:text-white hover:bg-white/10 rounded-full transition"
               >
                 <Facebook className="h-5 w-5" />
               </a>
               <a
-                href="#"
+                href="https://www.instagram.com/vinicola_amana/"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="p-2 text-white/80 hover:text-white hover:bg-white/10 rounded-full transition"
               >
                 <Instagram className="h-5 w-5" />
               </a>
               <a
-                href="#"
+                href="https://www.youtube.com/@Vin%C3%ADcolaAmana"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="p-2 text-white/80 hover:text-white hover:bg-white/10 rounded-full transition"
               >
                 <Youtube className="h-5 w-5" />
@@ -125,7 +131,7 @@ const Footer = () => {
               </li>
               <li>
                 <Link
-                  to="/sobre"
+                  to="/sobrenos"
                   className="text-white/80 hover:text-white transition-colors text-sm md:text-base"
                 >
                   Nossa História
@@ -160,42 +166,34 @@ const Footer = () => {
             <ul className="space-y-3">
               <li>
                 <Link
-                  to="/vinhos/tintos"
+                  to="/vinhos"
                   className="text-white/80 hover:text-white transition-colors text-sm md:text-base"
                 >
-                  Vinhos Tintos
+                  Vinhos
                 </Link>
               </li>
               <li>
                 <Link
-                  to="/vinhos/brancos"
+                  to="/vinhos"
                   className="text-white/80 hover:text-white transition-colors text-sm md:text-base"
                 >
-                  Vinhos Brancos
+                  Cafés
                 </Link>
               </li>
               <li>
                 <Link
-                  to="/vinhos/roses"
+                  to="/vinhos"
                   className="text-white/80 hover:text-white transition-colors text-sm md:text-base"
                 >
-                  Vinhos Rosés
+                  Experiências
                 </Link>
               </li>
               <li>
                 <Link
-                  to="/vinhos/especiais"
+                  to="/vinhos"
                   className="text-white/80 hover:text-white transition-colors text-sm md:text-base"
                 >
-                  Premiados
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="/promocoes"
-                  className="text-white/80 hover:text-white transition-colors text-sm md:text-base"
-                >
-                  Promoções
+                  Vale Presente
                 </Link>
               </li>
             </ul>

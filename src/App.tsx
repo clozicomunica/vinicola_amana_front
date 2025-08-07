@@ -3,6 +3,9 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Header from "./components/Header";
 import HomePage from "./pages/HomePage";
 import VinhosPage from "./pages/VinhosPage";
+import AboutPage from "./pages/AboutPage";
+import ExperiencesPage from "./pages/ExperiencesPage";
+import ContactPage from "./pages/ContactPage";
 import Footer from "./components/Footer";
 import ProductDetailsPage from "./pages/ProductDetailsPage";
 import CartPage from "./pages/CartPage";
@@ -22,11 +25,11 @@ function App() {
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/vinhos" element={<VinhosPage />} />
-            <Route
-              path="/produto/:id"
-              element={<ProductDetailsPage recommendations={[]} />}
-            />
+            <Route path="/produto/:id" element={<ProductDetailsPage />} />
             <Route path="/carrinho" element={<CartPage />} />
+            <Route path="/sobrenos" element={<AboutPage />} />
+            <Route path="/experiencias" element={<ExperiencesPage />} />
+            <Route path="/contato" element={<ContactPage />} />
           </Routes>
         </main>
         <Footer />

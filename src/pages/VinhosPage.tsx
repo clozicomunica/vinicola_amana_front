@@ -146,7 +146,7 @@ const VinhosPage = () => {
         key={wine.id}
         className="group bg-white rounded-xl overflow-hidden border border-[#9c9c9c]/30 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 flex flex-col h-full font-['Oswald']"
       >
-        <div className="relative flex items-center justify-center h-80 bg-gradient-to-b from-[#f5f5f5] to-[#e5e5e5] p-6">
+        <div className="relative flex items-center justify-center h-60 md:h-80 bg-gradient-to-b from-[#f5f5f5] to-[#e5e5e5] p-4 md:p-6">
           <img
             src={wine.images[0]?.src || wineImage}
             alt={wine.images[0]?.alt?.[0] || wine.name.pt}
@@ -154,59 +154,59 @@ const VinhosPage = () => {
             style={{
               mixBlendMode: "multiply",
               filter: "drop-shadow(0 8px 16px rgba(0, 0, 0, 0.15))",
-              height: "clamp(180px, 100%, 240px)",
+              height: "clamp(120px, 100%, 200px)",
             }}
           />
           {wine.variants[0]?.compare_at_price && (
-            <span className="absolute top-3 left-3 bg-[#9a3324] text-white text-xs px-3 py-1 rounded-full shadow-md uppercase tracking-tight">
+            <span className="absolute top-2 left-2 md:top-3 md:left-3 bg-[#9a3324] text-white text-xs px-2 md:px-3 py-0.5 md:py-1 rounded-full shadow-md uppercase tracking-tight">
               Oferta
             </span>
           )}
-          <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition flex items-center justify-center gap-3">
+          <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition flex items-center justify-center gap-2 md:gap-3">
             <Link
               to={`/produto/${wine.id}`}
-              className="p-3 bg-white/90 rounded-full hover:bg-white transition transform hover:scale-110 shadow-lg"
+              className="p-2 md:p-3 bg-white/90 rounded-full hover:bg-white transition transform hover:scale-110 shadow-lg"
             >
-              <Eye className="h-5 w-5 text-[#000000]" />
+              <Eye className="h-4 w-4 md:h-5 md:w-5 text-[#000000]" />
             </Link>
             <button
               onClick={() => handleAddToCart(wine)}
-              className="p-3 bg-[#89764b] text-white rounded-full hover:bg-[#756343] transition transform hover:scale-110 shadow-lg"
+              className="p-2 md:p-3 bg-[#89764b] text-white rounded-full hover:bg-[#756343] transition transform hover:scale-110 shadow-lg"
             >
-              <ShoppingCart className="h-5 w-5" />
+              <ShoppingCart className="h-4 w-4 md:h-5 md:w-5" />
             </button>
           </div>
         </div>
-        <div className="p-6 flex flex-col flex-grow">
-          <div className="mb-4">
-            <h3 className="text-[#000000] text-lg uppercase tracking-tight mb-2">
+        <div className="p-4 md:p-6 flex flex-col flex-grow">
+          <div className="mb-3 md:mb-4">
+            <h3 className="text-[#000000] text-base md:text-lg uppercase tracking-tight mb-1 md:mb-2 line-clamp-1">
               {wine.name.pt}
             </h3>
-            <div className="flex items-center gap-3 mb-3">
-              <span className="text-sm text-[#000000]">
+            <div className="flex items-center gap-2 md:gap-3">
+              <span className="text-xs md:text-sm text-[#000000]">
                 {wine.categories[0]?.name.pt || "Vinho"}
               </span>
               <span className="w-1 h-1 bg-[#9c9c9c] rounded-full"></span>
-              <span className="text-sm text-[#000000]">
+              <span className="text-xs md:text-sm text-[#000000]">
                 Safra {new Date(wine.created_at).getFullYear()}
               </span>
             </div>
           </div>
 
-          <p className="text-sm text-[#000000] line-clamp-3 mb-6 flex-grow">
+          <p className="text-xs md:text-sm text-[#000000] line-clamp-2 md:line-clamp-3 mb-4 md:mb-6 flex-grow">
             {decodeHtmlEntities(wine.description.pt.replace(/<[^>]*>/g, ""))}
           </p>
 
           <div className="mt-auto">
-            <div className="flex items-center justify-between mb-4">
-              <span className="text-[#000000] text-xl">
+            <div className="flex items-center justify-between mb-3 md:mb-4">
+              <span className="text-lg md:text-xl text-[#000000]">
                 R${" "}
                 {parseFloat(wine.variants[0]?.price ?? "0")
                   .toFixed(2)
                   .replace(".", ",")}
               </span>
               {wine.variants[0]?.compare_at_price && (
-                <span className="text-sm text-[#000000] line-through">
+                <span className="text-xs md:text-sm text-[#000000] line-through">
                   R${" "}
                   {parseFloat(wine.variants[0].compare_at_price)
                     .toFixed(2)
@@ -216,9 +216,9 @@ const VinhosPage = () => {
             </div>
             <button
               onClick={() => handleAddToCart(wine)}
-              className="w-full px-4 py-3 bg-[#89764b] hover:bg-[#756343] text-white rounded-lg transition-all duration-300 uppercase tracking-wide text-sm flex items-center justify-center gap-2"
+              className="w-full px-3 py-2 md:px-4 md:py-3 bg-[#89764b] hover:bg-[#756343] text-white rounded-lg transition-all duration-300 uppercase tracking-wide text-xs md:text-sm flex items-center justify-center gap-1 md:gap-2"
             >
-              <ShoppingCart className="h-4 w-4" />
+              <ShoppingCart className="h-3 w-3 md:h-4 md:w-4" />
               Adicionar
             </button>
           </div>
@@ -230,15 +230,15 @@ const VinhosPage = () => {
   return (
     <div className="min-h-screen bg-[#f8f5f0] font-['Oswald']">
       {/* Hero Section */}
-      <section className="relative pt-32 pb-16 lg:pt-40 lg:pb-20 text-center text-white overflow-hidden">
-        <div className="absolute inset-0 bg-black/90">
+      <section className="relative pt-24 md:pt-32 lg:pt-40 pb-12 md:pb-16 lg:pb-20 text-center text-white overflow-hidden">
+        <div className="absolute inset-0 bg-black">
           <div className="absolute inset-0 bg-black bg-cover bg-center opacity-30"></div>
         </div>
         <div className="container mx-auto px-4 relative z-10">
-          <h1 className="text-4xl lg:text-5xl mb-6 uppercase tracking-tight">
+          <h1 className="text-2xl md:text-3xl lg:text-4xl mb-4 md:mb-6 uppercase tracking-tight">
             <span className="text-center text-white">Nossos Produtos</span>
           </h1>
-          <p className="text-lg max-w-3xl mx-auto text-[#9c9c9c] leading-relaxed">
+          <p className="text-sm md:text-base max-w-3xl mx-auto text-[#9c9c9c] leading-relaxed">
             Vinhos, cafés e acessórios para garantir uma experiência Amana
             completa em sua casa.
           </p>
@@ -246,10 +246,40 @@ const VinhosPage = () => {
       </section>
 
       {/* Filtros e Busca */}
-      <section className="top-0 z-10 py-4 bg-black/95 backdrop-blur-sm border-b border-white/10">
+      <section className="sticky top-0 z-10 py-3 md:py-4 bg-black/95 backdrop-blur-sm border-b border-white/10">
         <div className="container mx-auto px-4">
-          <div className="flex flex-col lg:flex-row gap-3 items-center justify-between">
-            <div className="flex flex-wrap gap-2">
+          <div className="flex flex-col md:flex-row gap-3 items-center justify-between">
+            {/* Categorias Scrolláveis em Mobile */}
+            <div className="md:hidden w-full overflow-x-auto pb-2 scrollbar-hide">
+              <div className="flex space-x-2 w-max">
+                <button
+                  onClick={() => handleCategoryChange("all")}
+                  className={`px-3 py-1 text-xs rounded-full transition-all duration-200 uppercase tracking-tight whitespace-nowrap ${
+                    selectedCategory === "all"
+                      ? "bg-[#89764b] text-white"
+                      : "bg-black text-white/90 hover:bg-white/10 hover:text-white"
+                  }`}
+                >
+                  Todos
+                </button>
+                {CATEGORIES.map((category) => (
+                  <button
+                    key={category.id}
+                    onClick={() => handleCategoryChange(category.id)}
+                    className={`px-3 py-1 text-xs rounded-full transition-all duration-200 uppercase tracking-tight whitespace-nowrap ${
+                      selectedCategory === category.id
+                        ? "bg-[#89764b] text-white"
+                        : "bg-black text-white/90 hover:bg-white/10 hover:text-white"
+                    }`}
+                  >
+                    {category.name}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Categorias em Desktop */}
+            <div className="hidden md:flex flex-wrap gap-2">
               {CATEGORIES.map((category) => (
                 <button
                   key={category.id}
@@ -266,16 +296,16 @@ const VinhosPage = () => {
               ))}
             </div>
 
-            <div className="relative w-full lg:w-auto flex-1 max-w-md">
+            <div className="w-full md:w-auto md:flex-1 md:max-w-md">
               <form onSubmit={handleSearchSubmit}>
                 <div className="relative">
-                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-white/70" />
+                  <Search className="absolute left-3 md:left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-white/70" />
                   <input
                     type="text"
                     placeholder="Buscar..."
                     value={searchInput}
                     onChange={(e) => setSearchInput(e.target.value)}
-                    className="w-full pl-12 pr-4 py-3 bg-black/70 text-white border border-white/20 rounded-full focus:border-[#89764b] focus:ring-2 focus:ring-[#89764b]/50 transition-all"
+                    className="w-full pl-10 md:pl-12 pr-4 py-2 md:py-3 bg-black/70 text-white border border-white/20 rounded-full focus:border-[#89764b] focus:ring-2 focus:ring-[#89764b]/50 transition-all text-sm md:text-base"
                   />
                 </div>
               </form>
@@ -283,10 +313,10 @@ const VinhosPage = () => {
           </div>
 
           {(searchTerm || selectedCategory !== "all") && (
-            <div className="text-center mt-6">
+            <div className="text-center mt-3 md:mt-4">
               <button
                 onClick={handleClearFilters}
-                className="px-6 py-2 bg-[#89764b] hover:bg-[#756343] text-white rounded-lg transition-colors uppercase text-sm"
+                className="px-4 py-1.5 md:px-6 md:py-2 bg-[#89764b] hover:bg-[#756343] text-white rounded-lg transition-colors uppercase text-xs md:text-sm"
               >
                 Limpar busca e filtros
               </button>
@@ -296,29 +326,29 @@ const VinhosPage = () => {
       </section>
 
       {/* Lista de Produtos */}
-      <section className="py-16 bg-[#f8f5f0]">
+      <section className="py-8 md:py-12 lg:py-16 bg-[#d4d4d4]">
         <div className="container mx-auto px-4">
           {loading && page === 1 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6 lg:gap-8">
               {[...Array(8)].map((_, i) => (
                 <div
                   key={i}
                   className="bg-white rounded-xl overflow-hidden border border-[#9c9c9c]/30 animate-pulse"
                 >
-                  <div className="h-80 bg-[#e5e5e5]"></div>
-                  <div className="p-6">
-                    <div className="h-6 bg-[#e5e5e5] rounded mb-4"></div>
-                    <div className="h-4 bg-[#e5e5e5] rounded mb-2 w-3/4"></div>
-                    <div className="h-16 bg-[#e5e5e5] rounded mb-6"></div>
-                    <div className="h-10 bg-[#e5e5e5] rounded"></div>
+                  <div className="h-60 md:h-80 bg-[#e5e5e5]"></div>
+                  <div className="p-4 md:p-6">
+                    <div className="h-5 md:h-6 bg-[#e5e5e5] rounded mb-3 md:mb-4"></div>
+                    <div className="h-3 md:h-4 bg-[#e5e5e5] rounded mb-2 md:mb-3 w-3/4"></div>
+                    <div className="h-12 md:h-16 bg-[#e5e5e5] rounded mb-4 md:mb-6"></div>
+                    <div className="h-8 md:h-10 bg-[#e5e5e5] rounded"></div>
                   </div>
                 </div>
               ))}
             </div>
           ) : error ? (
-            <div className="text-center py-16">
-              <div className="bg-[#f5f5f5] text-[#9a3324] p-6 rounded-xl max-w-md mx-auto border border-[#9a3324]/30">
-                <p className="mb-4">{error}</p>
+            <div className="text-center py-12 md:py-16">
+              <div className="bg-[#f5f5f5] text-[#9a3324] p-4 md:p-6 rounded-xl max-w-md mx-auto border border-[#9a3324]/30">
+                <p className="mb-3 md:mb-4">{error}</p>
                 <button
                   onClick={() => fetchWines(1)}
                   className="px-6 py-2 bg-[#89764b] hover:bg-[#756343] text-white rounded-lg transition-colors uppercase text-sm"
@@ -328,32 +358,38 @@ const VinhosPage = () => {
               </div>
             </div>
           ) : wines.length === 0 ? (
-            <div className="text-center py-16">
+            <div className="text-center py-12 md:py-16">
               <div className="max-w-md mx-auto">
-                <h3 className="text-xl text-[#000000] mb-3">
+                <h3 className="text-lg md:text-xl text-[#000000] mb-2 md:mb-3">
                   Nenhum produto encontrado
                 </h3>
-                <p className="text-[#9c9c9c] mb-6">
+                <p className="text-xs md:text-sm text-[#9c9c9c] mb-4 md:mb-6">
                   Tente ajustar seus filtros de busca
                 </p>
+                <button
+                  onClick={handleClearFilters}
+                  className="px-6 py-2 bg-[#89764b] hover:bg-[#756343] text-white rounded-lg transition-colors uppercase text-sm"
+                >
+                  Limpar filtros
+                </button>
               </div>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6 lg:gap-8">
               {wineList}
             </div>
           )}
 
           {hasMore && !loadingMore && wines.length > 0 && (
-            <div className="text-center mt-16">
+            <div className="text-center mt-8 md:mt-12 lg:mt-16">
               <button
                 onClick={() => setPage((p) => p + 1)}
                 disabled={loadingMore}
-                className="px-10 py-4 bg-transparent text-[#89764b] border-2 border-[#89764b] rounded-lg hover:bg-[#89764b]/10 transition-all uppercase tracking-wider flex items-center justify-center gap-2 mx-auto"
+                className="px-6 md:px-8 py-2 md:py-3 bg-transparent text-[#89764b] border border-[#89764b] rounded-lg hover:bg-[#89764b]/10 transition-all uppercase tracking-wider flex items-center justify-center gap-2 mx-auto text-sm md:text-base"
               >
                 {loadingMore ? (
                   <>
-                    <Loader2 className="h-5 w-5 animate-spin" />
+                    <Loader2 className="h-4 w-4 md:h-5 md:w-5 animate-spin" />
                     Carregando...
                   </>
                 ) : (

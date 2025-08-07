@@ -136,11 +136,11 @@ const HomePage = () => {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-50 font-oswald antialiased">
+    <div className="flex flex-col min-h-screen bg-[#d4d4d4] font-oswald antialiased">
       <Hero />
 
       {/* Featured Wines Section */}
-      <section className="py-12 md:py-20 lg:py-28 bg-gradient-to-b from-[#f8f5f0] to-gray-50">
+      <section className="py-12 md:py-20 lg:py-28 bg-[#d4d4d4]">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
           {/* Section Header */}
           <div className="text-center mb-10 md:mb-16">
@@ -309,7 +309,7 @@ const HomePage = () => {
               </div>
 
               {/* View All Button */}
-              <div className="text-center mt-12 md:mt-20">
+              <div className="text-center mt-[110px]">
                 <Link
                   to="/vinhos"
                   className="inline-flex items-center px-6 py-3 md:px-10 md:py-4 bg-[#89764b] hover:bg-[#756343] text-white rounded-lg transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl font-medium tracking-wide uppercase text-xs md:text-sm"
@@ -324,13 +324,13 @@ const HomePage = () => {
       </section>
 
       {/* About Section */}
-      <div className="container mx-auto px-4 sm:px-6 py-6 md:py-8 lg:py-10">
+      <div className="container mx-auto px-4 sm:px-6 py-6 md:py-8 lg:py-10 bg-[#d4d4d4] -mt-6">
         <AboutSection />
       </div>
 
       {/* Quick View Modal - Versão Profissional */}
       {quickViewProduct && (
-        <div className="fixed inset-0 bg-black/90 backdrop-blur-sm z-50 flex justify-center items-center p-4 animate-fadeIn overflow-y-auto">
+        <div className="fixed inset-0 bg-[#d4d4d4] backdrop-blur-sm z-50 flex justify-center items-center p-4 animate-fadeIn overflow-y-auto">
           <div className="bg-white rounded-xl overflow-hidden w-full max-w-6xl max-h-[90vh] flex flex-col lg:flex-row shadow-2xl border border-gray-200">
             {/* Close Button */}
             <button
