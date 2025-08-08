@@ -111,9 +111,9 @@ const ContactPage = () => {
                     <div>
                       <h3 className="text-lg text-gray-300 mb-1">Endereço</h3>
                       <address className="text-gray-400 not-italic text-sm">
-                        Rodovia BR-407, Km 12
+                        Estrada vicinal Alberto Bartholomei, s/n Barthô -
                         <br />
-                        Petrolina/PE
+                        Espírito Santo do Pinhal - SP CEP 13990-000
                       </address>
                     </div>
                   </div>
@@ -258,16 +258,16 @@ const ContactPage = () => {
             <div className="w-16 h-1 bg-[#89764b] mx-auto"></div>
           </motion.div>
 
-          <div className="overflow-hidden rounded-lg border-2 border-[#1e1e1e] shadow-lg">
+          <div className="w-full h-[450px] overflow-hidden rounded-lg border-2 border-[#1e1e1e] shadow-lg">
             <iframe
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15733.215635621966!2d-40.500728!3d-9.569678!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zOcKwMzQnMTAuOCJTIDQwwrAzMCcwMi42Ilc!5e0!3m2!1sen!2sbr!4v1620000000000!5m2!1sen!2sbr"
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3694.0586548280908!2d-46.69281202577093!3d-22.199877112987824!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94c9aff9c4f10f69%3A0xd538a953f2a8769d!2sVinicola%20AMANA!5e0!3m2!1spt-BR!2sbr!4v1754678940776!5m2!1spt-BR!2sbr"
               width="100%"
-              height="450"
+              height="100%"
               style={{ border: 0 }}
               allowFullScreen
               loading="lazy"
-              className="block"
-            ></iframe>
+              className="w-full h-full block"
+            />
           </div>
         </div>
       </section>
