@@ -44,7 +44,6 @@ const ProductDetailsPage = () => {
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [similarProducts, setSimilarProducts] = useState<Wine[]>([]);
   const [isZoomed, setIsZoomed] = useState(false);
-  const [zoomPosition, setZoomPosition] = useState({ x: 0, y: 0 });
 
   const formatPrice = (price: string) =>
     parseFloat(price).toFixed(2).replace(".", ",");
@@ -62,14 +61,6 @@ const ProductDetailsPage = () => {
       variant_id: wine.variants[0].id,
     });
   }, [addToCart, wine]);
-
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    const { left, top, width, height } =
-      e.currentTarget.getBoundingClientRect();
-    const x = ((e.clientX - left) / width) * 100;
-    const y = ((e.clientY - top) / height) * 100;
-    setZoomPosition({ x, y });
-  };
 
   useEffect(() => {
     if (!id) {
@@ -142,7 +133,7 @@ const ProductDetailsPage = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex justify-center items-center bg-[#d4d4d4]">
+      <div className="min-h-screen flex justify-center items-center bg-[#f8f5f0] font-['Oswald']">
         <motion.div
           animate={{ rotate: 360 }}
           transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
@@ -154,17 +145,20 @@ const ProductDetailsPage = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen flex flex-col justify-center items-center bg-[#d4d4d4] p-6 text-center">
-        <div className="bg-white p-8 rounded-xl shadow-lg max-w-md">
-          <h2 className="text-2xl font-bold text-[#9a3324] mb-4">
+      <div className="min-h-screen flex flex-col justify-center items-center bg-[#f8f5f0] p-4 sm:p-6 text-center font-['Oswald']">
+        <div className="bg-white p-6 sm:p-8 rounded-xl shadow-lg max-w-md">
+          <h2 className="text-xl sm:text-2xl font-bold text-[#9a3324] mb-4">
             Ocorreu um erro
           </h2>
-          <p className="text-gray-700 mb-6">{error}</p>
+          <p className="text-gray-700 mb-4 sm:mb-6 text-sm sm:text-base">
+            {error}
+          </p>
           <Link
             to="/vinhos"
-            className="inline-flex items-center px-6 py-3 bg-[#89764b] hover:bg-[#756343] text-white rounded-lg transition-all"
+            className="inline-flex items-center px-4 sm:px-6 py-2 sm:py-3 bg-[#89764b] hover:bg-[#756343] text-white rounded-lg transition-all text-sm sm:text-base"
+            aria-label="Voltar para a loja"
           >
-            <ArrowLeft className="mr-2" />
+            <ArrowLeft className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
             Voltar para a loja
           </Link>
         </div>
@@ -174,20 +168,21 @@ const ProductDetailsPage = () => {
 
   if (!wine) {
     return (
-      <div className="min-h-screen flex flex-col justify-center items-center bg-[#d4d4d4] p-6 text-center">
-        <div className="bg-white p-8 rounded-xl shadow-lg max-w-md">
-          <Wine className="h-12 w-12 mx-auto text-[#89764b] mb-4" />
-          <h2 className="text-2xl font-bold text-gray-800 mb-4">
+      <div className="min-h-screen flex flex-col justify-center items-center bg-[#f8f5f0] p-4 sm:p-6 text-center font-['Oswald']">
+        <div className="bg-white p-6 sm:p-8 rounded-xl shadow-lg max-w-md">
+          <Wine className="h-10 w-10 sm:h-12 sm:w-12 mx-auto text-[#89764b] mb-4" />
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-4">
             Produto não encontrado
           </h2>
-          <p className="text-gray-700 mb-6">
+          <p className="text-gray-700 mb-4 sm:mb-6 text-sm sm:text-base">
             O vinho que você está procurando não está disponível no momento.
           </p>
           <Link
             to="/vinhos"
-            className="inline-flex items-center px-6 py-3 bg-[#89764b] hover:bg-[#756343] text-white rounded-lg transition-all"
+            className="inline-flex items-center px-4 sm:px-6 py-2 sm:py-3 bg-[#89764b] hover:bg-[#756343] text-white rounded-lg transition-all text-sm sm:text-base"
+            aria-label="Explorar nossa coleção"
           >
-            <ArrowLeft className="mr-2" />
+            <ArrowLeft className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
             Explorar nossa coleção
           </Link>
         </div>
@@ -196,31 +191,31 @@ const ProductDetailsPage = () => {
   }
 
   return (
-    <div className="bg-[#d4d4d4] min-h-screen">
+    <div className="bg-[#f8f5f0] min-h-screen font-['Oswald']">
       {/* Voltar */}
-      <div className="container mx-auto px-4 lg:px-8 pt-8">
+      <div className="container mx-auto px-4 sm:px-6 pt-8 sm:pt-16">
         <motion.div whileHover={{ x: -5 }}>
           <Link
             to="/vinhos"
-            className="inline-flex items-center text-[#89764b] hover:text-[#756343] transition-all"
+            className="inline-flex items-center text-[#89764b] hover:text-[#756343] transition-all text-sm sm:text-base"
+            aria-label="Voltar para a loja"
           >
-            <ArrowLeft className="mr-2" />
+            <ArrowLeft className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
             <span>Voltar para a loja</span>
           </Link>
         </motion.div>
       </div>
 
       {/* Conteúdo principal */}
-      <div className="container mx-auto px-4 lg:px-8 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+      <div className="container mx-auto px-4 sm:px-6 py-8 sm:pt-12">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-12">
           {/* Galeria de Imagens */}
-          <div className="bg-white rounded-xl shadow-lg p-6">
+          <div className="bg-white rounded-xl shadow-lg p-4 sm:p-6">
             {/* Imagem Principal com Zoom */}
             <div
-              className="relative h-[500px] mb-6 bg-white rounded-lg overflow-hidden cursor-zoom-in"
+              className="relative h-[300px] sm:h-[400px] lg:h-[500px] mb-4 sm:mb-6 bg-white rounded-lg overflow-hidden cursor-zoom-in"
               onMouseEnter={() => setIsZoomed(true)}
               onMouseLeave={() => setIsZoomed(false)}
-              onMouseMove={handleMouseMove}
             >
               <img
                 src={
@@ -231,7 +226,6 @@ const ProductDetailsPage = () => {
                   isZoomed ? "scale-150" : "scale-100"
                 }`}
                 style={{
-                  transformOrigin: `${zoomPosition.x}% ${zoomPosition.y}%`,
                   mixBlendMode: "multiply",
                 }}
               />
@@ -240,32 +234,38 @@ const ProductDetailsPage = () => {
               {isZoomed && (
                 <div className="absolute inset-0 flex items-center justify-center bg-black/10">
                   <div className="bg-white/80 p-2 rounded-full">
-                    <ZoomIn className="h-6 w-6 text-[#89764b]" />
+                    <ZoomIn className="h-5 w-5 sm:h-6 sm:w-6 text-[#89764b]" />
                   </div>
                 </div>
               )}
 
               {/* Botões de Ação */}
               <div className="absolute top-4 right-4 flex gap-2">
-                <button className="p-2 bg-white/80 rounded-full hover:bg-white transition-all shadow-md">
-                  <Heart className="h-5 w-5 text-[#89764b]" />
+                <button
+                  className="p-2 bg-white/80 rounded-full hover:bg-white transition-all shadow-md"
+                  aria-label="Adicionar aos favoritos"
+                >
+                  <Heart className="h-4 w-4 sm:h-5 sm:w-5 text-[#89764b]" />
                 </button>
-                <button className="p-2 bg-white/80 rounded-full hover:bg-white transition-all shadow-md">
-                  <Share2 className="h-5 w-5 text-[#89764b]" />
+                <button
+                  className="p-2 bg-white/80 rounded-full hover:bg-white transition-all shadow-md"
+                  aria-label="Compartilhar"
+                >
+                  <Share2 className="h-4 w-4 sm:h-5 sm:w-5 text-[#89764b]" />
                 </button>
               </div>
             </div>
 
             {/* Thumbnails */}
             {wine.images.length > 1 && (
-              <div className="grid grid-cols-4 gap-3">
+              <div className="grid grid-cols-4 gap-2 sm:gap-3">
                 {wine.images.map((img, index) => (
                   <motion.button
                     key={index}
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     onClick={() => setActiveImageIndex(index)}
-                    className={`w-24 h-24 rounded-lg overflow-hidden border-2 transition-all flex items-center justify-center bg-white ${
+                    className={`w-16 h-16 sm:w-20 sm:h-20 rounded-lg overflow-hidden border-2 transition-all flex items-center justify-center bg-white ${
                       activeImageIndex === index
                         ? "border-[#89764b]"
                         : "border-transparent hover:border-gray-200"
@@ -281,26 +281,38 @@ const ProductDetailsPage = () => {
                 ))}
               </div>
             )}
+
+            {/* Segundo Botão de Compra */}
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={handleAddToCart}
+              className="w-full mt-4 sm:mt-6 py-3 sm:py-4 bg-[#89764b] hover:bg-[#756343] text-white rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl font-medium flex items-center justify-center gap-2 sm:gap-3 text-sm sm:text-base font-['Oswald']"
+              aria-label="Adicionar ao carrinho"
+            >
+              <ShoppingCart className="h-4 w-4 sm:h-5 sm:w-5" />
+              Adicionar ao Carrinho
+            </motion.button>
           </div>
 
           {/* Detalhes do Produto */}
-          <div className="bg-white rounded-xl shadow-lg p-8 flex flex-col">
-            <div className="mb-6">
-              <div className="flex items-center gap-3 mb-4 flex-wrap">
+          <div className="bg-white rounded-xl shadow-lg p-4 sm:p-6 lg:p-8 flex flex-col">
+            <div className="mb-4 sm:mb-6">
+              <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4 flex-wrap">
                 {wine.rating !== undefined && (
                   <motion.div
                     whileHover={{ scale: 1.05 }}
-                    className="flex items-center bg-black px-3 py-1 rounded-full"
+                    className="flex items-center bg-black px-2 sm:px-3 py-1 rounded-full"
                   >
-                    <Star className="h-4 w-4 fill-[#89764b] text-[#89764b] mr-1" />
-                    <span className="text-[#89764b] text-sm font-medium">
+                    <Star className="h-3 w-3 sm:h-4 sm:w-4 fill-[#89764b] text-[#89764b] mr-1" />
+                    <span className="text-[#89764b] text-xs sm:text-sm font-medium font-['Oswald']">
                       {wine.rating.toFixed(1)}
                     </span>
                   </motion.div>
                 )}
                 <motion.span
                   whileHover={{ scale: 1.05 }}
-                  className="text-sm bg-black rounded-full text-[#89764b] py-1 px-3 flex items-center font-medium"
+                  className="text-xs sm:text-sm bg-black rounded-full text-[#89764b] py-1 px-2 sm:px-3 flex items-center font-medium font-['Oswald']"
                 >
                   {wine.categories[0]?.name.pt || "Vinho"}
                 </motion.span>
@@ -310,16 +322,16 @@ const ProductDetailsPage = () => {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3 }}
-                className="text-3xl lg:text-4xl font-bold text-black mb-3"
+                className="text-2xl sm:text-3xl lg:text-4xl font-bold text-black mb-2 sm:mb-3 font-['Oswald']"
               >
                 {wine.name.pt}
               </motion.h1>
 
-              <div className="flex items-center gap-4 text-sm text-gray-500 mb-6 flex-wrap">
+              <div className="flex items-center gap-3 sm:gap-4 text-xs sm:text-sm text-gray-500 mb-4 sm:mb-6 flex-wrap">
                 {wine.region && (
-                  <span className="flex items-center">
+                  <span className="flex items-center font-['Oswald']">
                     <svg
-                      className="h-4 w-4 mr-1 text-[#89764b]"
+                      className="h-3 w-3 sm:h-4 sm:w-4 mr-1 text-[#89764b]"
                       fill="none"
                       viewBox="0 0 24 24"
                       stroke="currentColor"
@@ -341,9 +353,9 @@ const ProductDetailsPage = () => {
                   </span>
                 )}
                 {wine.alcohol && (
-                  <span className="flex items-center">
+                  <span className="flex items-center font-['Oswald']">
                     <svg
-                      className="h-4 w-4 mr-1 text-[#89764b]"
+                      className="h-3 w-3 sm:h-4 sm:w-4 mr-1 text-[#89764b]"
                       fill="none"
                       viewBox="0 0 24 24"
                       stroke="currentColor"
@@ -359,15 +371,15 @@ const ProductDetailsPage = () => {
                   </span>
                 )}
                 {wine.pairing && (
-                  <span className="flex items-center">
-                    <Utensils className="h-4 w-4 mr-1 text-[#89764b]" />
+                  <span className="flex items-center font-['Oswald']">
+                    <Utensils className="h-3 w-3 sm:h-4 sm:w-4 mr-1 text-[#89764b]" />
                     {wine.pairing}
                   </span>
                 )}
                 {wine.created_at && (
-                  <span className="flex items-center">
+                  <span className="flex items-center font-['Oswald']">
                     <svg
-                      className="h-4 w-4 mr-1 text-[#89764b]"
+                      className="h-3 w-3 sm:h-4 sm:w-4 mr-1 text-[#89764b]"
                       fill="none"
                       viewBox="0 0 24 24"
                       stroke="currentColor"
@@ -390,14 +402,14 @@ const ProductDetailsPage = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.2 }}
-              className="mb-8"
+              className="mb-6 sm:mb-8"
             >
-              <div className="flex items-baseline gap-4 mb-2 flex-wrap">
-                <span className="text-3xl font-bold text-[#89764b]">
+              <div className="flex items-baseline gap-3 sm:gap-4 mb-2 flex-wrap">
+                <span className="text-2xl sm:text-3xl font-bold text-[#89764b] font-['Oswald']">
                   R$ {formatPrice(wine.variants[0].price)}
                 </span>
                 {wine.variants[0]?.compare_at_price && (
-                  <span className="text-lg text-gray-500 line-through">
+                  <span className="text-base sm:text-lg text-gray-500 line-through font-['Oswald']">
                     R$ {formatPrice(wine.variants[0].compare_at_price)}
                   </span>
                 )}
@@ -405,7 +417,7 @@ const ProductDetailsPage = () => {
               {wine.variants[0]?.compare_at_price && (
                 <motion.span
                   whileHover={{ scale: 1.05 }}
-                  className="inline-block bg-[#89764b]/10 text-[#89764b] px-3 py-1 rounded-md text-sm font-medium"
+                  className="inline-block bg-[#89764b]/10 text-[#89764b] px-2 sm:px-3 py-1 rounded-md text-xs sm:text-sm font-medium font-['Oswald']"
                 >
                   Economize R${" "}
                   {(
@@ -423,7 +435,7 @@ const ProductDetailsPage = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.3 }}
-              className="prose max-w-none text-gray-700 mb-8"
+              className="prose max-w-none text-gray-700 mb-6 sm:mb-8 text-sm sm:text-base font-['Oswald']"
               dangerouslySetInnerHTML={{ __html: wine.description.pt }}
             />
 
@@ -432,9 +444,10 @@ const ProductDetailsPage = () => {
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               onClick={handleAddToCart}
-              className="w-full py-4 bg-[#89764b] hover:bg-[#756343] text-white rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl font-medium flex items-center justify-center gap-3"
+              className="w-full py-3 sm:py-4 bg-[#89764b] hover:bg-[#756343] text-white rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl font-medium flex items-center justify-center gap-2 sm:gap-3 text-sm sm:text-base font-['Oswald']"
+              aria-label="Adicionar ao carrinho"
             >
-              <ShoppingCart className="h-5 w-5" />
+              <ShoppingCart className="h-4 w-4 sm:h-5 sm:w-5" />
               Adicionar ao Carrinho
             </motion.button>
 
@@ -443,11 +456,11 @@ const ProductDetailsPage = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.4 }}
-              className="mt-8 grid grid-cols-2 gap-4 text-sm"
+              className="mt-6 sm:mt-8 grid grid-cols-2 gap-3 sm:gap-4 text-xs sm:text-sm"
             >
-              <div className="flex items-start gap-3">
+              <div className="flex items-start gap-2 sm:gap-3">
                 <svg
-                  className="h-5 w-5 text-[#89764b] mt-0.5"
+                  className="h-4 w-4 sm:h-5 sm:w-5 text-[#89764b] mt-0.5"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -460,15 +473,21 @@ const ProductDetailsPage = () => {
                   />
                 </svg>
                 <div>
-                  <p className="text-gray-800 font-medium">Frete Grátis</p>
-                  <p className="text-gray-500">Para todo o Brasil</p>
+                  <p className="text-gray-800 font-medium font-['Oswald']">
+                    Frete Grátis
+                  </p>
+                  <p className="text-gray-500 font-['Oswald']">
+                    Para todo o Brasil
+                  </p>
                 </div>
               </div>
-              <div className="flex items-start gap-3">
-                <Utensils className="h-5 w-5 text-[#89764b] mt-0.5" />
+              <div className="flex items-start gap-2 sm:gap-3">
+                <Utensils className="h-4 w-4 sm:h-5 sm:w-5 text-[#89764b] mt-0.5" />
                 <div>
-                  <p className="text-gray-800 font-medium">Harmonização</p>
-                  <p className="text-gray-500">
+                  <p className="text-gray-800 font-medium font-['Oswald']">
+                    Harmonização
+                  </p>
+                  <p className="text-gray-500 font-['Oswald']">
                     {wine.pairing || "Sugestões de acompanhamento"}
                   </p>
                 </div>
@@ -483,29 +502,31 @@ const ProductDetailsPage = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.5 }}
-            className="mt-16"
+            className="mt-12 sm:mt-16"
           >
-            <div className="flex items-center justify-between mb-8">
-              <h2 className="text-2xl font-bold text-gray-800">
+            <div className="flex items-center justify-between mb-6 sm:mb-8">
+              <h2 className="text-xl sm:text-2xl font-bold text-gray-800 font-['Oswald']">
                 Você também pode gostar
               </h2>
               <Link
                 to="/vinhos"
-                className="flex items-center text-[#89764b] hover:text-[#756343] font-medium"
+                className="flex items-center text-[#89764b] hover:text-[#756343] font-medium text-sm sm:text-base font-['Oswald']"
+                aria-label="Ver todos os produtos"
               >
                 Ver todos <ChevronRight className="h-4 w-4 ml-1" />
               </Link>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="flex overflow-x-auto snap-x snap-mandatory gap-4 sm:grid sm:grid-cols-2 lg:grid-cols-4 sm:gap-6 pb-4 sm:pb-0 scrollbar-hide">
               {similarProducts.map((product) => (
                 <motion.div
                   key={product.id}
                   whileHover={{ y: -5 }}
-                  className="group bg-white rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-all duration-300"
+                  className="group bg-white rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-all duration-300 flex-shrink-0 w-60 sm:w-auto snap-center"
+                  aria-label={`Produto similar: ${product.name.pt}`}
                 >
                   <Link to={`/produto/${product.id}`} className="block">
-                    <div className="relative h-64 bg-white flex items-center justify-center p-6">
+                    <div className="relative h-48 sm:h-64 bg-white flex items-center justify-center p-4 sm:p-6">
                       <img
                         src={product.images[0]?.src || "/placeholder-wine.jpg"}
                         alt={product.images[0]?.alt || product.name.pt}
@@ -515,20 +536,20 @@ const ProductDetailsPage = () => {
                         }}
                       />
                     </div>
-                    <div className="p-5">
-                      <h3 className="font-medium text-gray-800 mb-1 line-clamp-1">
+                    <div className="p-4 sm:p-5">
+                      <h3 className="font-medium text-gray-800 mb-1 line-clamp-1 text-sm sm:text-base font-['Oswald']">
                         {product.name.pt}
                       </h3>
-                      <p className="text-sm text-gray-500 mb-3">
+                      <p className="text-xs sm:text-sm text-gray-500 mb-2 sm:mb-3 font-['Oswald']">
                         {product.categories[0]?.name.pt || "Vinho"}
                       </p>
                       <div className="flex items-center justify-between">
-                        <span className="font-bold text-[#89764b]">
+                        <span className="font-bold text-[#89764b] text-sm sm:text-base font-['Oswald']">
                           R$ {formatPrice(product.variants[0].price)}
                         </span>
                         {product.rating !== undefined && (
-                          <div className="flex items-center text-sm text-gray-500">
-                            <Star className="h-3 w-3 fill-[#89764b] text-[#89764b] mr-1" />
+                          <div className="flex items-center text-xs sm:text-sm text-gray-500 font-['Oswald']">
+                            <Star className="h-3 w-3 sm:h-4 sm:w-4 fill-[#89764b] text-[#89764b] mr-1" />
                             {product.rating.toFixed(1)}
                           </div>
                         )}

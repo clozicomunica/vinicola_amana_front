@@ -5,6 +5,7 @@ import logoAmana from "../assets/blacklogo.png";
 import vinhos from "../assets/aboutus1.jpg";
 import parallaxVinhos from "../assets/parallax.jpg";
 import visita from "../assets/visiteamana.jpg";
+
 const AboutPage = () => {
   // Dados fictícios (estilo premium)
   const features = [
@@ -66,7 +67,7 @@ const AboutPage = () => {
   ];
 
   return (
-    <div className="bg-[#d4d4d4] font-oswald">
+    <div className="bg-[#d4d4d4] font-['Oswald']">
       {/* Hero Cinematográfico - Versão Atualizada */}
       <section className="relative h-screen min-h-[600px] flex items-center justify-center overflow-hidden bg-[#d4d4d4]">
         {/* Container da imagem com tamanho controlado */}
@@ -126,6 +127,7 @@ const AboutPage = () => {
           </div>
         </div>
       </section>
+
       {/* Diferenciais - Texto Alinhado à Esquerda */}
       <section className="py-20 bg-[#d4d4d4]">
         <div className="container mx-auto px-4">
@@ -140,7 +142,7 @@ const AboutPage = () => {
                   {feature.title}
                 </h3>
 
-                <p className="text-gray-600 leading-relaxed text-left">
+                <p className="text-gray-600 leading-relaxed text-left font-['Oswald']">
                   {feature.description}
                 </p>
               </div>
@@ -181,41 +183,34 @@ const AboutPage = () => {
       </section>
 
       {/* Premiações em Timeline */}
-      <section className="py-24 bg-[#d4d4d4]">
+      <section className="py-16 sm:py-24 bg-[#d4d4d4]">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-20">
-            <h2 className="text-3xl md:text-4xl uppercase tracking-tight mb-3">
+          <div className="text-center mb-12 sm:mb-20">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl uppercase tracking-tight mb-3 font-['Oswald']">
               Linha do Tempo
             </h2>
-            <p className="text-black uppercase tracking-widest text-sm">
+            <p className="text-black uppercase tracking-widest text-xs sm:text-sm font-['Oswald']">
               Nossas Conquistas
             </p>
           </div>
 
-          <div className="relative max-w-4xl mx-auto">
-            <div className="absolute left-0 md:left-1/2 h-full w-0.5 bg-[#89764b]/30 transform md:-translate-x-1/2"></div>
+          <div className="relative max-w-4xl mx-auto flex flex-col">
+            <div className="absolute left-4 sm:left-6 h-full w-1 bg-[#89764b]/30"></div>
 
             {awards.map((award, index) => (
               <div
                 key={index}
-                className={`relative mb-12 ${
-                  index % 2 === 0
-                    ? "md:pr-8 md:text-right"
-                    : "md:pl-8 md:text-left"
-                }`}
+                className="relative mb-8 sm:mb-12 pl-12 sm:pl-16"
+                aria-label={`Evento de ${award.year}: ${award.name}`}
               >
-                <div
-                  className={`md:w-1/2 p-6 ${
-                    index % 2 === 0 ? "md:mr-auto" : "md:ml-auto"
-                  }`}
-                >
-                  <div
-                    className={`absolute top-6 w-4 h-4 rounded-full bg-[#89764b] ${
-                      index % 2 === 0 ? "md:-right-2" : "md:-left-2"
-                    }`}
-                  ></div>
-                  <h3 className="text-xl text-[#89764b] mb-1">{award.year}</h3>
-                  <p className="text-gray-700">{award.name}</p>
+                <div className="p-4 sm:p-6 bg-white rounded-lg border border-[#e0e0e0] shadow-sm">
+                  <div className="absolute top-6 sm:top-8 left-2 sm:left-3 w-5 h-5 rounded-full bg-[#89764b] shadow-sm"></div>
+                  <h3 className="text-lg sm:text-xl text-[#89764b] mb-1 font-['Oswald']">
+                    {award.year}
+                  </h3>
+                  <p className="text-gray-700 text-sm sm:text-base font-['Oswald']">
+                    {award.name}
+                  </p>
                 </div>
               </div>
             ))}

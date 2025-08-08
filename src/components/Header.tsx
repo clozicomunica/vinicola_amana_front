@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { ShoppingCart, Menu, X, Wine } from "lucide-react";
+import { ShoppingCart, Menu, X } from "lucide-react";
 import logo from "../assets/logo.png";
 import { useCart } from "../context/useCart";
 
@@ -17,7 +17,10 @@ const Header = () => {
   const [activeLink, setActiveLink] = useState("");
 
   const { cart } = useCart();
-  const totalQuantity = cart.reduce((sum, item) => sum + item.quantity, 0);
+  const totalQuantity = cart.reduce(
+    (sum, item) => sum + (item.quantity || 1),
+    0
+  );
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 10);
@@ -39,7 +42,7 @@ const Header = () => {
           : "bg-black py-3"
       }`}
     >
-      <div className="container mx-auto px-4 lg:px-8">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link
@@ -53,7 +56,7 @@ const Header = () => {
             <img
               src={logo}
               alt="Logo da Vinícola"
-              className="w-10 h-10 object-contain transition-all duration-300 group-hover:rotate-6 group-hover:scale-105"
+              className="w-12 h-12 object-contain transition-all duration-300 group-hover:rotate-6 group-hover:scale-105"
             />
           </Link>
 
@@ -84,25 +87,25 @@ const Header = () => {
             ))}
           </nav>
 
-          {/* Ícones */}
+          {/* Ícones (Mobile e Desktop) */}
           <div className="flex items-center gap-4">
             {/* Carrinho */}
             <Link
               to="/carrinho"
               className="p-2 relative transition-all duration-200 group"
-              aria-label="Carrinho"
+              aria-label="Ver carrinho"
             >
               <div className="relative">
                 <ShoppingCart
-                  className={`h-5 w-5 transition-colors duration-300 ${
+                  className={`h-6 w-6 transition-colors duration-300 ${
                     activeLink === "/carrinho"
                       ? "text-[#89764b]"
                       : "text-gray-300 hover:text-white"
                   }`}
                 />
                 {totalQuantity > 0 && (
-                  <span className="absolute -top-2 -right-2 bg-[#9a3324] text-white text-xs rounded-full h-5 w-5 flex items-center justify-center group-hover:scale-110 transition-transform duration-200 shadow-md">
-                    {totalQuantity}
+                  <span className="absolute -top-2 -right-2 bg-[#9a3324] text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-medium group-hover:scale-110 transition-transform duration-200 shadow-md">
+                    {totalQuantity > 9 ? "9+" : totalQuantity}
                   </span>
                 )}
               </div>
@@ -112,12 +115,12 @@ const Header = () => {
             <button
               className="p-2 text-gray-300 hover:text-white md:hidden transition-all duration-200"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              aria-label="Menu"
+              aria-label={isMenuOpen ? "Fechar menu" : "Abrir menu"}
             >
               {isMenuOpen ? (
-                <X className="h-6 w-6" />
+                <X className="h-7 w-7" />
               ) : (
-                <Menu className="h-6 w-6" />
+                <Menu className="h-7 w-7" />
               )}
             </button>
           </div>
@@ -125,20 +128,19 @@ const Header = () => {
 
         {/* Menu mobile */}
         {isMenuOpen && (
-          <div className="md:hidden bg-gradient-to-b from-black to-[#1a1a1a] shadow-xl">
-            <nav className="flex flex-col divide-y divide-[#ffffff10]">
+          <div className="md:hidden bg-black shadow-xl">
+            <nav className="flex flex-col">
               {navLinks.map((item) => (
                 <Link
                   key={item.path}
                   to={item.path}
-                  className={`px-6 py-4 transition-all duration-200 flex items-center gap-3 ${
+                  className={`px-6 py-5 text-lg uppercase font-medium transition-all duration-200 ${
                     activeLink === item.path
                       ? "text-[#89764b] bg-[#ffffff05]"
-                      : "text-gray-300 hover:text-white hover:bg-[#ffffff08]"
+                      : "text-gray-300 hover:text-white hover:bg-[#89764b]/10"
                   }`}
                   onClick={closeMenu}
                 >
-                  <Wine className="h-4 w-4" />
                   {item.label}
                 </Link>
               ))}

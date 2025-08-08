@@ -68,9 +68,7 @@ const CartPage = () => {
       !customer.city ||
       !customer.zipcode
     ) {
-      setError(
-        "Preencha todos os dados do cliente (email, nome, CPF, endereço, cidade, CEP)!"
-      );
+      setError("Preencha todos os campos obrigatórios!");
       setLoading(false);
       return;
     }
@@ -83,7 +81,7 @@ const CartPage = () => {
       gateway: "mercadopago",
       payment_status: "pending",
       products: cart.map((item) => ({
-        variant_id: item.variant_id || 0, // Garante que variant_id esteja presente
+        variant_id: item.variant_id || 0,
         quantity: item.quantity || 1,
       })),
       customer: {
@@ -121,9 +119,6 @@ const CartPage = () => {
       shipping_cost_owner: 20.0,
       checkout_enabled: true,
     };
-
-    console.log("Cart items:", cart);
-    console.log("Order data sent:", orderData);
 
     try {
       const response = await fetch(
@@ -164,24 +159,26 @@ const CartPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#ffffffdc] pb-20">
+    <div className="min-h-screen bg-[#d4d4d4] font-['Oswald'] antialiased">
       {/* Header do Carrinho */}
-      <div className="bg-gradient-to-r from-[#89764b] to-[#756343] text-white py-6 shadow-lg sticky top-0 z-10">
-        <div className="container mx-auto px-4">
+      <div className="bg-gradient-to-r from-[#89764b] to-[#756343] text-white py-4 sm:py-6 shadow-lg sticky top-0 z-10">
+        <div className="container mx-auto px-4 sm:px-6">
           <div className="flex items-center justify-between gap-4">
             <Link
               to="/"
-              className="flex items-center hover:opacity-80 transition-opacity font-oswald uppercase tracking-wider text-xs sm:text-sm"
+              className="flex items-center hover:opacity-80 transition-opacity uppercase tracking-wider text-xs sm:text-sm"
+              aria-label="Continuar comprando"
             >
-              <ArrowLeft className="h-4 w-4 mr-1 sm:mr-2" />
+              <ArrowLeft className="h-4 w-4 sm:h-5 sm:w-5 mr-1 sm:mr-2" />
               <span className="hidden sm:inline">Continuar Comprando</span>
+              <span className="sm:hidden">Voltar</span>
             </Link>
-            <h1 className="text-lg sm:text-xl font flex items-center font-oswald uppercase tracking-tight">
-              <ShoppingCart className="h-5 w-5 sm:h-6 sm:w-6 mr-2" />
+            <h1 className="text-base sm:text-xl flex items-center uppercase tracking-tight">
+              <ShoppingCart className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
               <span className="hidden sm:inline">Seu Carrinho</span>
               <span className="sm:hidden">Carrinho</span>
             </h1>
-            <div className="text-xs sm:text-sm bg-white/20 px-2 sm:px-3 py-1 rounded-full font-oswald uppercase tracking-wide">
+            <div className="text-xs sm:text-sm bg-white/20 px-2 sm:px-3 py-1 rounded-full uppercase tracking-wide">
               {cart.reduce((total, item) => total + (item.quantity || 1), 0)}{" "}
               ITEM
               {cart.reduce((total, item) => total + (item.quantity || 1), 0) !==
@@ -192,366 +189,469 @@ const CartPage = () => {
       </div>
 
       {/* Corpo do Carrinho */}
-      <div className="container mx-auto px-4 py-6">
+      <div className="container mx-auto px-4 sm:px-8 py-6 sm:py-12 pt-16 sm:pt-20">
         {cart.length === 0 ? (
-          <div className="text-center py-12 sm:py-20">
-            <div className="mx-auto w-24 h-24 sm:w-32 sm:h-32 bg-gradient-to-br from-[#89764b] to-[#a08d5f] rounded-full flex items-center justify-center mb-4 sm:mb-6 shadow-lg">
-              <ShoppingCart className="h-12 w-12 sm:h-16 sm:w-16 text-white" />
+          <div className="text-center py-12 sm:py-16">
+            <div className="mx-auto w-20 h-20 sm:w-24 sm:h-24 bg-gradient-to-br from-[#89764b] to-[#a08d5f] rounded-full flex items-center justify-center mb-4 sm:mb-6 shadow-lg">
+              <ShoppingCart className="h-10 w-10 sm:h-12 sm:w-12 text-white" />
             </div>
-            <h2 className="text-xl sm:text-2xl lg:text-3xl text-gray-800 mb-3 font-oswald uppercase tracking-tight">
+            <h2 className="text-lg sm:text-2xl text-gray-800 mb-3 sm:mb-4 uppercase tracking-tight">
               Seu carrinho está vazio
             </h2>
-            <p className="text-gray-600 mb-6 sm:mb-8 max-w-md mx-auto leading-relaxed text-sm sm:text-base">
-              Parece que você ainda não adicionou nenhum vinho ao carrinho
+            <p className="text-gray-600 mb-4 sm:mb-6 max-w-md mx-auto leading-relaxed text-sm sm:text-base">
+              Parece que você ainda não adicionou nenhum vinho ao carrinho.
             </p>
             <Link
               to="/vinhos"
-              className="inline-flex items-center px-6 py-3 sm:px-10 sm:py-4 bg-[#89764b] hover:bg-[#756343] text-white rounded-lg transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl font-oswald uppercase tracking-wider text-xs sm:text-sm"
+              className="inline-flex items-center px-4 py-2 sm:px-6 sm:py-3 bg-[#89764b] hover:bg-[#756343] text-white rounded-lg transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl uppercase tracking-wider text-xs sm:text-sm"
+              aria-label="Explorar vinhos"
             >
               Explorar Vinhos
               <ChevronRight className="ml-2 h-4 w-4 sm:h-5 sm:w-5" />
             </Link>
           </div>
         ) : (
-          <div className="flex flex-col gap-6">
-            {/* Lista de Itens */}
-            <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
-              <ul className="divide-y divide-gray-100">
-                {cart.map((item) => (
-                  <li
-                    key={item.id}
-                    className="p-4 hover:bg-gray-50/50 transition-colors duration-300"
-                  >
-                    <div className="flex flex-col sm:grid sm:grid-cols-12 gap-4">
-                      <div className="sm:col-span-6 flex items-start space-x-4">
-                        <div className="relative flex-shrink-0">
-                          <div className="w-16 h-16 sm:w-24 sm:h-24 bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg flex items-center justify-center p-2 sm:p-3">
-                            <img
-                              src={item.image || ""}
-                              alt={item.name}
-                              className="max-h-full max-w-full object-contain"
-                              style={{
-                                mixBlendMode: "multiply",
-                                filter:
-                                  "drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1))",
-                              }}
-                            />
+          <div className="flex flex-col lg:flex-row gap-6 sm:gap-10">
+            {/* Coluna esquerda - Itens e formulário */}
+            <div className="lg:w-2/3 flex flex-col gap-6 sm:gap-10">
+              {/* Lista de Itens */}
+              <div className="bg-white rounded-xl shadow-lg border border-[#89764b]/10 overflow-hidden">
+                <div className="hidden sm:grid sm:grid-cols-2 sm:gap-8 sm:p-6 bg-[#89764b]/5">
+                  <div className="text-lg font-bold text-gray-900 uppercase tracking-tight">
+                    Produto
+                  </div>
+                  <div className="grid grid-cols-3 gap-4">
+                    <div className="text-lg font-bold text-gray-900 uppercase tracking-tight text-center">
+                      Preço
+                    </div>
+                    <div className="text-lg font-bold text-gray-900 uppercase tracking-tight text-center">
+                      Quantidade
+                    </div>
+                    <div className="text-lg font-bold text-gray-900 uppercase tracking-tight text-right">
+                      Total
+                    </div>
+                  </div>
+                </div>
+                <ul className="divide-y divide-gray-100">
+                  {cart.map((item) => (
+                    <li
+                      key={item.id}
+                      className="p-3 sm:p-6 hover:bg-gray-50 transition-colors duration-300"
+                    >
+                      <div className="flex flex-col sm:grid sm:grid-cols-2 sm:gap-8">
+                        <div className="flex items-start space-x-3 sm:space-x-6">
+                          <div className="relative flex-shrink-0">
+                            <div className="w-16 h-16 sm:w-28 sm:h-28 bg-gray-50 rounded-lg flex items-center justify-center p-2 sm:p-4">
+                              <img
+                                src={item.image || ""}
+                                alt={item.name}
+                                className="max-h-full max-w-full object-contain mix-blend-multiply"
+                                onError={(e) => {
+                                  e.currentTarget.src =
+                                    "/path/to/fallback-image.jpg";
+                                }}
+                              />
+                            </div>
+                            {(item.quantity || 1) > 1 && (
+                              <span className="absolute -top-2 -right-2 sm:-top-4 sm:-right-4 bg-[#89764b] text-white text-xs sm:text-sm rounded-full h-5 w-5 sm:h-8 sm:w-8 flex items-center justify-center font-medium shadow-md">
+                                {item.quantity}
+                              </span>
+                            )}
                           </div>
-                          {(item.quantity || 1) > 1 && (
-                            <span className="absolute -top-2 -right-2 bg-[#89764b] text-white text-xs rounded-full h-5 w-5 sm:h-6 sm:w-6 flex items-center justify-center font-medium shadow-md">
-                              {item.quantity}
-                            </span>
-                          )}
-                        </div>
-                        <div className="flex-1">
-                          <h3 className=" text-gray-900 text-sm sm:text-base font-oswald uppercase tracking-tight">
-                            {item.name}
-                          </h3>
-                          <p className="text-xs sm:text-sm text-gray-500 font-oswald uppercase tracking-tight mt-1">
-                            {item.category || "Vinho Tinto"}
-                          </p>
-                          <div className="sm:hidden mt-2">
-                            <span className="font-medium text-gray-700">
-                              R${" "}
-                              {Number(item.price || 0)
-                                .toFixed(2)
-                                .replace(".", ",")}
-                            </span>
+                          <div className="flex-1">
+                            <h3 className="text-sm sm:text-lg text-gray-900 uppercase tracking-tight">
+                              {item.name}
+                            </h3>
+                            <p className="text-xs sm:text-base text-gray-500 uppercase tracking-wider mt-1">
+                              {item.category || "Vinho"}
+                            </p>
+                            <div className="sm:hidden mt-2">
+                              <span className="font-medium text-gray-700 text-sm">
+                                R${" "}
+                                {Number(item.price || 0)
+                                  .toFixed(2)
+                                  .replace(".", ",")}
+                              </span>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                      <div className="sm:hidden flex items-center justify-between mt-2">
-                        <div className="flex items-center border border-gray-200 rounded-lg overflow-hidden">
-                          <button
-                            onClick={() => handleDecrement(item)}
-                            className="px-3 py-1 text-gray-600 hover:bg-gray-100 transition-colors"
-                            aria-label="Reduzir quantidade"
-                          >
-                            -
-                          </button>
-                          <span className="px-3 py-1 text-center min-w-[30px] border-x border-gray-200 font-medium text-sm">
-                            {item.quantity || 1}
-                          </span>
-                          <button
-                            onClick={() => handleIncrement(item)}
-                            className="px-3 py-1 text-gray-600 hover:bg-gray-100 transition-colors"
-                            aria-label="Aumentar quantidade"
-                          >
-                            +
-                          </button>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <span className="font-bold text-gray-900 text-sm">
-                            R${" "}
-                            {(Number(item.price || 0) * (item.quantity || 1))
-                              .toFixed(2)
-                              .replace(".", ",")}
-                          </span>
-                          <button
-                            onClick={() => removeFromCart(item.id)}
-                            className="text-gray-400 hover:text-red-500 transition-colors p-1"
-                            aria-label="Remover item"
-                          >
-                            <X className="h-4 w-4" />
-                          </button>
-                        </div>
-                      </div>
-                      <div className="hidden sm:grid sm:col-span-6 grid-cols-6 items-center">
-                        <div className="col-span-2 text-center text-gray-700 font-medium text-sm">
-                          R${" "}
-                          {Number(item.price || 0)
-                            .toFixed(2)
-                            .replace(".", ",")}
-                        </div>
-                        <div className="col-span-2 flex items-center justify-center">
+                        <div className="sm:hidden flex items-center justify-between mt-2 gap-2">
                           <div className="flex items-center border border-gray-200 rounded-lg overflow-hidden">
                             <button
                               onClick={() => handleDecrement(item)}
-                              className="px-2 py-1 sm:px-3 sm:py-2 text-gray-600 hover:bg-gray-100 transition-colors"
+                              className="px-2 sm:px-3 py-1 text-gray-600 hover:bg-gray-100 transition-colors"
                               aria-label="Reduzir quantidade"
                             >
                               -
                             </button>
-                            <span className="px-2 py-1 sm:px-3 sm:py-2 text-center min-w-[30px] sm:min-w-[40px] border-x border-gray-200 font-medium text-sm">
+                            <span className="px-2 sm:px-3 py-1 text-center min-w-[30px] border-x border-gray-200 font-medium text-sm">
                               {item.quantity || 1}
                             </span>
                             <button
                               onClick={() => handleIncrement(item)}
-                              className="px-2 py-1 sm:px-3 sm:py-2 text-gray-600 hover:bg-gray-100 transition-colors"
+                              className="px-2 sm:px-3 py-1 text-gray-600 hover:bg-gray-100 transition-colors"
                               aria-label="Aumentar quantidade"
                             >
                               +
                             </button>
                           </div>
+                          <div className="flex items-center space-x-2">
+                            <span className="font-bold text-gray-900 text-sm">
+                              R${" "}
+                              {(Number(item.price || 0) * (item.quantity || 1))
+                                .toFixed(2)
+                                .replace(".", ",")}
+                            </span>
+                            <button
+                              onClick={() => removeFromCart(item.id)}
+                              className="text-gray-400 hover:text-red-500 transition-colors p-1"
+                              aria-label="Remover item"
+                            >
+                              <X className="h-4 w-4 sm:h-5 sm:w-5" />
+                            </button>
+                          </div>
                         </div>
-                        <div className="col-span-2 flex items-center justify-end space-x-2 sm:space-x-4">
-                          <span className="font-bold text-gray-900 text-sm sm:text-base">
+                        <div className="hidden sm:grid sm:grid-cols-3 sm:gap-4 sm:items-center">
+                          <div className="text-center text-gray-700 font-medium text-base">
                             R${" "}
-                            {(Number(item.price || 0) * (item.quantity || 1))
+                            {Number(item.price || 0)
                               .toFixed(2)
                               .replace(".", ",")}
-                          </span>
-                          <button
-                            onClick={() => removeFromCart(item.id)}
-                            className="text-gray-400 hover:text-red-500 transition-colors p-1"
-                            aria-label="Remover item"
-                          >
-                            <X className="h-4 w-4 sm:h-5 sm:w-5" />
-                          </button>
+                          </div>
+                          <div className="flex items-center justify-center">
+                            <div className="flex items-center border border-gray-200 rounded-lg overflow-hidden">
+                              <button
+                                onClick={() => handleDecrement(item)}
+                                className="px-5 py-2.5 text-gray-600 hover:bg-gray-100 transition-colors"
+                                aria-label="Reduzir quantidade"
+                              >
+                                -
+                              </button>
+                              <span className="px-5 py-2.5 text-center min-w-[56px] border-x border-gray-200 font-medium text-lg">
+                                {item.quantity || 1}
+                              </span>
+                              <button
+                                onClick={() => handleIncrement(item)}
+                                className="px-5 py-2.5 text-gray-600 hover:bg-gray-100 transition-colors"
+                                aria-label="Aumentar quantidade"
+                              >
+                                +
+                              </button>
+                            </div>
+                          </div>
+                          <div className="flex items-center justify-end space-x-4">
+                            <span className="font-bold text-gray-900 text-base">
+                              R${" "}
+                              {(Number(item.price || 0) * (item.quantity || 1))
+                                .toFixed(2)
+                                .replace(".", ",")}
+                            </span>
+                            <button
+                              onClick={() => removeFromCart(item.id)}
+                              className="text-gray-400 hover:text-red-500 transition-colors p-2.5"
+                              aria-label="Remover item"
+                            >
+                              <X className="h-6 w-6" />
+                            </button>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {/* Cupom e Limpar Carrinho */}
-            <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
-              <div className="w-full">
-                <div className="flex rounded-lg overflow-hidden shadow-sm">
-                  <input
-                    type="text"
-                    placeholder="CÓDIGO DE CUPOM"
-                    className="flex-1 px-4 py-3 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#89764b]/50 font-oswald uppercase tracking-wider text-xs sm:text-sm"
-                  />
-                  <button className="px-4 py-3 bg-gray-800 text-white hover:bg-gray-700 transition-colors font-oswald uppercase tracking-wider text-xs sm:text-sm">
-                    Aplicar
-                  </button>
-                </div>
+                    </li>
+                  ))}
+                </ul>
               </div>
-              <button
-                onClick={clearCart}
-                className="flex items-center text-gray-600 hover:text-red-600 transition-colors font-oswald uppercase tracking-wider text-xs sm:text-sm whitespace-nowrap"
-              >
-                <X className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
-                Limpar Carrinho
-              </button>
-            </div>
 
-            {/* Formulário de Dados do Cliente */}
-            <div className="bg-white rounded-xl shadow-sm p-5 border border-gray-100">
-              <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-4 pb-3 border-b font-oswald uppercase tracking-tight">
-                Dados do Cliente
-              </h3>
-              <div className="space-y-4">
-                <input
-                  type="email"
-                  value={customer.email}
-                  onChange={(e) =>
-                    setCustomer({ ...customer, email: e.target.value })
-                  }
-                  placeholder="Email"
-                  className="w-full px-4 py-2 border border-gray-200 rounded focus:outline-none focus:ring-2 focus:ring-[#89764b]/50"
-                />
-                <input
-                  type="text"
-                  value={customer.name}
-                  onChange={(e) =>
-                    setCustomer({ ...customer, name: e.target.value })
-                  }
-                  placeholder="Nome"
-                  className="w-full px-4 py-2 border border-gray-200 rounded focus:outline-none focus:ring-2 focus:ring-[#89764b]/50"
-                />
-                <input
-                  type="text"
-                  value={customer.document}
-                  onChange={(e) =>
-                    setCustomer({ ...customer, document: e.target.value })
-                  }
-                  placeholder="CPF (somente números)"
-                  className="w-full px-4 py-2 border border-gray-200 rounded focus:outline-none focus:ring-2 focus:ring-[#89764b]/50"
-                />
-                <input
-                  type="text"
-                  value={customer.address}
-                  onChange={(e) =>
-                    setCustomer({ ...customer, address: e.target.value })
-                  }
-                  placeholder="Endereço"
-                  className="w-full px-4 py-2 border border-gray-200 rounded focus:outline-none focus:ring-2 focus:ring-[#89764b]/50"
-                />
-                <input
-                  type="text"
-                  value={customer.city}
-                  onChange={(e) =>
-                    setCustomer({ ...customer, city: e.target.value })
-                  }
-                  placeholder="Cidade"
-                  className="w-full px-4 py-2 border border-gray-200 rounded focus:outline-none focus:ring-2 focus:ring-[#89764b]/50"
-                />
-                <input
-                  type="text"
-                  value={customer.zipcode}
-                  onChange={(e) =>
-                    setCustomer({ ...customer, zipcode: e.target.value })
-                  }
-                  placeholder="CEP (somente números)"
-                  className="w-full px-4 py-2 border border-gray-200 rounded focus:outline-none focus:ring-2 focus:ring-[#89764b]/50"
-                />
-              </div>
-            </div>
-
-            {/* Resumo do Pedido */}
-            <div className="bg-white rounded-xl shadow-sm p-5 border border-gray-100 sticky bottom-0 sm:relative sm:bottom-auto">
-              {orderSummary && (
-                <div className="mb-4">
-                  <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-4 pb-3 border-b font-oswald uppercase tracking-tight">
-                    Resumo do Pedido Criado
-                  </h3>
-                  <p>
-                    <strong>Número do Pedido:</strong>{" "}
-                    {orderSummary.number ||
-                      orderSummary.id?.toString() ||
-                      "N/A"}
-                  </p>
-                  <p>
-                    <strong>Cliente:</strong>{" "}
-                    {orderSummary.contact_name || customer.name} (
-                    {orderSummary.contact_email || customer.email})
-                  </p>
-                  <p>
-                    <strong>Produtos:</strong>{" "}
-                    {orderSummary.products
-                      ?.map((p) => `${p.name} (Qtd: ${p.quantity})`)
-                      .join(", ") ||
-                      cart
-                        .map(
-                          (item) => `${item.name} (Qtd: ${item.quantity || 1})`
-                        )
-                        .join(", ")}
-                  </p>
-                  <p>
-                    <strong>Total:</strong> R${" "}
-                    {parseFloat((orderSummary.total || total + 20).toString())
-                      .toFixed(2)
-                      .replace(".", ",")}
-                  </p>
-                  {orderSummary?.products?.[0]?.image?.src && (
-                    <img
-                      src={orderSummary.products[0].image.src}
-                      alt={orderSummary.products[0].name || "Produto"}
-                      style={{ maxWidth: "200px" }}
+              {/* Cupom e Limpar Carrinho */}
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sm:gap-8">
+                <div className="w-full sm:w-auto flex-1">
+                  <div className="flex rounded-lg overflow-hidden shadow-md">
+                    <input
+                      type="text"
+                      placeholder="CÓDIGO DE CUPOM"
+                      className="flex-1 px-3 sm:px-5 py-2 sm:py-4 border border-gray-200 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-[#89764b] uppercase tracking-wider text-xs sm:text-lg"
+                      aria-label="Inserir código de cupom"
                     />
-                  )}
-                  <p>
-                    <strong>Status:</strong> Aguardando pagamento
+                    <button
+                      className="px-3 sm:px-5 py-2 sm:py-4 bg-[#89764b] text-white hover:bg-[#756343] transition-all duration-300 hover:scale-105 uppercase tracking-wider text-xs sm:text-lg"
+                      aria-label="Aplicar cupom"
+                    >
+                      Aplicar
+                    </button>
+                  </div>
+                </div>
+                <button
+                  onClick={clearCart}
+                  className="flex items-center text-gray-600 hover:text-red-600 transition-colors uppercase tracking-wider text-xs sm:text-lg"
+                  aria-label="Limpar carrinho"
+                >
+                  <X className="h-3 w-3 sm:h-5 sm:w-5 mr-1" />
+                  Limpar Carrinho
+                </button>
+              </div>
+
+              {/* Formulário de Dados do Cliente */}
+              <div className="bg-white rounded-xl shadow-lg p-4 sm:p-8 border border-[#89764b]/10">
+                <h3 className="text-lg sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6 pb-3 border-b uppercase tracking-tight">
+                  Dados do Cliente
+                </h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-8">
+                  <div>
+                    <label
+                      htmlFor="email"
+                      className="block text-xs sm:text-lg text-gray-600 uppercase tracking-wider mb-2"
+                    >
+                      Email *
+                    </label>
+                    <input
+                      id="email"
+                      type="email"
+                      value={customer.email}
+                      onChange={(e) =>
+                        setCustomer({ ...customer, email: e.target.value })
+                      }
+                      placeholder="Digite seu email"
+                      className="w-full px-3 sm:px-5 py-2 sm:py-4 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#89764b] text-sm sm:text-lg"
+                      aria-required="true"
+                    />
+                  </div>
+                  <div>
+                    <label
+                      htmlFor="name"
+                      className="block text-xs sm:text-lg text-gray-600 uppercase tracking-wider mb-2"
+                    >
+                      Nome *
+                    </label>
+                    <input
+                      id="name"
+                      type="text"
+                      value={customer.name}
+                      onChange={(e) =>
+                        setCustomer({ ...customer, name: e.target.value })
+                      }
+                      placeholder="Digite seu nome"
+                      className="w-full px-3 sm:px-5 py-2 sm:py-4 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#89764b] text-sm sm:text-lg"
+                      aria-required="true"
+                    />
+                  </div>
+                  <div>
+                    <label
+                      htmlFor="document"
+                      className="block text-xs sm:text-lg text-gray-600 uppercase tracking-wider mb-2"
+                    >
+                      CPF (somente números) *
+                    </label>
+                    <input
+                      id="document"
+                      type="text"
+                      value={customer.document}
+                      onChange={(e) =>
+                        setCustomer({ ...customer, document: e.target.value })
+                      }
+                      placeholder="Digite seu CPF"
+                      className="w-full px-3 sm:px-5 py-2 sm:py-4 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#89764b] text-sm sm:text-lg"
+                      aria-required="true"
+                    />
+                  </div>
+                  <div>
+                    <label
+                      htmlFor="address"
+                      className="block text-xs sm:text-lg text-gray-600 uppercase tracking-wider mb-2"
+                    >
+                      Endereço *
+                    </label>
+                    <input
+                      id="address"
+                      type="text"
+                      value={customer.address}
+                      onChange={(e) =>
+                        setCustomer({ ...customer, address: e.target.value })
+                      }
+                      placeholder="Digite seu endereço"
+                      className="w-full px-3 sm:px-5 py-2 sm:py-4 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#89764b] text-sm sm:text-lg"
+                      aria-required="true"
+                    />
+                  </div>
+                  <div>
+                    <label
+                      htmlFor="city"
+                      className="block text-xs sm:text-lg text-gray-600 uppercase tracking-wider mb-2"
+                    >
+                      Cidade *
+                    </label>
+                    <input
+                      id="city"
+                      type="text"
+                      value={customer.city}
+                      onChange={(e) =>
+                        setCustomer({ ...customer, city: e.target.value })
+                      }
+                      placeholder="Digite sua cidade"
+                      className="w-full px-3 sm:px-5 py-2 sm:py-4 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#89764b] text-sm sm:text-lg"
+                      aria-required="true"
+                    />
+                  </div>
+                  <div>
+                    <label
+                      htmlFor="zipcode"
+                      className="block text-xs sm:text-lg text-gray-600 uppercase tracking-wider mb-2"
+                    >
+                      CEP (somente números) *
+                    </label>
+                    <input
+                      id="zipcode"
+                      type="text"
+                      value={customer.zipcode}
+                      onChange={(e) =>
+                        setCustomer({ ...customer, zipcode: e.target.value })
+                      }
+                      placeholder="Digite seu CEP"
+                      className="w-full px-3 sm:px-5 py-2 sm:py-4 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#89764b] text-sm sm:text-lg"
+                      aria-required="true"
+                    />
+                  </div>
+                </div>
+                <p className="text-xs sm:text-base text-gray-500 mt-3 sm:mt-4">
+                  * Campos obrigatórios
+                </p>
+              </div>
+            </div>
+
+            {/* Coluna direita - Resumo do Pedido */}
+            <div className="lg:w-1/3">
+              <div className="bg-white rounded-xl shadow-lg p-4 sm:p-8 border border-[#89764b]/10 lg:sticky lg:top-28">
+                {orderSummary && (
+                  <div className="mb-4 sm:mb-8 border-b pb-4 sm:pb-6">
+                    <h3 className="text-lg sm:text-2xl font-bold text-gray-900 mb-3 sm:mb-4 uppercase tracking-tight">
+                      Resumo do Pedido Criado
+                    </h3>
+                    <div className="space-y-2 sm:space-y-4 text-sm sm:text-lg">
+                      <p>
+                        <strong>Número do Pedido:</strong>{" "}
+                        {orderSummary.number ||
+                          orderSummary.id?.toString() ||
+                          "N/A"}
+                      </p>
+                      <p>
+                        <strong>Cliente:</strong>{" "}
+                        {orderSummary.contact_name || customer.name} (
+                        {orderSummary.contact_email || customer.email})
+                      </p>
+                      <p>
+                        <strong>Produtos:</strong>{" "}
+                        {orderSummary.products
+                          ?.map((p) => `${p.name} (Qtd: ${p.quantity})`)
+                          .join(", ") ||
+                          cart
+                            .map(
+                              (item) =>
+                                `${item.name} (Qtd: ${item.quantity || 1})`
+                            )
+                            .join(", ")}
+                      </p>
+                      <p>
+                        <strong>Total:</strong> R${" "}
+                        {parseFloat(
+                          (orderSummary.total || total + 20).toString()
+                        )
+                          .toFixed(2)
+                          .replace(".", ",")}
+                      </p>
+                      {orderSummary?.products?.[0]?.image?.src && (
+                        <img
+                          src={orderSummary.products[0].image.src}
+                          alt={orderSummary.products[0].name || "Produto"}
+                          className="max-w-[120px] sm:max-w-[200px] rounded-lg mt-2 sm:mt-4"
+                        />
+                      )}
+                      <p>
+                        <strong>Status:</strong> Aguardando pagamento
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                <h3 className="text-lg sm:text-2xl font-bold text-gray-900 mb-3 sm:mb-4 pb-3 border-b flex items-center uppercase tracking-tight">
+                  <Wine className="h-4 w-4 sm:h-6 sm:w-6 mr-2 text-[#89764b]" />
+                  Resumo
+                </h3>
+
+                <div className="space-y-6 mb-4 sm:mb-8">
+                  <div className="flex justify-between">
+                    <span className="text-gray-600 uppercase tracking-wider text-sm sm:text-lg">
+                      Subtotal
+                    </span>
+                    <span className="text-gray-900 font-medium text-base sm:text-xl">
+                      R${total.toFixed(2).replace(".", ",")}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600 uppercase tracking-wider text-sm sm:text-lg">
+                      Frete
+                    </span>
+                    <span className="text-gray-900 font-medium text-base sm:text-xl">
+                      R$ 20,00
+                    </span>
+                  </div>
+                  <div className="flex justify-between pt-3 border-t">
+                    <span className="text-gray-600 uppercase tracking-wider text-sm sm:text-lg">
+                      Desconto
+                    </span>
+                    <span className="text-[#89764b] font-medium text-base sm:text-xl">
+                      - R$ 0,00
+                    </span>
+                  </div>
+                </div>
+
+                <div className="flex justify-between items-center py-3 border-t border-b">
+                  <span className="font-bold text-base sm:text-2xl uppercase tracking-tight">
+                    Total
+                  </span>
+                  <span className="text-lg sm:text-3xl text-[#89764b]">
+                    R${(total + 20).toFixed(2).replace(".", ",")}
+                  </span>
+                </div>
+
+                {error && (
+                  <div className="flex items-center justify-between bg-red-50 text-red-600 p-3 sm:p-5 rounded-lg mt-4">
+                    <span className="text-sm sm:text-lg">{error}</span>
+                    <button
+                      onClick={() => setError("")}
+                      className="text-red-600 hover:text-red-800"
+                      aria-label="Fechar erro"
+                    >
+                      <X className="h-4 w-4 sm:h-6 w-6" />
+                    </button>
+                  </div>
+                )}
+                {loading && (
+                  <div className="flex items-center justify-center gap-2 text-gray-600 mt-4">
+                    <Wine className="h-4 w-4 sm:h-6 sm:w-6 animate-spin" />
+                    <span className="text-sm sm:text-lg">Carregando...</span>
+                  </div>
+                )}
+
+                <button
+                  onClick={handleCheckout}
+                  disabled={loading}
+                  className="w-full mt-4 sm:mt-8 bg-gradient-to-r from-[#89764b] to-[#a08d5f] hover:from-[#756343] hover:to-[#89764b] text-white py-3 sm:py-5 px-4 sm:px-10 rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 uppercase tracking-wider text-xs sm:text-lg flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                  aria-label="Finalizar compra"
+                >
+                  Finalizar Compra
+                  <ChevronRight className="h-4 w-4 sm:h-6 sm:w-6" />
+                </button>
+
+                <div className="mt-3 sm:mt-6 text-center">
+                  <p className="text-xs sm:text-lg text-gray-500 uppercase tracking-wider">
+                    ou{" "}
+                    <Link
+                      to="/vinhos"
+                      className="text-[#89764b] hover:text-[#756343] hover:underline font-medium"
+                      aria-label="Continuar comprando"
+                    >
+                      continuar comprando
+                    </Link>
                   </p>
                 </div>
-              )}
-
-              <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-4 pb-3 border-b flex items-center font-oswald uppercase tracking-tight">
-                <Wine className="h-4 w-4 sm:h-5 sm:w-5 mr-2 sm:mr-3 text-[#89764b]" />
-                Resumo
-              </h3>
-
-              <div className="space-y-3 mb-4">
-                <div className="flex justify-between">
-                  <span className="text-gray-600 font-oswald uppercase tracking-wider text-xs sm:text-sm">
-                    Subtotal
-                  </span>
-                  <span className="text-gray-900 font-medium text-sm sm:text-base">
-                    R${total.toFixed(2).replace(".", ",")}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600 font-oswald uppercase tracking-wider text-xs sm:text-sm">
-                    Frete
-                  </span>
-                  <span className="text-gray-900 font-medium text-sm sm:text-base">
-                    R$ 20,00
-                  </span>
-                </div>
-                <div className="flex justify-between pt-3 border-t">
-                  <span className="text-gray-600 font-oswald uppercase tracking-wider text-xs sm:text-sm">
-                    Desconto
-                  </span>
-                  <span className="text-[#89764b] font-medium text-sm sm:text-base">
-                    - R$ 0,00
-                  </span>
-                </div>
-              </div>
-
-              <div className="flex justify-between items-center py-3 border-t border-b">
-                <span className="font-bold text-base sm:text-lg font-oswald uppercase tracking-tight">
-                  Total
-                </span>
-                <span className=" text-lg sm:text-xl text-[#89764b]">
-                  R${(total + 20).toFixed(2).replace(".", ",")}
-                </span>
-              </div>
-
-              {error && (
-                <div
-                  className="text-red-500 text-center mt-4"
-                  dangerouslySetInnerHTML={{ __html: error }}
-                />
-              )}
-              {loading && (
-                <div className="text-center mt-4 text-gray-600">
-                  Carregando...
-                </div>
-              )}
-
-              <button
-                onClick={handleCheckout}
-                disabled={loading}
-                className="w-full mt-4 bg-gradient-to-r from-[#89764b] to-[#a08d5f] hover:from-[#756343] hover:to-[#89764b] text-white py-3 sm:py-4 px-4 sm:px-6 rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl font-oswald uppercase tracking-wider text-xs sm:text-sm flex items-center justify-center gap-1 sm:gap-2 disabled:opacity-50"
-              >
-                Finalizar Compra
-                <ChevronRight className="h-4 w-4 sm:h-5 sm:w-5" />
-              </button>
-
-              <div className="mt-4 text-center">
-                <p className="text-xs sm:text-sm text-gray-500 font-oswald uppercase tracking-wider">
-                  ou{" "}
-                  <Link
-                    to="/vinhos"
-                    className="text-[#89764b] hover:underline font-medium"
-                  >
-                    continuar comprando
-                  </Link>
-                </p>
               </div>
             </div>
           </div>
