@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { ShoppingCart, User, Menu, X, Wine } from "lucide-react";
+import { ShoppingCart, Menu, X, Wine } from "lucide-react";
 import logo from "../assets/logo.png";
 import { useCart } from "../context/useCart";
 
@@ -107,18 +107,6 @@ const Header = () => {
                 )}
               </div>
             </Link>
-
-            {/* Usuário */}
-            <button
-              className={`p-2 transition-colors duration-200 ${
-                activeLink === "/conta"
-                  ? "text-[#89764b]"
-                  : "text-gray-300 hover:text-white"
-              }`}
-              aria-label="Usuário"
-            >
-              <User className="h-5 w-5" />
-            </button>
 
             {/* Botão menu mobile */}
             <button

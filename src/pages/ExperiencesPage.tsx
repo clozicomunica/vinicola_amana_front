@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { Clock, ArrowRight, ChevronRight } from "lucide-react";
 import { motion } from "framer-motion";
 import type { Variants } from "framer-motion";
+import experienceBg from "../assets/experienceBg.jpg";
 
 const ExperiencesPage = () => {
   // Dados das experiências com micro-interações
@@ -63,16 +64,11 @@ const ExperiencesPage = () => {
     <div className="bg-[#0a0a0a] text-white font-oswald overflow-hidden">
       {/* Hero Cinematográfico */}
       <section className="relative h-screen min-h-[800px] flex items-center">
-        <video
-          autoPlay
-          loop
-          muted
-          playsInline
-          className="absolute z-0 w-full h-full object-cover opacity-70"
-          poster="https://images.unsplash.com/photo-1470338622423-81a89b56393f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200"
-        >
-          <source src="/videos/wine-vineyard.mp4" type="video/mp4" />
-        </video>
+        {/* Imagem de fundo no lugar do vídeo */}
+        <div
+          className="absolute z-0 w-full h-full bg-cover bg-center opacity-70"
+          style={{ backgroundImage: `url(${experienceBg})` }}
+        ></div>
 
         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent z-1"></div>
 

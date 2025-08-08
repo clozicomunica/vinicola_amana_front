@@ -309,7 +309,7 @@ const HomePage = () => {
               </div>
 
               {/* View All Button */}
-              <div className="text-center mt-[110px]">
+              <div className="text-center mt-12 lg:mt-16">
                 <Link
                   to="/vinhos"
                   className="inline-flex items-center px-6 py-3 md:px-10 md:py-4 bg-[#89764b] hover:bg-[#756343] text-white rounded-lg transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl font-medium tracking-wide uppercase text-xs md:text-sm"

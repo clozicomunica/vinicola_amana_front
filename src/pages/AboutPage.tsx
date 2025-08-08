@@ -1,58 +1,103 @@
 import { Link } from "react-router-dom";
-import { Wine, Calendar, MapPin, Award } from "lucide-react";
-
+import { Wine, Calendar, MapPin, Award, Instagram } from "lucide-react";
+import bgHero from "../assets/AMANA LOGO MONTANHA.png";
+import logoAmana from "../assets/blacklogo.png";
+import vinhos from "../assets/aboutus1.jpg";
+import parallaxVinhos from "../assets/parallax.jpg";
+import visita from "../assets/visiteamana.jpg";
 const AboutPage = () => {
   // Dados fictícios (estilo premium)
   const features = [
     {
       icon: <Wine className="w-8 h-8" />,
-      title: "Vinhedos Exclusivos",
-      description: "30 hectares no Vale do São Francisco com microclima único",
+      title: "Nossos Vinhedos",
+      description: `
+      Atualmente, abrangemos quase 100 hectares de terras, com 11 hectares já dedicados
+      ao cultivo de videiras francesas, incluindo variedades como Syrah, Cabernet Sauvignon,
+      Cabernet Franc, Malbec, Sauvignon Blanc e Chenin Blanc. Além dos vinhedos em crescimento,
+      nossas terras são ocupadas pela cultura de cafés especiais, oliveiras e áreas
+      de matas nativas preservadas.
+    `,
     },
     {
       icon: <Calendar className="w-8 h-8" />,
       title: "Safras Limitadas",
-      description: "Produção artesanal de apenas 15.000 garrafas/ano",
+      description: `
+      Investimos em uma vinícola de ponta, capacitada para mais de 200 mil garrafas por ano.
+      Aqui, a expertise dos enólogos se encontra com maquinários modernos, resultando em vinhos
+      inesquecíveis. Porém, respeitamos a natureza e as nossas safras ainda estão em desenvolvimento.
+    `,
     },
     {
       icon: <Award className="w-8 h-8" />,
       title: "Premiações",
-      description: "23 medalhas internacionais nos últimos 5 anos",
+      description: `
+      Somos uma Vinícola nova, aberta ao público apenas em 2023, e neste pouco tempo já possuímos
+      06 prêmios na Decanter.
+    `,
     },
     {
       icon: <MapPin className="w-8 h-8" />,
-      title: "Terroir Sertanejo",
-      description: "Solo granítico e 360 dias de sol por ano",
+      title: "Terroir Único",
+      description: `
+      Nossa propriedade fica nas serras que dividem São Paulo e Minas Gerais e tem potencial único.
+      A qualidade do solo de Espírito Santo do Pinhal é refletida em nossos rótulos.
+    `,
     },
   ];
 
   const awards = [
-    { year: "2023", name: "Decanter World Wine Awards - Ouro" },
-    { year: "2022", name: "International Wine Challenge - Prata" },
-    { year: "2021", name: "Berliner Wein Trophy - Gran Ouro" },
-    { year: "2020", name: "Concours Mondial - 92 Pontos" },
+    {
+      year: "2017",
+      name: `Quando um grupo de sócios apaixonados por vinho e confiantes no potencial único do terroir de Espírito Santo do Pinhal adquiriu uma propriedade nas serras que dividem São Paulo e Minas Gerais.`,
+    },
+    {
+      year: "2024",
+      name: "Abertura ao público",
+    },
+    {
+      year: "2024",
+      name: "Primeiro Prêmio na Decanter",
+    },
+    {
+      year: "2025",
+      name: `Lançamento do T4, rótulo exclusivo e de máxima qualidade, destacando a qualidade do conceito de microterroir da Amana.`,
+    },
   ];
 
   return (
     <div className="bg-[#d4d4d4] font-oswald">
-      {/* Hero Cinematográfico */}
-      <section className="relative h-screen min-h-[600px] flex items-center justify-center overflow-hidden">
-        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1535957998253-26f1eec9d836?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920')] bg-cover bg-center opacity-90">
-          <div className="absolute inset-0"></div>
+      {/* Hero Cinematográfico - Versão Atualizada */}
+      <section className="relative h-screen min-h-[600px] flex items-center justify-center overflow-hidden bg-[#d4d4d4]">
+        {/* Container da imagem com tamanho controlado */}
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute top-0 left-0 w-full h-1 bg-[#89764b]"></div>
+          <div className="absolute bottom-0 right-0 w-1 h-full bg-[#89764b]"></div>
+
+          <img
+            src={bgHero}
+            alt="Amana Vineyards"
+            className="absolute inset-0 w-full h-full object-contain object-center"
+            style={{
+              maskImage:
+                "linear-gradient(to bottom, black 60%, transparent 100%)",
+            }}
+          />
         </div>
 
-        <div className="container mx-auto px-4 relative z-10 text-center text-white">
-          <div className="mb-6 flex justify-center">
-            <div className="w-20 h-px bg-black"></div>
-          </div>
+        {/* Conteúdo sobreposto */}
+        <div className="container mx-auto px-4 relative z-10 text-center">
+          <div className="mb-6 flex justify-center"></div>
           <h1 className="text-5xl md:text-6xl lg:text-7xl font-light tracking-tight mb-6 text-black">
-            <span className="block mb-2">AMANA</span>
-            <span className="text-2xl md:text-3xl font-normal text-black">
-              Desde 2010
-            </span>
+            <img
+              src={logoAmana}
+              alt="Logo Amana"
+              className="h-10 mb-2 mx-auto"
+            />
           </h1>
           <p className="text-lg md:text-xl max-w-2xl mx-auto leading-relaxed text-black">
-            Onde a tradição vinícola encontra a ousadia do sertão brasileiro
+            O nome Amana-Tykyra, ou Mantiqueira em Tupi, presta homenagem às
+            características especiais dessa região. Bem vindo à Amana.
           </p>
         </div>
 
@@ -62,34 +107,42 @@ const AboutPage = () => {
       </section>
 
       {/* Assinatura Visual */}
-      <section className="py-24 bg-black text-white relative">
-        <div className="container mx-auto px-4 text-center">
+      <section
+        className="py-24 text-white relative bg-center bg-cover bg-no-repeat bg-fixed"
+        style={{
+          backgroundImage: `url(${vinhos})`,
+        }}
+      >
+        <div className="absolute inset-0 bg-black/60"></div>{" "}
+        {/* Sobreposição escura */}
+        <div className="relative container mx-auto px-4 text-center">
           <div className="max-w-4xl mx-auto">
             <p className="text-2xl md:text-3xl italic font-light leading-relaxed">
-              "Na Amana, cada garrafa é a materialização de um sonho sertanejo -
-              onde a resistência da videira encontra a paixão do vinicultor para
-              criar vinhos que desafiam o deserto."
+              O vinho é a poesia engarrafada
             </p>
             <p className="mt-8 text-[#89764b] uppercase tracking-widest text-sm">
-              Carlos Mendes, Fundador
+              Robert Louis Stevenson
             </p>
           </div>
         </div>
       </section>
-
-      {/* Diferenciais em Blocos */}
-      <section className="py-24 bg-[#d4d4d4]">
+      {/* Diferenciais - Texto Alinhado à Esquerda */}
+      <section className="py-20 bg-[#d4d4d4]">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {features.map((feature, index) => (
-              <div key={index} className="text-center p-8 group">
-                <div className="mx-auto mb-6 text-[#89764b] group-hover:text-black transition-colors">
+              <div key={index} className="p-6 group">
+                <div className="mb-5 text-[#89764b] group-hover:text-black transition-colors duration-200">
                   {feature.icon}
                 </div>
-                <h3 className="text-xl uppercase tracking-tight mb-3">
+
+                <h3 className="text-xl uppercase tracking-tight mb-3 font-normal text-gray-900">
                   {feature.title}
                 </h3>
-                <p className="text-gray-700">{feature.description}</p>
+
+                <p className="text-gray-600 leading-relaxed text-left">
+                  {feature.description}
+                </p>
               </div>
             ))}
           </div>
@@ -100,27 +153,27 @@ const AboutPage = () => {
       <section
         className="relative h-[500px] bg-fixed bg-center bg-cover flex items-center"
         style={{
-          backgroundImage:
-            "url('https://images.unsplash.com/photo-1600788886242-5c96aabe3757?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920')",
+          backgroundImage: `url(${parallaxVinhos})`,
         }}
       >
         <div className="absolute inset-0 bg-black/60"></div>
+
         <div className="container mx-auto px-4 relative z-10 text-white">
           <div className="max-w-2xl">
             <h2 className="text-3xl md:text-4xl uppercase tracking-tight mb-6">
-              Nossa Origem
+              Nossos vinhos
             </h2>
             <p className="text-lg leading-relaxed mb-6">
-              Em 2010, no coração do Vale do São Francisco, um grupo de
-              visionários percebeu o potencial único do terroir sertanejo. Com
-              técnicas inovadoras adaptadas ao clima semiárido, reinventamos a
-              vitivinicultura tropical.
+              Cada vinho Amana traz em seu interior uma história de paixão. Uma
+              combinação perfeita entre o melhor de cada uva, de cada safra com
+              o amor pela terra e pela Mantiqueira. Temos três linha de vinhos:
+              linha Amana, linha Amana Una e linha Amana Singular.
             </p>
             <Link
               to="/vinhos"
               className="inline-flex items-center px-8 py-3 border border-white text-white hover:bg-white hover:text-black transition-colors uppercase tracking-wider text-sm"
             >
-              Conheça as Safras
+              Conheça nossos vinhos
               <Wine className="ml-2 h-4 w-4" />
             </Link>
           </div>
@@ -171,43 +224,79 @@ const AboutPage = () => {
       </section>
 
       {/* Experiência na Vinícola */}
-      <section className="py-24 bg-[#d4d4d4] text-white">
+      <section className="py-24 bg-[#d4d4d4]">
         <div className="container mx-auto px-4">
-          <div className="flex flex-col lg:flex-row items-center">
-            <div className="lg:w-1/2 mb-12 lg:mb-0 lg:pr-12">
-              <h2 className="text-3xl md:text-4xl uppercase tracking-tight mb-6 text-black">
-                Visite Nossa Vinícola
-              </h2>
-              <p className="text-black mb-8 leading-relaxed">
-                Agende uma experiência imersiva em nosso complexo em
-                Petrolina/PE. Degustações guiadas, tour pelos vinhedos e jantar
-                harmonizado com vista para o Rio São Francisco.
-              </p>
-              <div className="space-y-4 mb-8">
-                <p className="flex items-center gap-3 text-black">
-                  <MapPin className="h-5 w-5 text-[#89764b]" />
-                  <span>Rodovia BR-407, Km 12 - Petrolina/PE</span>
+          <div className="flex flex-col lg:flex-row items-stretch gap-12">
+            {/* Texto e informações (mantido todas as melhorias) */}
+            <div className="lg:w-1/2 flex flex-col justify-center">
+              <div className="max-w-lg">
+                <div className="flex items-center gap-4 mb-6">
+                  <h2 className="text-3xl md:text-4xl uppercase tracking-tight text-black font-light">
+                    VIVÊNCIA AMANA
+                  </h2>
+                </div>
+
+                <p className="text-black text-lg leading-relaxed mb-8">
+                  Venha viver a experiência Amana: atendimento de excelência,
+                  vinhos espetaculares e uma vista de tirar o fôlego.
                 </p>
-                <p className="flex items-center gap-3 text-black">
-                  <Calendar className="h-5 w-5 text-[#89764b]" />
-                  <span>Terça a Sábado, das 9h às 17h</span>
-                </p>
+
+                {/* Bloco de endereço premium */}
+                <div className="mb-8 p-8 bg-white rounded-lg shadow-sm border border-[#e0e0e0]">
+                  <div className="flex items-start gap-5">
+                    <div className="bg-[#89764b]/10 p-3 rounded-full">
+                      <MapPin className="h-6 w-6 text-[#89764b]" />
+                    </div>
+                    <div>
+                      <p className="text-black font-medium text-lg">
+                        Estrada Vicinal Alberto Bartholomei, s/n - Barthô
+                      </p>
+                      <p className="text-black mt-1">
+                        Espírito Santo do Pinhal
+                      </p>
+                      <p className="text-black">SP - CEP 13990-000</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Bloco de redes sociais */}
+                <div className="mb-8 flex flex-col sm:flex-row gap-4">
+                  <a
+                    href="https://www.instagram.com/vinicola_amana/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex-1 flex items-center justify-center gap-3 px-6 py-3 bg-white border border-[#e0e0e0] rounded-lg hover:bg-[#f5f5f5] transition-colors"
+                  >
+                    <Instagram className="h-5 w-5 text-[#89764b]" />
+                    <span className="text-[#89764b] font-medium">
+                      @vinicola_amana
+                    </span>
+                  </a>
+
+                  <a
+                    href="https://widget.getinapp.com.br/zPQjaD1Y"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex-1 flex items-center justify-center gap-3 px-6 py-3 bg-[#89764b] hover:bg-[#756343] text-white rounded-lg transition-colors text-center"
+                  >
+                    <Calendar className="h-5 w-5" />
+                    <span className="font-medium">AGENDAR VISITA</span>
+                  </a>
+                </div>
               </div>
-              <Link
-                to="/contato"
-                className="inline-block px-8 py-3 bg-[#89764b] hover:bg-[#756343] text-white rounded-sm transition-colors uppercase tracking-wider text-sm"
-              >
-                Agendar Visita
-              </Link>
             </div>
+
+            {/* Imagem COM MOLDURA (como no original) */}
             <div className="lg:w-1/2">
-              <div className="relative aspect-w-16 aspect-h-9">
+              <div className="relative h-full min-h-[400px]">
+                <div className="absolute inset-0 m-4 border-2 border-[#89764b] rounded-lg z-10 pointer-events-none"></div>
                 <img
-                  src="https://images.unsplash.com/photo-1551632811-561732d1e306?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920"
+                  src={visita}
                   alt="Vinícola Amana"
-                  className="w-full h-auto object-cover"
+                  className="w-full h-full object-cover absolute inset-0 rounded-lg"
                 />
-                <div className="absolute inset-0 border-2 border-[#89764b] m-4"></div>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent rounded-lg"></div>
+                <div className="absolute bottom-8 left-8 right-8 z-20"></div>
               </div>
             </div>
           </div>

@@ -5,9 +5,6 @@ import { Link } from "react-router-dom";
 const HeroSection = () => {
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden font-['Oswald']">
-      {" "}
-      {/* Adicionei a fonte aqui */}
-      {/* Background Image com prioridade mobile */}
       <div className="absolute inset-0 z-0">
         <div
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
@@ -19,9 +16,8 @@ const HeroSection = () => {
         <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/50 to-black/30 md:from-black/60 md:via-black/40 md:to-transparent" />
       </div>
       {/* Conteúdo */}
-      <div className="relative z-10 w-full pt-24 pb-20 px-4 sm:px-6 lg:px-8 text-center lg:text-left">
-        <div className="max-w-4xl mx-auto lg:mx-0">
-          {/* Título - Removi o font-bold */}
+      <div className="relative z-10 w-full pt-24 pb-20 px-4 sm:px-6 lg:px-8 text-left">
+        <div className="max-w-4xl mx-0">
           <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl text-white mb-4 md:mb-6 leading-tight">
             Vinhos Únicos,
             <br />
@@ -31,11 +27,11 @@ const HeroSection = () => {
           </h1>
 
           {/* Descrição */}
-          <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-white mb-6 md:mb-8 max-w-2xl mx-auto lg:mx-0 leading-relaxed">
+          <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-white mb-6 md:mb-8 max-w-2xl mx-0 leading-relaxed">
             Excelência nas encostas da Serra da Mantiqueira
           </p>
 
-          {/* Botões - Removi font-medium */}
+          {/* Botões */}
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center lg:justify-start mb-12 md:mb-0">
             <Link to={"/vinhos"}>
               <button className="cursor-pointer px-6 py-3 sm:px-8 sm:py-4 bg-[#89764b] hover:bg-[#89764b]/90 text-white text-base sm:text-lg rounded-lg shadow-lg transition-all duration-300 group flex items-center justify-center">
@@ -55,8 +51,8 @@ const HeroSection = () => {
             </a>
           </div>
 
-          {/* Estatísticas - Removi font-bold */}
-          <div className="grid grid-cols-3 gap-4 sm:gap-6 md:gap-8 max-w-sm sm:max-w-md mx-auto lg:mx-0 mt-8">
+          {/* Estatísticas */}
+          <div className="grid grid-cols-3 gap-4 sm:gap-6 md:gap-8 max-w-sm sm:max-w-md mx-0 mt-8">
             <div className="text-center lg:text-left">
               <div className="text-2xl sm:text-3xl text-white mb-1">100</div>
               <div className="text-white/70 text-xs sm:text-sm">Hectares</div>
