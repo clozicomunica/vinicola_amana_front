@@ -200,7 +200,7 @@ const HomePage = () => {
                     className="group bg-white rounded-xl sm:rounded-2xl overflow-hidden shadow-sm hover:shadow-md md:hover:shadow-xl transition-all duration-500 border border-gray-100 flex flex-col h-full transform hover:-translate-y-1 md:hover:-translate-y-2"
                   >
                     {/* Image Container */}
-                    <div className="relative aspect-square bg-white p-3 sm:p-4 flex items-center justify-center">
+                    <div className="relative aspect-square bg-white p-3 sm:p-4 flex items-center justify-center overflow-hidden">
                       <Link
                         to={`/produto/${wine.id}`}
                         className="h-full w-full flex items-center justify-center p-2 sm:p-3 md:p-4"
@@ -228,16 +228,16 @@ const HomePage = () => {
                       </div>
 
                       {/* Action Overlay */}
-                      <div className="absolute bottom-2 right-2 sm:bottom-3 sm:right-3 md:bottom-4 md:right-4 flex items-center gap-1 sm:gap-2 md:gap-2 z-10 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-300">
+                      <div className="absolute bottom-3 right-3 flex items-center gap-2 z-10 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-300">
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
                             setQuickViewProduct(wine);
                           }}
-                          className="p-1.5 sm:p-2 bg-white/90 rounded-full hover:bg-white transition-all duration-300 transform hover:scale-105 shadow-md cursor-pointer"
+                          className="p-2 bg-white/90 rounded-full hover:bg-white transition-all duration-300 transform hover:scale-105 shadow-md cursor-pointer"
                           aria-label="Visualização rápida"
                         >
-                          <Eye className="h-4 w-4 sm:h-4 sm:w-4 text-gray-800" />
+                          <Eye className="h-4 w-4 text-gray-800" />
                         </button>
                         {wine.variants[0]?.stock !== 0 && (
                           <button
@@ -245,10 +245,10 @@ const HomePage = () => {
                               e.stopPropagation();
                               handleAddToCart(wine);
                             }}
-                            className="p-1.5 sm:p-2 bg-[#89764b] text-white rounded-full hover:bg-[#756343] transition-all duration-300 transform hover:scale-105 shadow-md cursor-pointer"
+                            className="p-2 bg-[#89764b] text-white rounded-full hover:bg-[#756343] transition-all duration-300 transform hover:scale-105 shadow-md cursor-pointer"
                             aria-label="Adicionar ao carrinho"
                           >
-                            <ShoppingCart className="h-4 w-4 sm:h-4 sm:w-4" />
+                            <ShoppingCart className="h-4 w-4" />
                           </button>
                         )}
                       </div>

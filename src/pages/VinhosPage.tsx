@@ -10,6 +10,7 @@ interface WineVariant {
   id: number;
   price: string;
   compare_at_price?: string;
+  values: { pt: string }[];
 }
 
 interface Wine {
@@ -17,15 +18,15 @@ interface Wine {
   name: { pt: string };
   variants: WineVariant[];
   images: { src: string; alt?: string[] }[];
-  categories: { name: { pt: string } }[];
+  categories: { id: number; name: { pt: string } }[];
   description: { pt: string };
   created_at: string;
 }
 
 const CATEGORIES = [
-  { id: "Tinto", name: "Vinhos Tintos" },
-  { id: "Branco", name: "Vinhos Brancos" },
-  { id: "Rosé", name: "Vinhos Rosé" },
+  { id: "tinto", name: "Vinhos Tintos" },
+  { id: "branco", name: "Vinhos Brancos" },
+  { id: "rosé", name: "Vinhos Rosé" },
   { id: "amana", name: "Amana" },
   { id: "una", name: "Una" },
   { id: "singular", name: "Singular" },
@@ -46,6 +47,14 @@ const VinhosPage = () => {
   const [sortOrder, setSortOrder] = useState<string>("");
   const { addToCart } = useCart();
 
+  // Função para normalizar strings, igual ao backend
+  const cleanString = (str: string) =>
+    str
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .trim();
+
   const fetchWines = async (
     pageNumber: number,
     category: string = selectedCategory,
@@ -61,7 +70,7 @@ const VinhosPage = () => {
     }
 
     try {
-      let url = `https://vinicola-amana-back.onrender.com/api/products?page=${pageNumber}&per_page=8`;
+      let url = `https://vinicola-amana-back.onrender.com/api/products?page=${pageNumber}&per_page=8&published=true`;
 
       if (category !== "all") {
         url += `&category=${encodeURIComponent(category)}`;
@@ -71,24 +80,52 @@ const VinhosPage = () => {
         url += `&search=${encodeURIComponent(search)}`;
       }
 
+      console.log("Fetching wines with URL:", url);
+
       const res = await fetch(url);
       if (!res.ok) throw new Error(`Erro ${res.status}: ${res.statusText}`);
       const data: Wine[] = await res.json();
 
-      // Filter out "Visita Guiada" and "Degustação" by name
-      const filteredData = data.filter(
+      // Log detalhado para depuração
+      console.log(
+        "API Response:",
+        data.map((w) => ({
+          name: w.name.pt,
+          categories: w.categories.map((c) => c.name.pt),
+          variantValues: w.variants.flatMap((v) =>
+            v.values.map((val) => val.pt)
+          ),
+        }))
+      );
+
+      // Filtrar "Visita Guiada" e "Degustação"
+      let filteredData = data.filter(
         (wine) =>
           !wine.name.pt.toLowerCase().includes("visita guiada") &&
           !wine.name.pt.toLowerCase().includes("degustação")
       );
 
-      // Check if there are more products to load (pagination)
+      // Filtragem local para garantir que apenas a variante correta seja exibida
+      if (
+        category !== "all" &&
+        ["tinto", "branco", "rosé"].includes(category)
+      ) {
+        const normalizedCategory = cleanString(category);
+        filteredData = filteredData.filter((wine) =>
+          wine.variants.some((variant) =>
+            variant.values.some(
+              (value) => cleanString(value.pt) === normalizedCategory
+            )
+          )
+        );
+      }
+
       setHasMore(data.length === 8);
 
       if (isFirstPage) {
-        setWines(filteredData); // Set filtered products
+        setWines(filteredData);
       } else {
-        setWines((prev) => [...prev, ...filteredData]); // Append filtered products
+        setWines((prev) => [...prev, ...filteredData]);
       }
       setError(null);
     } catch (err) {
@@ -157,7 +194,10 @@ const VinhosPage = () => {
       price: parseFloat(wine.variants[0].price),
       quantity: 1,
       image: wine.images[0]?.src || wineImage,
-      category: wine.categories[0]?.name.pt || "Vinho",
+      category:
+        wine.variants[0]?.values[0]?.pt ||
+        wine.categories[0]?.name.pt ||
+        "Vinho",
     });
 
     toast.success(`${wine.name.pt} adicionado ao carrinho!`, {
@@ -191,6 +231,19 @@ const VinhosPage = () => {
         ? parseFloat(wine.variants[0].compare_at_price)
         : null;
       const isOnSale = compareAtPrice && compareAtPrice > price;
+
+      // Escolher a variante correta para exibição
+      const displayCategory =
+        selectedCategory !== "all" &&
+        ["tinto", "branco", "rosé"].includes(selectedCategory)
+          ? wine.variants.find((v) =>
+              v.values.some(
+                (val) => cleanString(val.pt) === cleanString(selectedCategory)
+              )
+            )?.values[0]?.pt
+          : wine.variants[0]?.values[0]?.pt ||
+            wine.categories[0]?.name.pt ||
+            "Vinho";
 
       return (
         <motion.div
@@ -252,7 +305,7 @@ const VinhosPage = () => {
               </h3>
               <div className="flex items-center gap-2 md:gap-3">
                 <span className="text-xs md:text-sm text-[#000000] font-['Oswald']">
-                  {wine.categories[0]?.name.pt || "Vinho"}
+                  {displayCategory}
                 </span>
                 <span className="w-1 h-1 bg-[#9c9c9c] rounded-full"></span>
                 <span className="text-xs md:text-sm text-[#000000] font-['Oswald']">
@@ -291,7 +344,7 @@ const VinhosPage = () => {
         </motion.div>
       );
     });
-  }, [wines, sortOrder]);
+  }, [wines, sortOrder, selectedCategory]);
 
   return (
     <div className="min-h-screen bg-[#f8f5f0] font-['Oswald']">
@@ -307,7 +360,7 @@ const VinhosPage = () => {
             transition={{ duration: 0.5 }}
             className="text-2xl md:text-3xl lg:text-4xl mb-4 md:mb-6 uppercase tracking-tight font-['Oswald']"
           >
-            <span className="text-center text-white">Nossos Produtos</span>
+            Nossos Produtos
           </motion.h1>
           <motion.p
             initial={{ opacity: 0 }}
@@ -459,8 +512,18 @@ const VinhosPage = () => {
       </motion.section>
 
       {/* Lista de Produtos */}
-      <section className="py-8 md:py-12 lg:py-16 bg-[#f8f5f0] pt-16 md:pt-20">
+      <section
+        className="py-8 md:py-12 lg:py-16 bg-[#f8f5f0] pt-16 md:pt-20"
+        role="region"
+        aria-label="Lista de produtos"
+      >
         <div className="container mx-auto px-4">
+          {wines.length > 0 && (
+            <p className="text-sm text-[#9c9c9c] mb-4 text-center font-['Oswald']">
+              {wines.length} produto{wines.length !== 1 ? "s" : ""} encontrado
+              {wines.length !== 1 ? "s" : ""}
+            </p>
+          )}
           <AnimatePresence mode="wait">
             {loading && page === 1 ? (
               <motion.div
