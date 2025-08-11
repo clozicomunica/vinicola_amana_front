@@ -9,8 +9,6 @@ import {
   Wine,
   Utensils,
   ZoomIn,
-  Heart,
-  Share2,
 } from "lucide-react";
 import { useCart } from "../context/useCart";
 import toast from "react-hot-toast";
@@ -254,22 +252,6 @@ const ProductDetailsPage = () => {
                   </div>
                 </div>
               )}
-
-              {/* Botões de Ação */}
-              <div className="absolute top-4 right-4 flex gap-2">
-                <button
-                  className="p-2 bg-white/80 rounded-full hover:bg-white transition-all shadow-md"
-                  aria-label="Adicionar aos favoritos"
-                >
-                  <Heart className="h-4 w-4 sm:h-5 sm:w-5 text-[#89764b]" />
-                </button>
-                <button
-                  className="p-2 bg-white/80 rounded-full hover:bg-white transition-all shadow-md"
-                  aria-label="Compartilhar"
-                >
-                  <Share2 className="h-4 w-4 sm:h-5 sm:w-5 text-[#89764b]" />
-                </button>
-              </div>
             </div>
 
             {/* Thumbnails */}

@@ -134,6 +134,7 @@ const HomePage = () => {
       },
     });
   };
+
   return (
     <div className="flex flex-col min-h-screen bg-[#d4d4d4] font-['Oswald'] antialiased">
       <Hero />
@@ -227,16 +228,16 @@ const HomePage = () => {
                       </div>
 
                       {/* Action Overlay */}
-                      <div className="absolute bottom-4 right-4 sm:bottom-6 sm:right-6 flex sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-500 items-center gap-2 sm:gap-3 md:gap-4">
+                      <div className="absolute bottom-2 right-2 sm:bottom-3 sm:right-3 md:bottom-4 md:right-4 flex items-center gap-1 sm:gap-2 md:gap-2 z-10 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-300">
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
                             setQuickViewProduct(wine);
                           }}
-                          className="p-2.5 sm:p-3 bg-white/90 rounded-full hover:bg-white transition-all duration-300 transform hover:scale-105 sm:hover:scale-110 shadow-md cursor-pointer"
+                          className="p-1.5 sm:p-2 bg-white/90 rounded-full hover:bg-white transition-all duration-300 transform hover:scale-105 shadow-md cursor-pointer"
                           aria-label="Visualização rápida"
                         >
-                          <Eye className="h-5 w-5 sm:h-5 sm:w-5 text-gray-800" />
+                          <Eye className="h-4 w-4 sm:h-4 sm:w-4 text-gray-800" />
                         </button>
                         {wine.variants[0]?.stock !== 0 && (
                           <button
@@ -244,10 +245,10 @@ const HomePage = () => {
                               e.stopPropagation();
                               handleAddToCart(wine);
                             }}
-                            className="p-2.5 sm:p-3 bg-[#89764b] text-white rounded-full hover:bg-[#756343] transition-all duration-300 transform hover:scale-105 sm:hover:scale-110 shadow-md cursor-pointer"
+                            className="p-1.5 sm:p-2 bg-[#89764b] text-white rounded-full hover:bg-[#756343] transition-all duration-300 transform hover:scale-105 shadow-md cursor-pointer"
                             aria-label="Adicionar ao carrinho"
                           >
-                            <ShoppingCart className="h-5 w-5 sm:h-5 sm:w-5" />
+                            <ShoppingCart className="h-4 w-4 sm:h-4 sm:w-4" />
                           </button>
                         )}
                       </div>
@@ -326,6 +327,7 @@ const HomePage = () => {
       <div className="container mx-auto px-4 sm:px-6 py-6 md:py-8 lg:py-10 bg-[#d4d4d4] -mt-6 sm:mt-0 md:-mt-4 lg:-mt-6">
         <AboutSection />
       </div>
+
       {/* Quick View Modal */}
       {quickViewProduct && (
         <div

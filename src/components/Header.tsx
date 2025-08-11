@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { ShoppingCart, Menu, X } from "lucide-react";
 import logo from "../assets/logo.png";
 import { useCart } from "../context/useCart";
@@ -15,23 +15,28 @@ const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [activeLink, setActiveLink] = useState("");
-
   const { cart } = useCart();
+  const location = useLocation();
+
+  // Calculate total quantity in cart
   const totalQuantity = cart.reduce(
     (sum, item) => sum + (item.quantity || 1),
     0
   );
 
+  // Update active link on route change
+  useEffect(() => {
+    setActiveLink(location.pathname);
+  }, [location.pathname]);
+
+  // Handle scroll effect for header styling
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 10);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  useEffect(() => {
-    setActiveLink(window.location.pathname);
-  }, []);
-
+  // Close mobile menu
   const closeMenu = () => setIsMenuOpen(false);
 
   return (
@@ -50,6 +55,7 @@ const Header = () => {
             className="group flex items-center gap-2"
             onClick={() => {
               closeMenu();
+              setActiveLink("/"); // Set homepage as active
               window.scrollTo({ top: 0, behavior: "smooth" });
             }}
           >
@@ -60,17 +66,20 @@ const Header = () => {
             />
           </Link>
 
-          {/* Navegação Desktop */}
-          <nav className="hidden md:flex items-center space-x-1 text-transform: uppercase">
+          {/* Desktop Navigation */}
+          <nav className="hidden md:flex items-center space-x-1 uppercase">
             {navLinks.map((item) => (
               <Link
                 key={item.path}
                 to={item.path}
-                onClick={closeMenu}
+                onClick={() => {
+                  closeMenu();
+                  setActiveLink(item.path); // Update active link on click
+                }}
                 className={`relative px-5 py-2 transition-all duration-300 ${
                   activeLink === item.path
                     ? "text-[#89764b]"
-                    : "text-gray-300 hover:text-white"
+                    : "text-[#9C9C9C] hover:text-[#FFFFFF]"
                 }`}
               >
                 <span className="relative group">
@@ -79,7 +88,7 @@ const Header = () => {
                     className={`absolute left-0 bottom-0 w-full h-px ${
                       activeLink === item.path
                         ? "bg-[#89764b] scale-100"
-                        : "bg-white scale-0 group-hover:scale-100"
+                        : "bg-[#FFFFFF] scale-0 group-hover:scale-100"
                     } transition-all duration-300 origin-left`}
                   ></span>
                 </span>
@@ -87,12 +96,16 @@ const Header = () => {
             ))}
           </nav>
 
-          {/* Ícones (Mobile e Desktop) */}
+          {/* Icons (Mobile and Desktop) */}
           <div className="flex items-center gap-4">
-            {/* Carrinho */}
+            {/* Cart */}
             <Link
               to="/carrinho"
               className="p-2 relative transition-all duration-200 group"
+              onClick={() => {
+                closeMenu();
+                setActiveLink("/carrinho"); // Set cart as active
+              }}
               aria-label="Ver carrinho"
             >
               <div className="relative">
@@ -100,20 +113,20 @@ const Header = () => {
                   className={`h-6 w-6 transition-colors duration-300 ${
                     activeLink === "/carrinho"
                       ? "text-[#89764b]"
-                      : "text-gray-300 hover:text-white"
+                      : "text-[#9C9C9C] hover:text-[#FFFFFF]"
                   }`}
                 />
                 {totalQuantity > 0 && (
-                  <span className="absolute -top-2 -right-2 bg-[#9a3324] text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-medium group-hover:scale-110 transition-transform duration-200 shadow-md">
+                  <span className="absolute -top-2 -right-2 bg-[#9A3324] text-[#FFFFFF] text-xs rounded-full h-5 w-5 flex items-center justify-center font-medium group-hover:scale-110 transition-transform duration-200 shadow-md">
                     {totalQuantity > 9 ? "9+" : totalQuantity}
                   </span>
                 )}
               </div>
             </Link>
 
-            {/* Botão menu mobile */}
+            {/* Mobile menu button */}
             <button
-              className="p-2 text-gray-300 hover:text-white md:hidden transition-all duration-200"
+              className="p-2 text-[#9C9C9C] hover:text-[#FFFFFF] md:hidden transition-all duration-200"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               aria-label={isMenuOpen ? "Fechar menu" : "Abrir menu"}
             >
@@ -126,7 +139,7 @@ const Header = () => {
           </div>
         </div>
 
-        {/* Menu mobile */}
+        {/* Mobile Menu */}
         {isMenuOpen && (
           <div className="md:hidden bg-black shadow-xl">
             <nav className="flex flex-col">
@@ -136,10 +149,13 @@ const Header = () => {
                   to={item.path}
                   className={`px-6 py-5 text-lg uppercase font-medium transition-all duration-200 ${
                     activeLink === item.path
-                      ? "text-[#89764b] bg-[#ffffff05]"
-                      : "text-gray-300 hover:text-white hover:bg-[#89764b]/10"
+                      ? "text-[#89764b] bg-[#FFFFFF05]"
+                      : "text-[#9C9C9C] hover:text-[#FFFFFF] hover:bg-[#89764b]/10"
                   }`}
-                  onClick={closeMenu}
+                  onClick={() => {
+                    closeMenu();
+                    setActiveLink(item.path); // Update active link on click
+                  }}
                 >
                   {item.label}
                 </Link>

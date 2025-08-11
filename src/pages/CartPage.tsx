@@ -1,10 +1,9 @@
 import { useState } from "react";
 import { useCart } from "../context/useCart";
 import { ShoppingCart, X, ArrowLeft, Wine, ChevronRight } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom"; // Adicionado useNavigate
 import type { CartItem } from "../context/CartProvider";
 
-// Interface para a resposta do pedido
 interface OrderSummary {
   id?: number;
   number?: string;
@@ -27,19 +26,18 @@ const CartPage = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [orderSummary, setOrderSummary] = useState<OrderSummary | null>(null);
+  const navigate = useNavigate(); // Hook para navegação
 
-  // Calcula o total do carrinho
+  // Calculate cart subtotal
   const total = cart.reduce(
     (sum, item) => sum + Number(item.price) * (item.quantity || 1),
     0
   );
 
-  // Incrementa a quantidade de um item
   const handleIncrement = (item: CartItem) => {
     addToCart({ ...item, quantity: 1 });
   };
 
-  // Decrementa a quantidade de um item
   const handleDecrement = (item: CartItem) => {
     if ((item.quantity || 1) > 1) {
       addToCart({ ...item, quantity: -1 });
@@ -48,13 +46,11 @@ const CartPage = () => {
     }
   };
 
-  // Função de checkout
   const handleCheckout = async () => {
     setLoading(true);
     setError("");
     setOrderSummary(null);
 
-    // Validações
     if (!cart.length) {
       setError("O carrinho está vazio!");
       setLoading(false);
@@ -73,7 +69,6 @@ const CartPage = () => {
       return;
     }
 
-    // Monta o JSON para a Nuvemshop
     const orderData = {
       currency: "BRL",
       language: "pt",
@@ -115,8 +110,6 @@ const CartPage = () => {
       shipping_pickup_type: "ship",
       shipping: "correios",
       shipping_option: "Correios - PAC",
-      shipping_cost_customer: 20.0,
-      shipping_cost_owner: 20.0,
       checkout_enabled: true,
     };
 
@@ -138,16 +131,8 @@ const CartPage = () => {
 
       if (response.ok) {
         setOrderSummary(data);
-        if (data.checkout_url) {
-          window.location.href = data.checkout_url;
-        } else if (data.id) {
-          const fallbackUrl = `https://vinicolaamana.lojavirtualnuvem.com.br/checkout/${data.id}`;
-          window.location.href = fallbackUrl;
-        } else {
-          setError(
-            "Link de checkout não retornado. Contate o suporte ou tente novamente."
-          );
-        }
+        // Redireciona para a página de sucesso com orderSummary como estado
+        navigate("/success", { state: { orderSummary: data, customer } });
       } else {
         setError(`Erro ao criar pedido: ${data.error || "Tente novamente"}`);
       }
@@ -160,25 +145,24 @@ const CartPage = () => {
 
   return (
     <div className="min-h-screen bg-[#d4d4d4] font-['Oswald'] antialiased">
-      {/* Header do Carrinho */}
-      <div className="bg-gradient-to-r from-[#89764b] to-[#756343] text-white py-4 sm:py-6 shadow-lg sticky top-0 z-10">
-        <div className="container mx-auto px-4 sm:px-6">
-          <div className="flex items-center justify-between gap-4">
+      {/* Header */}
+      <div className="bg-gradient-to-r from-[#89764b] to-[#756343] text-white py-3 shadow-md sticky top-0 z-10">
+        <div className="container mx-auto px-4">
+          <div className="flex items-center justify-between gap-3">
             <Link
               to="/"
-              className="flex items-center hover:opacity-80 transition-opacity uppercase tracking-wider text-xs sm:text-sm"
+              className="flex items-center hover:opacity-80 transition-opacity uppercase tracking-wide text-sm"
               aria-label="Continuar comprando"
             >
-              <ArrowLeft className="h-4 w-4 sm:h-5 sm:w-5 mr-1 sm:mr-2" />
+              <ArrowLeft className="h-4 w-4 mr-1" />
               <span className="hidden sm:inline">Continuar Comprando</span>
               <span className="sm:hidden">Voltar</span>
             </Link>
-            <h1 className="text-base sm:text-xl flex items-center uppercase tracking-tight">
-              <ShoppingCart className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
-              <span className="hidden sm:inline">Seu Carrinho</span>
-              <span className="sm:hidden">Carrinho</span>
+            <h1 className="text-lg flex items-center uppercase tracking-tight">
+              <ShoppingCart className="h-4 w-4 mr-1" />
+              Carrinho
             </h1>
-            <div className="text-xs sm:text-sm bg-white/20 px-2 sm:px-3 py-1 rounded-full uppercase tracking-wide">
+            <div className="text-xs bg-white/20 px-2 py-1 rounded-full uppercase tracking-wide">
               {cart.reduce((total, item) => total + (item.quantity || 1), 0)}{" "}
               ITEM
               {cart.reduce((total, item) => total + (item.quantity || 1), 0) !==
@@ -188,46 +172,46 @@ const CartPage = () => {
         </div>
       </div>
 
-      {/* Corpo do Carrinho */}
-      <div className="container mx-auto px-4 sm:px-8 py-6 sm:py-12 pt-16 sm:pt-20">
+      {/* Body */}
+      <div className="container mx-auto px-4 py-6 pt-12">
         {cart.length === 0 ? (
-          <div className="text-center py-12 sm:py-16">
-            <div className="mx-auto w-20 h-20 sm:w-24 sm:h-24 bg-gradient-to-br from-[#89764b] to-[#a08d5f] rounded-full flex items-center justify-center mb-4 sm:mb-6 shadow-lg">
-              <ShoppingCart className="h-10 w-10 sm:h-12 sm:w-12 text-white" />
+          <div className="text-center py-8">
+            <div className="mx-auto w-16 h-16 bg-gradient-to-br from-[#89764b] to-[#a08d5f] rounded-full flex items-center justify-center mb-4 shadow-md">
+              <ShoppingCart className="h-8 w-8 text-white" />
             </div>
-            <h2 className="text-lg sm:text-2xl text-gray-800 mb-3 sm:mb-4 uppercase tracking-tight">
+            <h2 className="text-lg text-gray-800 mb-2 uppercase tracking-tight">
               Seu carrinho está vazio
             </h2>
-            <p className="text-gray-600 mb-4 sm:mb-6 max-w-md mx-auto leading-relaxed text-sm sm:text-base">
+            <p className="text-sm text-gray-600 mb-4 max-w-md mx-auto">
               Parece que você ainda não adicionou nenhum vinho ao carrinho.
             </p>
             <Link
               to="/vinhos"
-              className="inline-flex items-center px-4 py-2 sm:px-6 sm:py-3 bg-[#89764b] hover:bg-[#756343] text-white rounded-lg transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl uppercase tracking-wider text-xs sm:text-sm"
+              className="inline-flex items-center px-4 py-2 bg-[#89764b] hover:bg-[#756343] text-white rounded-lg transition-all hover:scale-105 uppercase tracking-wide text-sm"
               aria-label="Explorar vinhos"
             >
               Explorar Vinhos
-              <ChevronRight className="ml-2 h-4 w-4 sm:h-5 sm:w-5" />
+              <ChevronRight className="ml-1 h-4 w-4" />
             </Link>
           </div>
         ) : (
-          <div className="flex flex-col lg:flex-row gap-6 sm:gap-10">
-            {/* Coluna esquerda - Itens e formulário */}
-            <div className="lg:w-2/3 flex flex-col gap-6 sm:gap-10">
-              {/* Lista de Itens */}
-              <div className="bg-white rounded-xl shadow-lg border border-[#89764b]/10 overflow-hidden">
-                <div className="hidden sm:grid sm:grid-cols-2 sm:gap-8 sm:p-6 bg-[#89764b]/5">
-                  <div className="text-lg font-bold text-gray-900 uppercase tracking-tight">
+          <div className="flex flex-col lg:flex-row gap-6">
+            {/* Left Column - Items and Form */}
+            <div className="lg:w-2/3 flex flex-col gap-6">
+              {/* Cart Items */}
+              <div className="bg-white rounded-lg shadow-md border border-[#89764b]/10">
+                <div className="hidden sm:grid sm:grid-cols-2 sm:gap-6 sm:p-4 bg-[#89764b]/5">
+                  <div className="text-base font-bold text-gray-900 uppercase tracking-tight">
                     Produto
                   </div>
-                  <div className="grid grid-cols-3 gap-4">
-                    <div className="text-lg font-bold text-gray-900 uppercase tracking-tight text-center">
+                  <div className="grid grid-cols-3 gap-3">
+                    <div className="text-base font-bold text-gray-900 uppercase tracking-tight text-center">
                       Preço
                     </div>
-                    <div className="text-lg font-bold text-gray-900 uppercase tracking-tight text-center">
+                    <div className="text-base font-bold text-gray-900 uppercase tracking-tight text-center">
                       Quantidade
                     </div>
-                    <div className="text-lg font-bold text-gray-900 uppercase tracking-tight text-right">
+                    <div className="text-base font-bold text-gray-900 uppercase tracking-tight text-right">
                       Total
                     </div>
                   </div>
@@ -236,12 +220,12 @@ const CartPage = () => {
                   {cart.map((item) => (
                     <li
                       key={item.id}
-                      className="p-3 sm:p-6 hover:bg-gray-50 transition-colors duration-300"
+                      className="p-3 hover:bg-gray-50 transition-colors"
                     >
-                      <div className="flex flex-col sm:grid sm:grid-cols-2 sm:gap-8">
-                        <div className="flex items-start space-x-3 sm:space-x-6">
+                      <div className="flex flex-col sm:grid sm:grid-cols-2 sm:gap-6">
+                        <div className="flex items-start space-x-3">
                           <div className="relative flex-shrink-0">
-                            <div className="w-16 h-16 sm:w-28 sm:h-28 bg-gray-50 rounded-lg flex items-center justify-center p-2 sm:p-4">
+                            <div className="w-14 h-14 bg-gray-50 rounded-lg flex items-center justify-center p-2">
                               <img
                                 src={item.image || ""}
                                 alt={item.name}
@@ -253,21 +237,21 @@ const CartPage = () => {
                               />
                             </div>
                             {(item.quantity || 1) > 1 && (
-                              <span className="absolute -top-2 -right-2 sm:-top-4 sm:-right-4 bg-[#89764b] text-white text-xs sm:text-sm rounded-full h-5 w-5 sm:h-8 sm:w-8 flex items-center justify-center font-medium shadow-md">
+                              <span className="absolute -top-2 -right-2 bg-[#89764b] text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-medium shadow-md">
                                 {item.quantity}
                               </span>
                             )}
                           </div>
                           <div className="flex-1">
-                            <h3 className="text-sm sm:text-lg text-gray-900 uppercase tracking-tight">
+                            <h3 className="text-sm text-gray-900 uppercase tracking-tight">
                               {item.name}
                             </h3>
-                            <p className="text-xs sm:text-base text-gray-500 uppercase tracking-wider mt-1">
+                            <p className="text-xs text-gray-500 uppercase tracking-wider mt-1">
                               {item.category || "Vinho"}
                             </p>
                             <div className="sm:hidden mt-2">
                               <span className="font-medium text-gray-700 text-sm">
-                                R${" "}
+                                R$
                                 {Number(item.price || 0)
                                   .toFixed(2)
                                   .replace(".", ",")}
@@ -276,20 +260,20 @@ const CartPage = () => {
                           </div>
                         </div>
                         <div className="sm:hidden flex items-center justify-between mt-2 gap-2">
-                          <div className="flex items-center border border-gray-200 rounded-lg overflow-hidden">
+                          <div className="flex items-center border border-gray-200 rounded-lg">
                             <button
                               onClick={() => handleDecrement(item)}
-                              className="px-2 sm:px-3 py-1 text-gray-600 hover:bg-gray-100 transition-colors"
+                              className="px-2 py-1 text-gray-600 hover:bg-gray-100"
                               aria-label="Reduzir quantidade"
                             >
                               -
                             </button>
-                            <span className="px-2 sm:px-3 py-1 text-center min-w-[30px] border-x border-gray-200 font-medium text-sm">
+                            <span className="px-2 py-1 text-center min-w-[30px] border-x border-gray-200 font-medium text-sm">
                               {item.quantity || 1}
                             </span>
                             <button
                               onClick={() => handleIncrement(item)}
-                              className="px-2 sm:px-3 py-1 text-gray-600 hover:bg-gray-100 transition-colors"
+                              className="px-2 py-1 text-gray-600 hover:bg-gray-100"
                               aria-label="Aumentar quantidade"
                             >
                               +
@@ -297,61 +281,61 @@ const CartPage = () => {
                           </div>
                           <div className="flex items-center space-x-2">
                             <span className="font-bold text-gray-900 text-sm">
-                              R${" "}
+                              R$
                               {(Number(item.price || 0) * (item.quantity || 1))
                                 .toFixed(2)
                                 .replace(".", ",")}
                             </span>
                             <button
                               onClick={() => removeFromCart(item.id)}
-                              className="text-gray-400 hover:text-red-500 transition-colors p-1"
+                              className="text-gray-400 hover:text-red-500 p-1"
                               aria-label="Remover item"
                             >
-                              <X className="h-4 w-4 sm:h-5 sm:w-5" />
+                              <X className="h-4 w-4" />
                             </button>
                           </div>
                         </div>
-                        <div className="hidden sm:grid sm:grid-cols-3 sm:gap-4 sm:items-center">
-                          <div className="text-center text-gray-700 font-medium text-base">
-                            R${" "}
+                        <div className="hidden sm:grid sm:grid-cols-3 sm:gap-3 sm:items-center">
+                          <div className="text-center text-gray-700 font-medium text-sm">
+                            R$
                             {Number(item.price || 0)
                               .toFixed(2)
                               .replace(".", ",")}
                           </div>
                           <div className="flex items-center justify-center">
-                            <div className="flex items-center border border-gray-200 rounded-lg overflow-hidden">
+                            <div className="flex items-center border border-gray-200 rounded-lg">
                               <button
                                 onClick={() => handleDecrement(item)}
-                                className="px-5 py-2.5 text-gray-600 hover:bg-gray-100 transition-colors"
+                                className="px-3 py-1 text-gray-600 hover:bg-gray-100"
                                 aria-label="Reduzir quantidade"
                               >
                                 -
                               </button>
-                              <span className="px-5 py-2.5 text-center min-w-[56px] border-x border-gray-200 font-medium text-lg">
+                              <span className="px-3 py-1 text-center min-w-[40px] border-x border-gray-200 font-medium text-sm">
                                 {item.quantity || 1}
                               </span>
                               <button
                                 onClick={() => handleIncrement(item)}
-                                className="px-5 py-2.5 text-gray-600 hover:bg-gray-100 transition-colors"
+                                className="px-3 py-1 text-gray-600 hover:bg-gray-100"
                                 aria-label="Aumentar quantidade"
                               >
                                 +
                               </button>
                             </div>
                           </div>
-                          <div className="flex items-center justify-end space-x-4">
-                            <span className="font-bold text-gray-900 text-base">
-                              R${" "}
+                          <div className="flex items-center justify-end space-x-3">
+                            <span className="font-bold text-gray-900 text-sm">
+                              R$
                               {(Number(item.price || 0) * (item.quantity || 1))
                                 .toFixed(2)
                                 .replace(".", ",")}
                             </span>
                             <button
                               onClick={() => removeFromCart(item.id)}
-                              className="text-gray-400 hover:text-red-500 transition-colors p-2.5"
+                              className="text-gray-400 hover:text-red-500 p-1"
                               aria-label="Remover item"
                             >
-                              <X className="h-6 w-6" />
+                              <X className="h-4 w-4" />
                             </button>
                           </div>
                         </div>
@@ -361,18 +345,18 @@ const CartPage = () => {
                 </ul>
               </div>
 
-              {/* Cupom e Limpar Carrinho */}
-              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sm:gap-8">
+              {/* Coupon and Clear Cart */}
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                 <div className="w-full sm:w-auto flex-1">
                   <div className="flex rounded-lg overflow-hidden shadow-md">
                     <input
                       type="text"
                       placeholder="CÓDIGO DE CUPOM"
-                      className="flex-1 px-3 sm:px-5 py-2 sm:py-4 border border-gray-200 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-[#89764b] uppercase tracking-wider text-xs sm:text-lg"
+                      className="flex-1 px-3 py-2 border border-gray-200 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-[#89764b] uppercase tracking-wider text-sm"
                       aria-label="Inserir código de cupom"
                     />
                     <button
-                      className="px-3 sm:px-5 py-2 sm:py-4 bg-[#89764b] text-white hover:bg-[#756343] transition-all duration-300 hover:scale-105 uppercase tracking-wider text-xs sm:text-lg"
+                      className="px-3 py-2 bg-[#89764b] text-white hover:bg-[#756343] transition-all hover:scale-105 uppercase tracking-wider text-sm"
                       aria-label="Aplicar cupom"
                     >
                       Aplicar
@@ -381,24 +365,24 @@ const CartPage = () => {
                 </div>
                 <button
                   onClick={clearCart}
-                  className="flex items-center text-gray-600 hover:text-red-600 transition-colors uppercase tracking-wider text-xs sm:text-lg"
+                  className="flex items-center text-gray-600 hover:text-red-600 transition-colors uppercase tracking-wider text-sm"
                   aria-label="Limpar carrinho"
                 >
-                  <X className="h-3 w-3 sm:h-5 sm:w-5 mr-1" />
+                  <X className="h-4 w-4 mr-1" />
                   Limpar Carrinho
                 </button>
               </div>
 
-              {/* Formulário de Dados do Cliente */}
-              <div className="bg-white rounded-xl shadow-lg p-4 sm:p-8 border border-[#89764b]/10">
-                <h3 className="text-lg sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6 pb-3 border-b uppercase tracking-tight">
+              {/* Customer Form */}
+              <div className="bg-white rounded-lg shadow-md p-4 border border-[#89764b]/10">
+                <h3 className="text-lg font-bold text-gray-900 mb-3 pb-2 border-b uppercase tracking-tight">
                   Dados do Cliente
                 </h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-8">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
                     <label
                       htmlFor="email"
-                      className="block text-xs sm:text-lg text-gray-600 uppercase tracking-wider mb-2"
+                      className="block text-sm text-gray-600 uppercase tracking-wider mb-1"
                     >
                       Email *
                     </label>
@@ -410,14 +394,14 @@ const CartPage = () => {
                         setCustomer({ ...customer, email: e.target.value })
                       }
                       placeholder="Digite seu email"
-                      className="w-full px-3 sm:px-5 py-2 sm:py-4 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#89764b] text-sm sm:text-lg"
+                      className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#89764b] text-sm"
                       aria-required="true"
                     />
                   </div>
                   <div>
                     <label
                       htmlFor="name"
-                      className="block text-xs sm:text-lg text-gray-600 uppercase tracking-wider mb-2"
+                      className="block text-sm text-gray-600 uppercase tracking-wider mb-1"
                     >
                       Nome *
                     </label>
@@ -429,14 +413,14 @@ const CartPage = () => {
                         setCustomer({ ...customer, name: e.target.value })
                       }
                       placeholder="Digite seu nome"
-                      className="w-full px-3 sm:px-5 py-2 sm:py-4 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#89764b] text-sm sm:text-lg"
+                      className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#89764b] text-sm"
                       aria-required="true"
                     />
                   </div>
                   <div>
                     <label
                       htmlFor="document"
-                      className="block text-xs sm:text-lg text-gray-600 uppercase tracking-wider mb-2"
+                      className="block text-sm text-gray-600 uppercase tracking-wider mb-1"
                     >
                       CPF (somente números) *
                     </label>
@@ -448,14 +432,14 @@ const CartPage = () => {
                         setCustomer({ ...customer, document: e.target.value })
                       }
                       placeholder="Digite seu CPF"
-                      className="w-full px-3 sm:px-5 py-2 sm:py-4 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#89764b] text-sm sm:text-lg"
+                      className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#89764b] text-sm"
                       aria-required="true"
                     />
                   </div>
                   <div>
                     <label
                       htmlFor="address"
-                      className="block text-xs sm:text-lg text-gray-600 uppercase tracking-wider mb-2"
+                      className="block text-sm text-gray-600 uppercase tracking-wider mb-1"
                     >
                       Endereço *
                     </label>
@@ -467,14 +451,14 @@ const CartPage = () => {
                         setCustomer({ ...customer, address: e.target.value })
                       }
                       placeholder="Digite seu endereço"
-                      className="w-full px-3 sm:px-5 py-2 sm:py-4 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#89764b] text-sm sm:text-lg"
+                      className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#89764b] text-sm"
                       aria-required="true"
                     />
                   </div>
                   <div>
                     <label
                       htmlFor="city"
-                      className="block text-xs sm:text-lg text-gray-600 uppercase tracking-wider mb-2"
+                      className="block text-sm text-gray-600 uppercase tracking-wider mb-1"
                     >
                       Cidade *
                     </label>
@@ -486,14 +470,14 @@ const CartPage = () => {
                         setCustomer({ ...customer, city: e.target.value })
                       }
                       placeholder="Digite sua cidade"
-                      className="w-full px-3 sm:px-5 py-2 sm:py-4 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#89764b] text-sm sm:text-lg"
+                      className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#89764b] text-sm"
                       aria-required="true"
                     />
                   </div>
                   <div>
                     <label
                       htmlFor="zipcode"
-                      className="block text-xs sm:text-lg text-gray-600 uppercase tracking-wider mb-2"
+                      className="block text-sm text-gray-600 uppercase tracking-wider mb-1"
                     >
                       CEP (somente números) *
                     </label>
@@ -505,26 +489,26 @@ const CartPage = () => {
                         setCustomer({ ...customer, zipcode: e.target.value })
                       }
                       placeholder="Digite seu CEP"
-                      className="w-full px-3 sm:px-5 py-2 sm:py-4 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#89764b] text-sm sm:text-lg"
+                      className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#89764b] text-sm"
                       aria-required="true"
                     />
                   </div>
                 </div>
-                <p className="text-xs sm:text-base text-gray-500 mt-3 sm:mt-4">
+                <p className="text-xs text-gray-500 mt-2">
                   * Campos obrigatórios
                 </p>
               </div>
             </div>
 
-            {/* Coluna direita - Resumo do Pedido */}
+            {/* Right Column - Order Summary */}
             <div className="lg:w-1/3">
-              <div className="bg-white rounded-xl shadow-lg p-4 sm:p-8 border border-[#89764b]/10 lg:sticky lg:top-28">
+              <div className="bg-white rounded-lg shadow-md p-4 border border-[#89764b]/10 lg:sticky lg:top-20">
                 {orderSummary && (
-                  <div className="mb-4 sm:mb-8 border-b pb-4 sm:pb-6">
-                    <h3 className="text-lg sm:text-2xl font-bold text-gray-900 mb-3 sm:mb-4 uppercase tracking-tight">
+                  <div className="mb-4 border-b pb-4">
+                    <h3 className="text-lg font-bold text-gray-900 mb-2 uppercase tracking-tight">
                       Resumo do Pedido Criado
                     </h3>
-                    <div className="space-y-2 sm:space-y-4 text-sm sm:text-lg">
+                    <div className="space-y-2 text-sm">
                       <p>
                         <strong>Número do Pedido:</strong>{" "}
                         {orderSummary.number ||
@@ -550,9 +534,7 @@ const CartPage = () => {
                       </p>
                       <p>
                         <strong>Total:</strong> R${" "}
-                        {parseFloat(
-                          (orderSummary.total || total + 20).toString()
-                        )
+                        {parseFloat((orderSummary.total || total).toString())
                           .toFixed(2)
                           .replace(".", ",")}
                       </p>
@@ -560,7 +542,7 @@ const CartPage = () => {
                         <img
                           src={orderSummary.products[0].image.src}
                           alt={orderSummary.products[0].name || "Produto"}
-                          className="max-w-[120px] sm:max-w-[200px] rounded-lg mt-2 sm:mt-4"
+                          className="max-w-[100px] rounded-lg mt-2"
                         />
                       )}
                       <p>
@@ -570,78 +552,70 @@ const CartPage = () => {
                   </div>
                 )}
 
-                <h3 className="text-lg sm:text-2xl font-bold text-gray-900 mb-3 sm:mb-4 pb-3 border-b flex items-center uppercase tracking-tight">
-                  <Wine className="h-4 w-4 sm:h-6 sm:w-6 mr-2 text-[#89764b]" />
+                <h3 className="text-lg font-bold text-gray-900 mb-3 pb-2 border-b flex items-center uppercase tracking-tight">
+                  <Wine className="h-4 w-4 mr-1 text-[#89764b]" />
                   Resumo
                 </h3>
 
-                <div className="space-y-6 mb-4 sm:mb-8">
+                <div className="space-y-4 mb-4">
                   <div className="flex justify-between">
-                    <span className="text-gray-600 uppercase tracking-wider text-sm sm:text-lg">
+                    <span className="text-gray-600 uppercase tracking-wider text-sm">
                       Subtotal
                     </span>
-                    <span className="text-gray-900 font-medium text-base sm:text-xl">
+                    <span className="text-gray-900 font-medium text-sm">
                       R${total.toFixed(2).replace(".", ",")}
                     </span>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600 uppercase tracking-wider text-sm sm:text-lg">
-                      Frete
-                    </span>
-                    <span className="text-gray-900 font-medium text-base sm:text-xl">
-                      R$ 20,00
-                    </span>
-                  </div>
-                  <div className="flex justify-between pt-3 border-t">
-                    <span className="text-gray-600 uppercase tracking-wider text-sm sm:text-lg">
+                  <div className="flex justify-between pt-2 border-t">
+                    <span className="text-gray-600 uppercase tracking-wider text-sm">
                       Desconto
                     </span>
-                    <span className="text-[#89764b] font-medium text-base sm:text-xl">
+                    <span className="text-[#89764b] font-medium text-sm">
                       - R$ 0,00
                     </span>
                   </div>
                 </div>
 
-                <div className="flex justify-between items-center py-3 border-t border-b">
-                  <span className="font-bold text-base sm:text-2xl uppercase tracking-tight">
+                <div className="flex justify-between items-center py-2 border-t border-b">
+                  <span className="font-bold text-lg uppercase tracking-tight">
                     Total
                   </span>
-                  <span className="text-lg sm:text-3xl text-[#89764b]">
-                    R${(total + 20).toFixed(2).replace(".", ",")}
+                  <span className="text-lg text-[#89764b]">
+                    R${total.toFixed(2).replace(".", ",")}
                   </span>
                 </div>
 
                 {error && (
-                  <div className="flex items-center justify-between bg-red-50 text-red-600 p-3 sm:p-5 rounded-lg mt-4">
-                    <span className="text-sm sm:text-lg">{error}</span>
+                  <div className="flex items-center justify-between bg-red-50 text-red-600 p-2 rounded-lg mt-3">
+                    <span className="text-sm">{error}</span>
                     <button
                       onClick={() => setError("")}
                       className="text-red-600 hover:text-red-800"
                       aria-label="Fechar erro"
                     >
-                      <X className="h-4 w-4 sm:h-6 w-6" />
+                      <X className="h-4 w-4" />
                     </button>
                   </div>
                 )}
                 {loading && (
-                  <div className="flex items-center justify-center gap-2 text-gray-600 mt-4">
-                    <Wine className="h-4 w-4 sm:h-6 sm:w-6 animate-spin" />
-                    <span className="text-sm sm:text-lg">Carregando...</span>
+                  <div className="flex items-center justify-center gap-2 text-gray-600 mt-3">
+                    <Wine className="h-4 w-4 animate-spin" />
+                    <span className="text-sm">Carregando...</span>
                   </div>
                 )}
 
                 <button
                   onClick={handleCheckout}
                   disabled={loading}
-                  className="w-full mt-4 sm:mt-8 bg-gradient-to-r from-[#89764b] to-[#a08d5f] hover:from-[#756343] hover:to-[#89764b] text-white py-3 sm:py-5 px-4 sm:px-10 rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 uppercase tracking-wider text-xs sm:text-lg flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full mt-4 bg-gradient-to-r from-[#89764b] to-[#a08d5f] hover:from-[#756343] hover:to-[#89764b] text-white py-3 px-6 rounded-lg transition-all shadow-md hover:shadow-lg hover:scale-105 uppercase tracking-wider text-sm flex items-center justify-center gap-1 disabled:opacity-50 disabled:cursor-not-allowed"
                   aria-label="Finalizar compra"
                 >
                   Finalizar Compra
-                  <ChevronRight className="h-4 w-4 sm:h-6 sm:w-6" />
+                  <ChevronRight className="h-4 w-4" />
                 </button>
 
-                <div className="mt-3 sm:mt-6 text-center">
-                  <p className="text-xs sm:text-lg text-gray-500 uppercase tracking-wider">
+                <div className="mt-3 text-center">
+                  <p className="text-sm text-gray-500 uppercase tracking-wider">
                     ou{" "}
                     <Link
                       to="/vinhos"

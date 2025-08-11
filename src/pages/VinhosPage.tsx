@@ -64,7 +64,7 @@ const VinhosPage = () => {
       let url = `https://vinicola-amana-back.onrender.com/api/products?page=${pageNumber}&per_page=8`;
 
       if (category !== "all") {
-        url += `&category=${category}`;
+        url += `&category=${encodeURIComponent(category)}`;
       }
 
       if (search) {
@@ -72,18 +72,27 @@ const VinhosPage = () => {
       }
 
       const res = await fetch(url);
-      if (!res.ok) throw new Error("Erro ao carregar os produtos");
-      const data = await res.json();
+      if (!res.ok) throw new Error(`Erro ${res.status}: ${res.statusText}`);
+      const data: Wine[] = await res.json();
 
+      // Filter out "Visita Guiada" and "Degustação" by name
+      const filteredData = data.filter(
+        (wine) =>
+          !wine.name.pt.toLowerCase().includes("visita guiada") &&
+          !wine.name.pt.toLowerCase().includes("degustação")
+      );
+
+      // Check if there are more products to load (pagination)
       setHasMore(data.length === 8);
 
       if (isFirstPage) {
-        setWines(data);
+        setWines(filteredData); // Set filtered products
       } else {
-        setWines((prev) => [...prev, ...data]);
+        setWines((prev) => [...prev, ...filteredData]); // Append filtered products
       }
       setError(null);
     } catch (err) {
+      console.error("Fetch error:", err);
       setError(err instanceof Error ? err.message : "Erro desconhecido");
     } finally {
       setLoading(false);
@@ -176,110 +185,112 @@ const VinhosPage = () => {
   const wineList = useMemo(() => {
     const sortedWines = sortOrder ? sortProducts(wines, sortOrder) : wines;
 
-    return sortedWines.map((wine) => (
-      <motion.div
-        key={wine.id}
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3 }}
-        className="group bg-white rounded-xl overflow-hidden border border-[#9c9c9c]/30 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 flex flex-col h-full font-['Oswald']"
-      >
-        <div className="relative flex items-center justify-center h-60 md:h-80 bg-gradient-to-b from-[#f5f5f5] to-[#e5e5e5] p-4 md:p-6">
-          <Link
-            to={`/produto/${wine.id}`}
-            className="h-full w-full flex items-center justify-center"
-          >
-            <motion.img
-              src={wine.images[0]?.src || wineImage}
-              alt={wine.images[0]?.alt?.[0] || wine.name.pt}
-              className="max-h-[150px] sm:max-h-[200px] md:max-h-full w-auto object-contain transition duration-500 group-hover:scale-105"
-              style={{
-                mixBlendMode: "multiply",
-                filter: "drop-shadow(0 8px 16px rgba(0, 0, 0, 0.15))",
-              }}
-              whileHover={{ scale: 1.05 }}
-            />
-          </Link>
-          {wine.variants[0]?.compare_at_price && (
-            <motion.span
-              className="absolute top-2 left-2 md:top-3 md:left-3 bg-[#9a3324] text-white text-xs px-2 md:px-3 py-0.5 md:py-1 rounded-full shadow-md uppercase tracking-tight font-['Oswald']"
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ delay: 0.2 }}
-            >
-              Oferta
-            </motion.span>
-          )}
-          <div className="absolute bottom-3 right-3 md:bottom-4 md:right-4 flex items-center gap-2 md:gap-3 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300">
+    return sortedWines.map((wine) => {
+      const price = parseFloat(wine.variants[0]?.price ?? "0");
+      const compareAtPrice = wine.variants[0]?.compare_at_price
+        ? parseFloat(wine.variants[0].compare_at_price)
+        : null;
+      const isOnSale = compareAtPrice && compareAtPrice > price;
+
+      return (
+        <motion.div
+          key={wine.id}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+          className="group bg-white rounded-xl overflow-hidden border border-[#9c9c9c]/30 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 flex flex-col h-full font-['Oswald']"
+        >
+          <div className="relative flex items-center justify-center h-60 md:h-80 bg-gradient-to-b from-[#f5f5f5] to-[#e5e5e5] p-4 md:p-6">
             <Link
               to={`/produto/${wine.id}`}
-              className="p-2 md:p-3 bg-white/90 rounded-full hover:bg-white transition transform hover:scale-110 shadow-md"
-              aria-label="Visualização rápida"
+              className="h-full w-full flex items-center justify-center"
             >
-              <Eye className="h-4 w-4 md:h-5 md:w-5 text-[#000000]" />
+              <motion.img
+                src={wine.images[0]?.src || wineImage}
+                alt={wine.images[0]?.alt?.[0] || wine.name.pt}
+                className="max-h-[150px] sm:max-h-[200px] md:max-h-full w-auto object-contain transition duration-500 group-hover:scale-105"
+                style={{
+                  mixBlendMode: "multiply",
+                  filter: "drop-shadow(0 8px 16px rgba(0, 0, 0, 0.15))",
+                }}
+                whileHover={{ scale: 1.05 }}
+              />
             </Link>
-            <motion.button
-              onClick={() => handleAddToCart(wine)}
-              className="p-2 md:p-3 bg-[#89764b] text-white rounded-full hover:bg-[#756343] transition transform hover:scale-110 shadow-md"
-              aria-label="Adicionar ao carrinho"
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-            >
-              <ShoppingCart className="h-4 w-4 md:h-5 md:w-5" />
-            </motion.button>
-          </div>
-        </div>
-        <div className="p-4 md:p-6 flex flex-col flex-grow">
-          <div className="mb-3 md:mb-4">
-            <h3 className="text-[#000000] text-base md:text-lg uppercase tracking-tight mb-1 md:mb-2 line-clamp-1 font-['Oswald']">
-              {wine.name.pt}
-            </h3>
-            <div className="flex items-center gap-2 md:gap-3">
-              <span className="text-xs md:text-sm text-[#000000] font-['Oswald']">
-                {wine.categories[0]?.name.pt || "Vinho"}
-              </span>
-              <span className="w-1 h-1 bg-[#9c9c9c] rounded-full"></span>
-              <span className="text-xs md:text-sm text-[#000000] font-['Oswald']">
-                Safra {new Date(wine.created_at).getFullYear()}
-              </span>
+            {isOnSale && (
+              <motion.span
+                className="absolute top-2 left-2 md:top-3 md:left-3 bg-[#9a3324] text-white text-xs px-2 md:px-3 py-0.5 md:py-1 rounded-full shadow-md uppercase tracking-tight font-['Oswald']"
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ delay: 0.2 }}
+              >
+                Oferta
+              </motion.span>
+            )}
+            <div className="absolute bottom-3 right-3 md:bottom-4 md:right-4 flex items-center gap-2 md:gap-3 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300">
+              <Link
+                to={`/produto/${wine.id}`}
+                className="p-2 md:p-3 bg-white/90 rounded-full hover:bg-white transition transform hover:scale-110 shadow-md"
+                aria-label="Visualização rápida"
+              >
+                <Eye className="h-4 w-4 md:h-5 md:w-5 text-[#000000]" />
+              </Link>
+              <motion.button
+                onClick={() => handleAddToCart(wine)}
+                className="p-2 md:p-3 bg-[#89764b] text-white rounded-full hover:bg-[#756343] transition transform hover:scale-110 shadow-md"
+                aria-label="Adicionar ao carrinho"
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+              >
+                <ShoppingCart className="h-4 w-4 md:h-5 md:w-5" />
+              </motion.button>
             </div>
           </div>
-
-          <p className="text-xs md:text-sm text-[#000000] line-clamp-2 md:line-clamp-3 mb-4 md:mb-6 flex-grow font-['Oswald']">
-            {decodeHtmlEntities(wine.description.pt.replace(/<[^>]*>/g, ""))}
-          </p>
-
-          <div className="mt-auto">
-            <div className="flex items-center justify-between mb-3 md:mb-4">
-              <span className="text-lg md:text-xl text-[#000000] font-['Oswald']">
-                R${" "}
-                {parseFloat(wine.variants[0]?.price ?? "0")
-                  .toFixed(2)
-                  .replace(".", ",")}
-              </span>
-              {wine.variants[0]?.compare_at_price && (
-                <span className="text-xs md:text-sm text-[#000000] line-through font-['Oswald']">
-                  R${" "}
-                  {parseFloat(wine.variants[0].compare_at_price)
-                    .toFixed(2)
-                    .replace(".", ",")}
+          <div className="p-4 md:p-6 flex flex-col flex-grow">
+            <div className="mb-3 md:mb-4">
+              <h3 className="text-[#000000] text-base md:text-lg uppercase tracking-tight mb-1 md:mb-2 line-clamp-1 font-['Oswald']">
+                {wine.name.pt}
+              </h3>
+              <div className="flex items-center gap-2 md:gap-3">
+                <span className="text-xs md:text-sm text-[#000000] font-['Oswald']">
+                  {wine.categories[0]?.name.pt || "Vinho"}
                 </span>
-              )}
+                <span className="w-1 h-1 bg-[#9c9c9c] rounded-full"></span>
+                <span className="text-xs md:text-sm text-[#000000] font-['Oswald']">
+                  Safra {new Date(wine.created_at).getFullYear()}
+                </span>
+              </div>
             </div>
-            <motion.button
-              onClick={() => handleAddToCart(wine)}
-              className="w-full px-3 py-2 md:px-4 md:py-3 bg-[#89764b] hover:bg-[#756343] text-white rounded-lg transition-all duration-300 uppercase tracking-wide text-xs md:text-sm flex items-center justify-center gap-1 md:gap-2 font-['Oswald']"
-              aria-label="Adicionar ao carrinho"
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-            >
-              <ShoppingCart className="h-3 w-3 md:h-4 md:w-4" />
-              Adicionar
-            </motion.button>
+
+            <p className="text-xs md:text-sm text-[#000000] line-clamp-2 md:line-clamp-3 mb-4 md:mb-6 flex-grow font-['Oswald']">
+              {decodeHtmlEntities(wine.description.pt.replace(/<[^>]*>/g, ""))}
+            </p>
+
+            <div className="mt-auto">
+              <div className="flex items-center justify-between mb-3 md:mb-4">
+                <span className="text-lg md:text-xl text-[#000000] font-['Oswald']">
+                  R${price.toFixed(2).replace(".", ",")}
+                </span>
+                {isOnSale && (
+                  <span className="text-xs md:text-sm text-[#000000] line-through font-['Oswald']">
+                    R${compareAtPrice.toFixed(2).replace(".", ",")}
+                  </span>
+                )}
+              </div>
+              <motion.button
+                onClick={() => handleAddToCart(wine)}
+                className="w-full px-3 py-2 md:px-4 md:py-3 bg-[#89764b] hover:bg-[#756343] text-white rounded-lg transition-all duration-300 uppercase tracking-wide text-xs md:text-sm flex items-center justify-center gap-1 md:gap-2 font-['Oswald']"
+                aria-label="Adicionar ao carrinho"
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                <ShoppingCart className="h-3 w-3 md:h-4 md:w-4" />
+                Adicionar
+              </motion.button>
+            </div>
           </div>
-        </div>
-      </motion.div>
-    ));
+        </motion.div>
+      );
+    });
   }, [wines, sortOrder]);
 
   return (

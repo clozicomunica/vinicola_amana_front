@@ -13,6 +13,7 @@ import CartPage from "./pages/CartPage";
 import ScrollToTop from "./components/ScrollToTop";
 import WhatsAppButton from "./components/WhatsappButton";
 import ScrollToTopLeft from "./components/ScrollToTopLeft";
+import SuccessPage from "./pages/SucessPage";
 
 function App() {
   return (
@@ -43,6 +44,7 @@ function App() {
             <Route path="/vinhos" element={<VinhosPage />} />
             <Route path="/produto/:id" element={<ProductDetailsPage />} />
             <Route path="/carrinho" element={<CartPage />} />
+            <Route path="/success" element={<SuccessPage />} />
             <Route path="/sobrenos" element={<AboutPage />} />
             <Route path="/experiencias" element={<ExperiencesPage />} />
             <Route path="/contato" element={<ContactPage />} />
