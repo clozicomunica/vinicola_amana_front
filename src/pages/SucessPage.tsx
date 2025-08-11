@@ -167,7 +167,7 @@ const SuccessPage = () => {
               className="flex items-center justify-center px-6 py-3 bg-transparent border border-[#89764b] text-[#89764b] hover:bg-[#89764b]/10 rounded-lg transition-all hover:scale-105 uppercase tracking-wide text-sm md:text-base shadow-md"
               aria-label="Voltar à página inicial"
             >
-              Voltar à Home
+              Página Inicial
             </Link>
           </div>
         </motion.div>
