@@ -406,26 +406,30 @@ const ProductDetailsPage = () => {
                 <span className="text-2xl sm:text-3xl font-bold text-[#89764b] font-['Oswald']">
                   R$ {formatPrice(wine.variants[0].price)}
                 </span>
-                {wine.variants[0]?.compare_at_price && (
-                  <span className="text-base sm:text-lg text-gray-500 line-through font-['Oswald']">
-                    R$ {formatPrice(wine.variants[0].compare_at_price)}
-                  </span>
-                )}
+                {wine.variants[0]?.compare_at_price &&
+                  parseFloat(wine.variants[0].compare_at_price) >
+                    parseFloat(wine.variants[0].price) && (
+                    <span className="text-base sm:text-lg text-gray-500 line-through font-['Oswald']">
+                      R$ {formatPrice(wine.variants[0].compare_at_price)}
+                    </span>
+                  )}
               </div>
-              {wine.variants[0]?.compare_at_price && (
-                <motion.span
-                  whileHover={{ scale: 1.05 }}
-                  className="inline-block bg-[#89764b]/10 text-[#89764b] px-2 sm:px-3 py-1 rounded-md text-xs sm:text-sm font-medium font-['Oswald']"
-                >
-                  Economize R${" "}
-                  {(
-                    parseFloat(wine.variants[0].compare_at_price) -
-                    parseFloat(wine.variants[0].price)
-                  )
-                    .toFixed(2)
-                    .replace(".", ",")}
-                </motion.span>
-              )}
+              {wine.variants[0]?.compare_at_price &&
+                parseFloat(wine.variants[0].compare_at_price) >
+                  parseFloat(wine.variants[0].price) && (
+                  <motion.span
+                    whileHover={{ scale: 1.05 }}
+                    className="inline-block bg-[#89764b]/10 text-[#89764b] px-2 sm:px-3 py-1 rounded-md text-xs sm:text-sm font-medium font-['Oswald']"
+                  >
+                    Economize R${" "}
+                    {(
+                      parseFloat(wine.variants[0].compare_at_price) -
+                      parseFloat(wine.variants[0].price)
+                    )
+                      .toFixed(2)
+                      .replace(".", ",")}
+                  </motion.span>
+                )}
             </motion.div>
 
             {/* Descrição */}
@@ -520,7 +524,7 @@ const ProductDetailsPage = () => {
                 <motion.div
                   key={product.id}
                   whileHover={{ y: -5 }}
-                  className="group bg-white rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-all duration-300 flex-shrink-0 w-60 sm:w-auto snap-center"
+                  className="group bg-white rounded-xl溢出-hidden shadow-md hover:shadow-lg transition-all duration-300 flex-shrink-0 w-60 sm:w-auto snap-center"
                   aria-label={`Produto similar: ${product.name.pt}`}
                 >
                   <Link to={`/produto/${product.id}`} className="block">
