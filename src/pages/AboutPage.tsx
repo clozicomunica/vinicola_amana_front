@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { Wine, Calendar, MapPin, Award, Instagram } from "lucide-react";
-import bgHero from "../assets/AMANA LOGO MONTANHA.png";
+import bgHero from "../assets/MONTANHA AMANA LOGO.svg";
 import logoAmana from "../assets/blacklogo.png";
 import vinhos from "../assets/aboutus1.jpg";
 import parallaxVinhos from "../assets/parallax.jpg";
@@ -80,6 +80,7 @@ const AboutPage = () => {
             alt="Amana Vineyards"
             className="absolute inset-0 w-full h-full object-contain object-center"
             style={{
+              top: "125px",
               maskImage:
                 "linear-gradient(to bottom, black 60%, transparent 100%)",
             }}
@@ -87,7 +88,7 @@ const AboutPage = () => {
         </div>
 
         {/* Conteúdo sobreposto */}
-        <div className="container mx-auto px-4 relative z-10 text-center">
+        <div className="container mx-auto px-4 relative z-10 text-center mb-66">
           <div className="mb-6 flex justify-center"></div>
           <h1 className="text-5xl md:text-6xl lg:text-7xl font-light tracking-tight mb-6 text-black">
             <img
@@ -109,7 +110,7 @@ const AboutPage = () => {
 
       {/* Assinatura Visual */}
       <section
-        className="py-24 text-white relative bg-center bg-cover bg-no-repeat bg-fixed"
+        className="relative h-[500px] bg-fixed bg-center bg-cover flex items-center text-white"
         style={{
           backgroundImage: `url(${vinhos})`,
         }}

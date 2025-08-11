@@ -13,6 +13,7 @@ import {
   Share2,
 } from "lucide-react";
 import { useCart } from "../context/useCart";
+import toast from "react-hot-toast";
 
 interface Variant {
   id: number;
@@ -59,6 +60,21 @@ const ProductDetailsPage = () => {
       image: wine.images[0]?.src || "/placeholder-wine.jpg",
       category: wine.categories[0]?.name.pt || "Vinho",
       variant_id: wine.variants[0].id,
+    });
+
+    toast.success(`${wine.name.pt} adicionado ao carrinho!`, {
+      position: "bottom-right",
+      style: {
+        background: "#89764b",
+        color: "#fff",
+        borderRadius: "8px",
+        padding: "16px 24px",
+        fontFamily: "'Oswald', sans-serif",
+      },
+      iconTheme: {
+        primary: "#fff",
+        secondary: "#89764b",
+      },
     });
   }, [addToCart, wine]);
 

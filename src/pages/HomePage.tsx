@@ -134,7 +134,6 @@ const HomePage = () => {
       },
     });
   };
-
   return (
     <div className="flex flex-col min-h-screen bg-[#d4d4d4] font-['Oswald'] antialiased">
       <Hero />
@@ -193,7 +192,7 @@ const HomePage = () => {
             </div>
           ) : (
             <>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8 mb-8 sm:mb-12 lg:mb-16">
                 {featuredWines.map((wine) => (
                   <div
                     key={wine.id}
@@ -309,7 +308,7 @@ const HomePage = () => {
               </div>
 
               {/* View All Button */}
-              <div className="text-center mt-8 sm:mt-12 lg:mt-16">
+              <div className="text-center mt-8 sm:mt-12 lg:mt-16 pb-0">
                 <Link
                   to="/vinhos"
                   className="inline-flex items-center px-4 py-2 sm:px-6 sm:py-3 md:px-10 md:py-4 bg-[#89764b] hover:bg-[#756343] text-white rounded-lg transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl font-medium tracking-wide uppercase text-xs sm:text-sm"
@@ -324,32 +323,58 @@ const HomePage = () => {
       </section>
 
       {/* About Section */}
-      <div className="container mx-auto px-4 sm:px-6 py-6 md:py-8 lg:py-10 bg-[#d4d4d4] -mt-6">
+      <div className="container mx-auto px-4 sm:px-6 py-6 md:py-8 lg:py-10 bg-[#d4d4d4] -mt-6 sm:mt-0 md:-mt-4 lg:-mt-6">
         <AboutSection />
       </div>
-
       {/* Quick View Modal */}
       {quickViewProduct && (
         <div
-          className="fixed inset-0 bg-black/70 z-50 flex flex-col sm:items-center sm:justify-center p-4 sm:p-6 overflow-y-auto"
+          className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4 sm:p-6 overflow-y-auto"
           role="dialog"
           aria-labelledby="quick-view-title"
           aria-modal="true"
         >
-          <div className="bg-white rounded-xl overflow-hidden w-full max-w-md sm:max-w-lg md:max-w-3xl lg:max-w-6xl max-h-[90vh] sm:max-h-[95vh] flex flex-col sm:flex-row sm:shadow-2xl border border-gray-200 relative">
+          <div className="bg-white rounded-xl overflow-hidden w-full max-w-md sm:max-w-lg md:max-w-4xl lg:max-w-6xl max-h-[90vh] flex flex-col md:flex-row sm:shadow-2xl border border-gray-200 relative">
             {/* Close Button */}
             <button
               onClick={() => setQuickViewProduct(null)}
-              className="absolute top-3 right-3 sm:top-4 sm:right-4 z-20 bg-white hover:bg-gray-100 rounded-full p-2 shadow-md transition-all"
+              className="absolute top-3 right-3 sm:top-4 sm:right-4 z-20 bg-white hover:bg-gray-100 rounded-full p-2 shadow-md transition-all duration-200"
               aria-label="Fechar visualização rápida"
             >
               <X className="h-5 w-5 text-gray-700" />
             </button>
 
             {/* Image Gallery */}
-            <div className="sm:w-1/2 lg:w-[55%] flex flex-col h-full">
+            <div className="w-full md:w-[50%] flex flex-col md:flex-row bg-white">
+              {/* Thumbnails (Desktop - Vertical, Mobile - Hidden) */}
+              {quickViewProduct.images.length > 1 && (
+                <div className="hidden md:flex flex-col w-[100px] p-2 space-y-2 overflow-y-auto max-h-[60vh] border-r border-gray-200 bg-gray-50">
+                  {quickViewProduct.images.map((img, index) => (
+                    <button
+                      key={index}
+                      onClick={() => setActiveImageIndex(index)}
+                      className={`w-16 h-16 rounded-md overflow-hidden transition-all duration-200 ${
+                        activeImageIndex === index
+                          ? "ring-2 ring-[#89764b]"
+                          : "hover:ring-1 hover:ring-gray-300"
+                      }`}
+                      aria-label={`Selecionar imagem ${index + 1}`}
+                    >
+                      <img
+                        src={img.src || wineImage}
+                        alt={img.alt || `Miniatura ${index + 1}`}
+                        className="w-full h-full object-contain bg-white rounded-md"
+                        onError={(e) => {
+                          e.currentTarget.src = wineImage;
+                        }}
+                      />
+                    </button>
+                  ))}
+                </div>
+              )}
+
               {/* Main Image */}
-              <div className="flex-1 flex items-center justify-center p-4 sm:p-6 bg-white relative">
+              <div className="flex-1 flex items-center justify-center p-4 sm:p-6 relative">
                 <img
                   src={
                     quickViewProduct.images[activeImageIndex]?.src || wineImage
@@ -363,16 +388,47 @@ const HomePage = () => {
                     e.currentTarget.src = wineImage;
                   }}
                 />
+                {/* Navigation Arrows (Mobile Only) */}
+                {quickViewProduct.images.length > 1 && (
+                  <div className="md:hidden flex justify-between absolute top-1/2 left-0 right-0 transform -translate-y-1/2 px-2">
+                    <button
+                      onClick={() =>
+                        setActiveImageIndex((prev) =>
+                          prev === 0
+                            ? quickViewProduct.images.length - 1
+                            : prev - 1
+                        )
+                      }
+                      className="p-2 bg-white/80 rounded-full shadow-md hover:bg-white transition-all"
+                      aria-label="Imagem anterior"
+                    >
+                      <ChevronRight className="h-5 w-5 text-gray-700 rotate-180" />
+                    </button>
+                    <button
+                      onClick={() =>
+                        setActiveImageIndex((prev) =>
+                          prev === quickViewProduct.images.length - 1
+                            ? 0
+                            : prev + 1
+                        )
+                      }
+                      className="p-2 bg-white/80 rounded-full shadow-md hover:bg-white transition-all"
+                      aria-label="Próxima imagem"
+                    >
+                      <ChevronRight className="h-5 w-5 text-gray-700" />
+                    </button>
+                  </div>
+                )}
               </div>
 
-              {/* Mobile Thumbnails */}
+              {/* Thumbnails (Mobile Only - Horizontal) */}
               {quickViewProduct.images.length > 1 && (
-                <div className="flex sm:hidden gap-2 p-3 overflow-x-auto border-t border-gray-200 bg-gray-50">
+                <div className="md:hidden flex gap-2 p-3 overflow-x-auto border-t border-gray-200 bg-gray-50">
                   {quickViewProduct.images.map((img, index) => (
                     <button
                       key={index}
                       onClick={() => setActiveImageIndex(index)}
-                      className={`flex-shrink-0 w-12 h-12 sm:w-14 sm:h-14 rounded-md overflow-hidden transition-all ${
+                      className={`flex-shrink-0 w-12 h-12 rounded-md overflow-hidden transition-all ${
                         activeImageIndex === index
                           ? "ring-2 ring-[#89764b]"
                           : "hover:ring-1 hover:ring-gray-300"
@@ -380,43 +436,13 @@ const HomePage = () => {
                       aria-label={`Selecionar imagem ${index + 1}`}
                     >
                       <img
-                        src={img.src}
-                        alt={img.alt || `Miniatura ${index + 1}`}
-                        className="w-full h-full object-contain"
-                        onError={(e) => {
-                          e.currentTarget.src = wineImage;
-                        }}
-                      />
-                    </button>
-                  ))}
-                </div>
-              )}
-
-              {/* Desktop Thumbnails */}
-              {quickViewProduct.images.length > 1 && (
-                <div className="hidden sm:flex flex-col items-center p-3 space-y-2 border-r border-gray-200 bg-gray-50 overflow-y-auto max-h-[50vh] lg:max-h-[60vh]">
-                  {quickViewProduct.images.map((img, index) => (
-                    <button
-                      key={index}
-                      onClick={() => setActiveImageIndex(index)}
-                      className={`relative w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 rounded-md overflow-hidden transition-all duration-200 ${
-                        activeImageIndex === index
-                          ? "ring-2 ring-[#89764b]"
-                          : "hover:ring-1 hover:ring-gray-300"
-                      }`}
-                      aria-label={`Selecionar imagem ${index + 1}`}
-                    >
-                      <img
-                        src={img.src}
+                        src={img.src || wineImage}
                         alt={img.alt || `Miniatura ${index + 1}`}
                         className="w-full h-full object-contain bg-white rounded-md"
                         onError={(e) => {
                           e.currentTarget.src = wineImage;
                         }}
                       />
-                      {activeImageIndex === index && (
-                        <div className="absolute inset-0 bg-black/10"></div>
-                      )}
                     </button>
                   ))}
                 </div>
@@ -424,13 +450,13 @@ const HomePage = () => {
             </div>
 
             {/* Product Details */}
-            <div className="sm:w-1/2 lg:w-[45%] p-4 sm:p-6 overflow-y-auto border-t sm:border-t-0 sm:border-l border-gray-200">
+            <div className="w-full md:w-[50%] p-4 sm:p-6 overflow-y-auto border-t md:border-t-0 md:border-l border-gray-200">
               <div className="space-y-4 sm:space-y-5">
                 {/* Header */}
                 <div>
                   <h2
                     id="quick-view-title"
-                    className="text-xl sm:text-2xl text-black mb-1 uppercase tracking-tight"
+                    className="text-xl sm:text-2xl lg:text-3xl text-black mb-1 uppercase tracking-tight"
                   >
                     {quickViewProduct.name.pt}
                   </h2>
@@ -441,7 +467,7 @@ const HomePage = () => {
 
                 {/* Price and Rating */}
                 <div className="flex items-center justify-between">
-                  <span className="text-xl sm:text-2xl text-[#89764b]">
+                  <span className="text-xl sm:text-2xl lg:text-3xl text-[#89764b] font-medium">
                     R${" "}
                     {parseFloat(quickViewProduct.variants[0]?.price || "0")
                       .toFixed(2)

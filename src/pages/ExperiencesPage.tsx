@@ -1,52 +1,56 @@
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Clock, ArrowRight, ChevronRight } from "lucide-react";
 import { motion } from "framer-motion";
 import type { Variants } from "framer-motion";
 import experienceBg from "../assets/experienceBg.jpg";
+import wineImage from "../assets/wine-bottle.jpg"; // Fallback image from VinhosPage
+
+interface Wine {
+  id: number;
+  name: { pt: string };
+  variants: { id: number; price: string; compare_at_price?: string }[];
+  images: { src: string; alt?: string[] }[];
+  categories: { name: { pt: string } }[];
+  description: { pt: string };
+  created_at: string;
+}
 
 const ExperiencesPage = () => {
-  // Dados das experiências com micro-interações
-  const experiences = [
-    {
-      id: 1,
-      title: "Visita Guiada",
-      tagline: "Imersão Sensorial",
-      description:
-        "Conheça a história Amana através de uma jornada multisensorial pelos vinhedos",
-      highlight:
-        "Degustação dirigida pela nossa sommelière em sala com vista panorâmica",
-      schedule: "Sexta a Domingo • 10h30 / 15h",
-      image:
-        "https://images.unsplash.com/photo-1470338622423-81a89b56393f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200",
-      color: "from-[#89764b] to-[#a08d63]",
-    },
-    {
-      id: 2,
-      title: "Jardim Amana",
-      tagline: "Convivência Premium",
-      description:
-        "Um oásis para apreciar nossos vinhos com a vista mais cobiçada da Mantiqueira",
-      highlight: "Espaço exclusivo para grupos e celebrações especiais",
-      schedule: "Sexta e Sábado • 10h-19h | Domingo • 10h-16h",
-      image:
-        "https://images.unsplash.com/photo-1494318401918-8c59e4432e0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200",
-      color: "from-[#756343] to-[#8a774d]",
-    },
-    {
-      id: 3,
-      title: "Loja Conceito",
-      tagline: "Discovery Bar",
-      description:
-        "Experimente nossos vinhos no balcão de degustação interativo",
-      highlight: "Tecnologia de harmonização digital com realidade aumentada",
-      schedule: "Terça a Domingo • Horários variados",
-      image:
-        "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200",
-      color: "from-[#5e4b32] to-[#756343]",
-    },
-  ];
+  const [products, setProducts] = useState<Wine[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Animations com tipagem correta
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        const response = await fetch(
+          "https://vinicola-amana-back.onrender.com/api/products?per_page=2"
+        );
+
+        if (!response.ok) {
+          throw new Error(`Erro ${response.status}: ${response.statusText}`);
+        }
+
+        const data: Wine[] = await response.json();
+        setProducts(data); // Fetch only 2 products
+      } catch (err: unknown) {
+        if (err instanceof Error) {
+          setError(err.message);
+        } else {
+          setError("Erro desconhecido ao carregar os produtos");
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, []);
+
   const cardVariants: Variants = {
     offscreen: { y: 50, opacity: 0 },
     onscreen: {
@@ -60,18 +64,38 @@ const ExperiencesPage = () => {
     },
   };
 
+  // Function to decode HTML entities (from VinhosPage)
+  function decodeHtmlEntities(html: string) {
+    const txt = document.createElement("textarea");
+    txt.innerHTML = html;
+    return txt.value;
+  }
+
+  if (loading) {
+    return (
+      <div className="text-center py-12 text-white bg-[#0a0a0a] min-h-screen flex items-center justify-center">
+        Carregando produtos...
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="text-center py-12 text-red-600 bg-[#0a0a0a] min-h-screen flex items-center justify-center">
+        Erro: {error}
+      </div>
+    );
+  }
+
   return (
     <div className="bg-[#0a0a0a] text-white font-oswald overflow-hidden">
       {/* Hero Cinematográfico */}
       <section className="relative h-screen min-h-[800px] flex items-center">
-        {/* Imagem de fundo no lugar do vídeo */}
         <div
           className="absolute z-0 w-full h-full bg-cover bg-center opacity-70"
           style={{ backgroundImage: `url(${experienceBg})` }}
-        ></div>
-
-        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent z-1"></div>
-
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent z-1" />
         <div className="container mx-auto px-4 relative z-10">
           <motion.div
             initial={{ opacity: 0 }}
@@ -81,20 +105,11 @@ const ExperiencesPage = () => {
           >
             <h1 className="text-6xl md:text-8xl font-light tracking-tight mb-6 leading-[0.9]">
               <span className="block mb-4">VIVA</span>
-              <span className="text-[#89764b]">AMANA</span>
+              <span className="text-white">AMANA</span>
             </h1>
             <p className="text-xl md:text-2xl text-gray-300 mb-8 leading-relaxed">
-              Experiências imersivas que redefinem o conceito de enoturismo
+              Produtos exclusivos que elevam sua experiência de enoturismo
             </p>
-            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-              <Link
-                to="#experiencias"
-                className="inline-flex items-center px-8 py-4 bg-[#89764b] hover:bg-[#756343] text-white rounded-sm transition-all duration-300 uppercase tracking-wider text-sm group"
-              >
-                Explorar
-                <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
-              </Link>
-            </motion.div>
           </motion.div>
         </div>
 
@@ -108,8 +123,8 @@ const ExperiencesPage = () => {
         </div>
       </section>
 
-      {/* Experiências */}
-      <section id="experiencias" className="py-24 relative">
+      {/* Produtos */}
+      <section id="produtos" className="py-24 relative">
         <div className="container mx-auto px-4">
           <div className="text-center mb-20">
             <motion.div
@@ -128,36 +143,41 @@ const ExperiencesPage = () => {
             </motion.div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {experiences.map((exp) => (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {products.map((product) => (
               <motion.div
-                key={exp.id}
+                key={product.id}
                 initial="offscreen"
                 whileInView="onscreen"
                 viewport={{ once: true, amount: 0.3 }}
                 variants={cardVariants}
                 className="group relative overflow-hidden"
               >
-                <div className="relative h-[500px] overflow-hidden">
+                <div className="relative h-[500px] overflow-hidden rounded-xl shadow-lg">
                   <img
-                    src={exp.image}
-                    alt={exp.title}
+                    src={product.images[0]?.src || wineImage}
+                    alt={product.name.pt}
                     className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
                   />
-                  <div
-                    className={`absolute inset-0 bg-gradient-to-t ${exp.color} opacity-90 mix-blend-multiply`}
-                  ></div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#89764b] to-transparent opacity-90 mix-blend-multiply rounded-xl" />
                   <div className="absolute bottom-0 left-0 right-0 p-8 text-white">
                     <span className="text-sm uppercase tracking-widest opacity-80">
-                      {exp.tagline}
+                      {product.categories[0]?.name.pt || "Produto Amana"}
                     </span>
-                    <h3 className="text-3xl font-light mb-4">{exp.title}</h3>
+                    <h3 className="text-3xl font-light mb-4">
+                      {product.name.pt}
+                    </h3>
                     <div className="w-12 h-px bg-white mb-4"></div>
-                    <p className="mb-6">{exp.description}</p>
+                    <p className="mb-6">
+                      {decodeHtmlEntities(
+                        product.description.pt.replace(/<[^>]*>/g, "")
+                      ).slice(0, 100)}
+                      ...
+                    </p>
                     <ul className="text-sm opacity-90 space-y-2 mb-6">
                       <li className="flex items-center gap-2">
                         <Clock className="h-4 w-4" />
-                        {exp.schedule}
+                        Disponível para compra imediata
                       </li>
                     </ul>
                     <motion.div
@@ -165,7 +185,7 @@ const ExperiencesPage = () => {
                       transition={{ type: "spring", stiffness: 300 }}
                     >
                       <Link
-                        to={`/experiencias/${exp.id}`}
+                        to={`/produto/${product.id}`}
                         className="inline-flex items-center text-sm uppercase tracking-widest border-b border-white pb-1"
                       >
                         Saiba mais

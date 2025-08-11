@@ -1,5 +1,6 @@
 // src/App.tsx
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { Toaster } from "react-hot-toast"; // Importe o Toaster
 import Header from "./components/Header";
 import HomePage from "./pages/HomePage";
 import VinhosPage from "./pages/VinhosPage";
@@ -16,6 +17,21 @@ import ScrollToTopLeft from "./components/ScrollToTopLeft";
 function App() {
   return (
     <BrowserRouter>
+      <Toaster
+        position="bottom-right"
+        toastOptions={{
+          className: 'font-["Oswald"]',
+          duration: 3000,
+          style: {
+            background: "#89764b",
+            color: "#fff",
+            border: "1px solid #756343",
+            borderRadius: "8px",
+            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
+          },
+        }}
+      />
+
       <ScrollToTop />
       <WhatsAppButton />
       <ScrollToTopLeft />

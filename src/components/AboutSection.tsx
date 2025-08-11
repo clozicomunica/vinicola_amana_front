@@ -31,16 +31,11 @@ const features = [
 const AboutSection = () => {
   return (
     <section className="py-12 lg:py-24 bg-[#f5f5f5] overflow-hidden w-full font-['Oswald']">
-      {" "}
-      {/* Adicionei a fonte e ajustei o cinza */}
       <div className="container mx-auto px-4 sm:px-6 w-full">
         <div className="flex flex-col lg:flex-row gap-8 lg:gap-16 items-start w-full">
-          {/* Content */}
           <div className="order-2 lg:order-1 w-full space-y-6 lg:space-y-8">
             <div>
               <h2 className="text-black text-2xl sm:text-3xl lg:text-4xl mb-4 lg:mb-6">
-                {" "}
-                {/* Removi font-bold */}
                 Somos apaixonados pela Mantiqueira e comprometidos com a
                 excelência
               </h2>
@@ -62,23 +57,19 @@ const AboutSection = () => {
               {features.map((feature, index) => (
                 <div
                   key={index}
-                  className="border border-[#9c9c9c]/50 rounded-lg hover:shadow-md transition-all hover:border-[#9a3324]/30 w-full bg-white p-4 sm:p-5"
+                  className="border border-[#9c9c9c]/50 rounded-lg hover:shadow-md transition-all hover:border-[#9a3324]/30 w-full bg-black p-4 sm:p-5"
                 >
                   <div className="flex items-start space-x-3 sm:space-x-4">
                     <div className="flex-shrink-0">
-                      <div className="w-10 h-10 sm:w-12 sm:h-12 bg-black rounded-lg flex items-center justify-center">
-                        <feature.icon className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
+                      <div className="w-10 h-10 sm:w-12 sm:h-12 bg-white rounded-lg flex items-center justify-center">
+                        <feature.icon className="h-5 w-5 sm:h-6 sm:w-6 text-black" />
                       </div>
                     </div>
                     <div>
-                      <h3 className="text-[#000000] text-sm sm:text-base mb-1 sm:mb-2">
-                        {" "}
-                        {/* Removi font-semibold */}
+                      <h3 className="text-white text-sm sm:text-base mb-1 sm:mb-2">
                         {feature.title}
                       </h3>
                       <p className="text-[#9c9c9c] text-xs sm:text-sm">
-                        {" "}
-                        {/* Ajuste de cor */}
                         {feature.description}
                       </p>
                     </div>
@@ -95,8 +86,6 @@ const AboutSection = () => {
                 rel="noopener noreferrer"
               >
                 <button className="cursor-pointer inline-flex items-center justify-center px-6 py-3 md:px-10 md:py-4 bg-[#89764b] hover:bg-[#756343] text-white rounded-lg transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl tracking-wide uppercase text-xs md:text-sm w-full sm:w-auto">
-                  {" "}
-                  {/* Removi font-medium */}
                   Nossa História Completa
                   <ChevronRight className="ml-2 h-4 w-4 md:ml-3 md:h-5 md:w-5" />
                 </button>
@@ -107,8 +96,6 @@ const AboutSection = () => {
                 rel="noopener noreferrer"
               >
                 <button className="cursor-pointer inline-flex items-center justify-center px-6 py-3 md:px-10 md:py-4 border border-[#89764b] text-[#89764b] hover:bg-[#9a3324]/10 rounded-lg transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl tracking-wide uppercase text-xs md:text-sm w-full sm:w-auto">
-                  {" "}
-                  {/* Removi font-medium */}
                   Agende uma Visita
                   <ChevronRight className="ml-2 h-4 w-4 md:ml-3 md:h-5 md:w-5" />
                 </button>
@@ -131,22 +118,18 @@ const AboutSection = () => {
             <div className="absolute -bottom-4 left-4 sm:bottom-8 sm:left-8 bg-white/95 backdrop-blur-sm border border-[#9c9c9c]/50 rounded-lg p-3 sm:p-4 shadow w-24 sm:w-auto">
               <div className="text-center">
                 <div className="text-lg sm:text-xl lg:text-2xl text-black">
-                  {" "}
-                  {/* Removi font-bold */}6
+                  6
                 </div>
-                <div className="text-xs sm:text-sm text-[#9c9c9c]">Rótulos</div>{" "}
-                {/* Ajuste de cor */}
+                <div className="text-xs sm:text-sm text-[#9c9c9c]">Rótulos</div>
               </div>
             </div>
 
             <div className="absolute top-4 right-4 sm:top-8 sm:right-8 bg-white/95 backdrop-blur-sm border border-[#9c9c9c]/50 rounded-lg p-3 sm:p-4 shadow w-24 sm:w-auto">
               <div className="text-center">
                 <div className="text-lg sm:text-xl lg:text-2xl text-black">
-                  {" "}
-                  {/* Removi font-bold */}6
+                  6
                 </div>
-                <div className="text-xs sm:text-sm text-[#9c9c9c]">Prêmios</div>{" "}
-                {/* Ajuste de cor */}
+                <div className="text-xs sm:text-sm text-[#9c9c9c]">Prêmios</div>
               </div>
             </div>
           </div>

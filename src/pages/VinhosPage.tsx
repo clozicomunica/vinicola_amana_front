@@ -3,6 +3,8 @@ import { Search, ShoppingCart, Eye, Loader2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useCart } from "../context/useCart";
 import wineImage from "../assets/wine-bottle.jpg";
+import { motion, AnimatePresence } from "framer-motion";
+import toast from "react-hot-toast";
 
 interface WineVariant {
   id: number;
@@ -21,18 +23,14 @@ interface Wine {
 }
 
 const CATEGORIES = [
-  { id: "tinto", name: "Vinhos Tintos" },
-  { id: "branco", name: "Vinhos Brancos" },
-  { id: "rose", name: "Vinhos Rosé" },
+  { id: "Tinto", name: "Vinhos Tintos" },
+  { id: "Branco", name: "Vinhos Brancos" },
+  { id: "Rosé", name: "Vinhos Rosé" },
   { id: "amana", name: "Amana" },
   { id: "una", name: "Una" },
   { id: "singular", name: "Singular" },
   { id: "cafe", name: "Cafés" },
-  { id: "em grao", name: "Em grão" },
-  { id: "em po", name: "Em pó" },
   { id: "diversos", name: "Diversos" },
-  { id: "experiencias", name: "Experiências" },
-  { id: "vale-presente", name: "Vale Presente" },
 ];
 
 const VinhosPage = () => {
@@ -45,6 +43,7 @@ const VinhosPage = () => {
   const [error, setError] = useState<string | null>(null);
   const [hasMore, setHasMore] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState("all");
+  const [sortOrder, setSortOrder] = useState<string>("");
   const { addToCart } = useCart();
 
   const fetchWines = async (
@@ -92,6 +91,23 @@ const VinhosPage = () => {
     }
   };
 
+  const sortProducts = (products: Wine[], order: string) => {
+    if (order === "price_asc") {
+      return [...products].sort(
+        (a, b) =>
+          parseFloat(a.variants[0]?.price || "0") -
+          parseFloat(b.variants[0]?.price || "0")
+      );
+    } else if (order === "price_desc") {
+      return [...products].sort(
+        (a, b) =>
+          parseFloat(b.variants[0]?.price || "0") -
+          parseFloat(a.variants[0]?.price || "0")
+      );
+    }
+    return products;
+  };
+
   useEffect(() => {
     setPage(1);
     fetchWines(1);
@@ -118,11 +134,13 @@ const VinhosPage = () => {
     setSearchInput("");
     setSearchTerm("");
     setSelectedCategory("all");
+    setSortOrder("");
     setPage(1);
   };
 
   const handleAddToCart = (wine: Wine) => {
     if (!wine.variants[0]) return;
+
     addToCart({
       id: wine.id,
       variant_id: wine.variants[0]?.id || wine.id,
@@ -131,6 +149,21 @@ const VinhosPage = () => {
       quantity: 1,
       image: wine.images[0]?.src || wineImage,
       category: wine.categories[0]?.name.pt || "Vinho",
+    });
+
+    toast.success(`${wine.name.pt} adicionado ao carrinho!`, {
+      position: "bottom-right",
+      style: {
+        background: "#89764b",
+        color: "#fff",
+        borderRadius: "8px",
+        padding: "16px 24px",
+        fontFamily: "'Oswald', sans-serif",
+      },
+      iconTheme: {
+        primary: "#fff",
+        secondary: "#89764b",
+      },
     });
   };
 
@@ -141,9 +174,14 @@ const VinhosPage = () => {
   }
 
   const wineList = useMemo(() => {
-    return wines.map((wine) => (
-      <div
+    const sortedWines = sortOrder ? sortProducts(wines, sortOrder) : wines;
+
+    return sortedWines.map((wine) => (
+      <motion.div
         key={wine.id}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
         className="group bg-white rounded-xl overflow-hidden border border-[#9c9c9c]/30 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 flex flex-col h-full font-['Oswald']"
       >
         <div className="relative flex items-center justify-center h-60 md:h-80 bg-gradient-to-b from-[#f5f5f5] to-[#e5e5e5] p-4 md:p-6">
@@ -151,7 +189,7 @@ const VinhosPage = () => {
             to={`/produto/${wine.id}`}
             className="h-full w-full flex items-center justify-center"
           >
-            <img
+            <motion.img
               src={wine.images[0]?.src || wineImage}
               alt={wine.images[0]?.alt?.[0] || wine.name.pt}
               className="max-h-[150px] sm:max-h-[200px] md:max-h-full w-auto object-contain transition duration-500 group-hover:scale-105"
@@ -159,12 +197,18 @@ const VinhosPage = () => {
                 mixBlendMode: "multiply",
                 filter: "drop-shadow(0 8px 16px rgba(0, 0, 0, 0.15))",
               }}
+              whileHover={{ scale: 1.05 }}
             />
           </Link>
           {wine.variants[0]?.compare_at_price && (
-            <span className="absolute top-2 left-2 md:top-3 md:left-3 bg-[#9a3324] text-white text-xs px-2 md:px-3 py-0.5 md:py-1 rounded-full shadow-md uppercase tracking-tight font-['Oswald']">
+            <motion.span
+              className="absolute top-2 left-2 md:top-3 md:left-3 bg-[#9a3324] text-white text-xs px-2 md:px-3 py-0.5 md:py-1 rounded-full shadow-md uppercase tracking-tight font-['Oswald']"
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ delay: 0.2 }}
+            >
               Oferta
-            </span>
+            </motion.span>
           )}
           <div className="absolute bottom-3 right-3 md:bottom-4 md:right-4 flex items-center gap-2 md:gap-3 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300">
             <Link
@@ -174,13 +218,15 @@ const VinhosPage = () => {
             >
               <Eye className="h-4 w-4 md:h-5 md:w-5 text-[#000000]" />
             </Link>
-            <button
+            <motion.button
               onClick={() => handleAddToCart(wine)}
               className="p-2 md:p-3 bg-[#89764b] text-white rounded-full hover:bg-[#756343] transition transform hover:scale-110 shadow-md"
               aria-label="Adicionar ao carrinho"
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
             >
               <ShoppingCart className="h-4 w-4 md:h-5 md:w-5" />
-            </button>
+            </motion.button>
           </div>
         </div>
         <div className="p-4 md:p-6 flex flex-col flex-grow">
@@ -220,19 +266,21 @@ const VinhosPage = () => {
                 </span>
               )}
             </div>
-            <button
+            <motion.button
               onClick={() => handleAddToCart(wine)}
               className="w-full px-3 py-2 md:px-4 md:py-3 bg-[#89764b] hover:bg-[#756343] text-white rounded-lg transition-all duration-300 uppercase tracking-wide text-xs md:text-sm flex items-center justify-center gap-1 md:gap-2 font-['Oswald']"
               aria-label="Adicionar ao carrinho"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
             >
               <ShoppingCart className="h-3 w-3 md:h-4 md:w-4" />
               Adicionar
-            </button>
+            </motion.button>
           </div>
         </div>
-      </div>
+      </motion.div>
     ));
-  }, [wines]);
+  }, [wines, sortOrder]);
 
   return (
     <div className="min-h-screen bg-[#f8f5f0] font-['Oswald']">
@@ -242,24 +290,40 @@ const VinhosPage = () => {
           <div className="absolute inset-0 bg-black bg-cover bg-center opacity-30"></div>
         </div>
         <div className="container mx-auto px-4 relative z-10">
-          <h1 className="text-2xl md:text-3xl lg:text-4xl mb-4 md:mb-6 uppercase tracking-tight font-['Oswald']">
+          <motion.h1
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="text-2xl md:text-3xl lg:text-4xl mb-4 md:mb-6 uppercase tracking-tight font-['Oswald']"
+          >
             <span className="text-center text-white">Nossos Produtos</span>
-          </h1>
-          <p className="text-sm md:text-base max-w-3xl mx-auto text-[#9c9c9c] leading-relaxed font-['Oswald']">
+          </motion.h1>
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.2, duration: 0.5 }}
+            className="text-sm md:text-base max-w-3xl mx-auto text-[#9c9c9c] leading-relaxed font-['Oswald']"
+          >
             Vinhos, cafés e acessórios para garantir uma experiência Amana
             completa em sua casa.
-          </p>
+          </motion.p>
         </div>
       </section>
 
       {/* Filtros e Busca */}
-      <section className="sticky top-0 z-10 py-3 md:py-4 bg-black/95 backdrop-blur-sm border-b border-white/10">
+      <motion.section
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.3, duration: 0.3 }}
+        className="sticky top-0 z-10 py-3 md:py-4 bg-black/95 backdrop-blur-sm border-b border-white/10"
+      >
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row gap-3 items-center justify-between">
             {/* Categorias Scrolláveis em Mobile */}
             <div className="md:hidden w-full overflow-x-auto pb-2 scrollbar-hide">
               <div className="flex space-x-2 w-max">
-                <button
+                <motion.button
+                  whileTap={{ scale: 0.95 }}
                   onClick={() => handleCategoryChange("all")}
                   className={`px-3 py-1.5 text-xs rounded-full transition-all duration-200 uppercase tracking-tight whitespace-nowrap font-['Oswald'] ${
                     selectedCategory === "all"
@@ -269,10 +333,11 @@ const VinhosPage = () => {
                   aria-label="Filtrar por todos os produtos"
                 >
                   Todos
-                </button>
+                </motion.button>
                 {CATEGORIES.map((category) => (
-                  <button
+                  <motion.button
                     key={category.id}
+                    whileTap={{ scale: 0.95 }}
                     onClick={() => handleCategoryChange(category.id)}
                     className={`px-3 py-1.5 text-xs rounded-full transition-all duration-200 uppercase tracking-tight whitespace-nowrap font-['Oswald'] ${
                       selectedCategory === category.id
@@ -282,14 +347,16 @@ const VinhosPage = () => {
                     aria-label={`Filtrar por ${category.name}`}
                   >
                     {category.name}
-                  </button>
+                  </motion.button>
                 ))}
               </div>
             </div>
 
             {/* Categorias em Desktop */}
             <div className="hidden md:flex flex-wrap gap-2">
-              <button
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
                 onClick={() => handleCategoryChange("all")}
                 className={`px-3 py-1.5 text-sm rounded-full transition-all duration-200 uppercase tracking-tight font-['Oswald'] ${
                   selectedCategory === "all"
@@ -299,11 +366,12 @@ const VinhosPage = () => {
                 aria-label="Filtrar por todos os produtos"
               >
                 Todos
-              </button>
+              </motion.button>
               {CATEGORIES.map((category) => (
-                <button
+                <motion.button
                   key={category.id}
-                  type="button"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
                   onClick={() => handleCategoryChange(category.id)}
                   className={`px-3 py-1.5 text-sm rounded-full transition-all duration-200 uppercase tracking-tight font-['Oswald'] ${
                     selectedCategory === category.id
@@ -313,101 +381,179 @@ const VinhosPage = () => {
                   aria-label={`Filtrar por ${category.name}`}
                 >
                   {category.name}
-                </button>
+                </motion.button>
               ))}
             </div>
 
-            <div className="w-full md:w-auto md:flex-1 md:max-w-md">
-              <form onSubmit={handleSearchSubmit}>
-                <div className="relative">
-                  <Search className="absolute left-3 md:left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-white/70" />
-                  <input
-                    type="text"
-                    placeholder="Buscar..."
-                    value={searchInput}
-                    onChange={(e) => setSearchInput(e.target.value)}
-                    className="w-full pl-10 md:pl-12 pr-4 py-2 md:py-3 bg-black/70 text-white border border-white/20 rounded-full focus:border-[#89764b] focus:ring-2 focus:ring-[#89764b]/50 transition-all text-sm md:text-base font-['Oswald']"
-                    aria-label="Buscar produtos"
-                  />
-                </div>
-              </form>
+            <div className="flex flex-col md:flex-row gap-3 w-full md:w-auto">
+              {/* Seletor de Ordenação */}
+              <div className="flex items-center gap-2 md:gap-3">
+                <label
+                  htmlFor="sort"
+                  className="text-xs md:text-sm text-white/80 font-['Oswald']"
+                >
+                  Ordenar por:
+                </label>
+                <select
+                  id="sort"
+                  value={sortOrder}
+                  onChange={(e) => setSortOrder(e.target.value)}
+                  className="bg-black/70 text-white border border-white/20 rounded-full px-3 py-1.5 text-xs md:text-sm focus:border-[#89764b] focus:ring-2 focus:ring-[#89764b]/50 transition-all font-['Oswald'] appearance-none bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgZmlsbD0iI2ZmZmZmZiI+PHBhdGggZD0iTTcuMjQ3IDEwLjE0TDQuNDU3IDcuMzVhLjUuNSAwIDAgMSAwLS43MDdsLjM1LS4zNWEuNS41IDAgMCAxIC43MDcgMGwyLjE0NiAyLjE0NyAyLjE0Ni0yLjE0N2EuNS41IDAgMCAxIC43MDcgMGwuMzUuMzVhLjUuNSAwIDAgMSAwIC43MDdsLTIuNzkgMi43OWEuNS41IDAgMCAxLS43MDcgMHoiLz48L3N2Zz4=')] bg-no-repeat bg-[center_right_0.5rem] pr-6"
+                >
+                  <option value="">Padrão</option>
+                  <option value="price_asc">Mais barato</option>
+                  <option value="price_desc">Mais caro</option>
+                </select>
+              </div>
+
+              {/* Campo de busca */}
+              <div className="w-full md:w-auto md:flex-1 md:max-w-md">
+                <form onSubmit={handleSearchSubmit}>
+                  <div className="relative">
+                    <Search className="absolute left-3 md:left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-white/70" />
+                    <motion.input
+                      type="text"
+                      placeholder="Buscar..."
+                      value={searchInput}
+                      onChange={(e) => setSearchInput(e.target.value)}
+                      className="w-full pl-10 md:pl-12 pr-4 py-2 md:py-3 bg-black/70 text-white border border-white/20 rounded-full focus:border-[#89764b] focus:ring-2 focus:ring-[#89764b]/50 transition-all text-sm md:text-base font-['Oswald']"
+                      aria-label="Buscar produtos"
+                      whileFocus={{ scale: 1.02 }}
+                    />
+                  </div>
+                </form>
+              </div>
             </div>
           </div>
 
-          {(searchTerm || selectedCategory !== "all") && (
-            <div className="text-center mt-3 md:mt-4">
-              <button
+          {(searchTerm || selectedCategory !== "all" || sortOrder) && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              className="text-center mt-3 md:mt-4 overflow-hidden"
+            >
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
                 onClick={handleClearFilters}
                 className="px-4 py-1.5 md:px-6 md:py-2 bg-[#89764b] hover:bg-[#756343] text-white rounded-lg transition-colors uppercase text-xs md:text-sm font-['Oswald']"
                 aria-label="Limpar busca e filtros"
               >
                 Limpar busca e filtros
-              </button>
-            </div>
+              </motion.button>
+            </motion.div>
           )}
         </div>
-      </section>
+      </motion.section>
 
       {/* Lista de Produtos */}
       <section className="py-8 md:py-12 lg:py-16 bg-[#f8f5f0] pt-16 md:pt-20">
         <div className="container mx-auto px-4">
-          {loading && page === 1 ? (
-            <div className="grid grid-cols-2 gap-4 md:grid-cols-3 md:gap-6 lg:grid-cols-4 lg:gap-8">
-              {[...Array(8)].map((_, i) => (
-                <div
-                  key={i}
-                  className="bg-white rounded-xl overflow-hidden border border-[#9c9c9c]/30 animate-pulse"
-                >
-                  <div className="h-60 md:h-80 bg-[#e5e5e5]"></div>
-                  <div className="p-4 md:p-6">
-                    <div className="h-5 md:h-6 bg-[#e5e5e5] rounded mb-3 md:mb-4"></div>
-                    <div className="h-3 md:h-4 bg-[#e5e5e5] rounded mb-2 md:mb-3 w-3/4"></div>
-                    <div className="h-12 md:h-16 bg-[#e5e5e5] rounded mb-4 md:mb-6"></div>
-                    <div className="h-8 md:h-10 bg-[#e5e5e5] rounded"></div>
-                  </div>
+          <AnimatePresence mode="wait">
+            {loading && page === 1 ? (
+              <motion.div
+                key="loading"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="grid grid-cols-2 gap-4 md:grid-cols-3 md:gap-6 lg:grid-cols-4 lg:gap-8"
+              >
+                {[...Array(8)].map((_, i) => (
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3, delay: i * 0.05 }}
+                    className="bg-white rounded-xl overflow-hidden border border-[#9c9c9c]/30"
+                  >
+                    <div className="h-60 md:h-80 bg-gradient-to-br from-[#f5f5f5] to-[#e5e5e5] animate-pulse">
+                      <motion.div
+                        animate={{
+                          backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"],
+                        }}
+                        transition={{
+                          duration: 2,
+                          repeat: Infinity,
+                          ease: "linear",
+                        }}
+                        className="h-full w-full bg-gradient-to-r from-transparent via-white/50 to-transparent"
+                      />
+                    </div>
+                    <div className="p-4 md:p-6">
+                      <div className="h-5 md:h-6 bg-gradient-to-r from-[#f5f5f5] to-[#e5e5e5] rounded mb-3 md:mb-4"></div>
+                      <div className="h-3 md:h-4 bg-gradient-to-r from-[#f5f5f5] to-[#e5e5e5] rounded mb-2 md:mb-3 w-3/4"></div>
+                      <div className="h-12 md:h-16 bg-gradient-to-r from-[#f5f5f5] to-[#e5e5e5] rounded mb-4 md:mb-6"></div>
+                      <div className="h-8 md:h-10 bg-gradient-to-r from-[#f5f5f5] to-[#e5e5e5] rounded"></div>
+                    </div>
+                  </motion.div>
+                ))}
+              </motion.div>
+            ) : error ? (
+              <motion.div
+                key="error"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="text-center py-12 md:py-16"
+              >
+                <div className="bg-[#f5f5f5] text-[#9a3324] p-4 md:p-6 rounded-xl max-w-md mx-auto border border-[#9a3324]/30">
+                  <p className="mb-3 md:mb-4 font-['Oswald']">{error}</p>
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => fetchWines(1)}
+                    className="px-6 py-2 bg-[#89764b] hover:bg-[#756343] text-white rounded-lg transition-colors uppercase text-sm font-['Oswald']"
+                    aria-label="Tentar novamente"
+                  >
+                    Tentar novamente
+                  </motion.button>
                 </div>
-              ))}
-            </div>
-          ) : error ? (
-            <div className="text-center py-12 md:py-16">
-              <div className="bg-[#f5f5f5] text-[#9a3324] p-4 md:p-6 rounded-xl max-w-md mx-auto border border-[#9a3324]/30">
-                <p className="mb-3 md:mb-4 font-['Oswald']">{error}</p>
-                <button
-                  onClick={() => fetchWines(1)}
-                  className="px-6 py-2 bg-[#89764b] hover:bg-[#756343] text-white rounded-lg transition-colors uppercase text-sm font-['Oswald']"
-                  aria-label="Tentar novamente"
-                >
-                  Tentar novamente
-                </button>
-              </div>
-            </div>
-          ) : wines.length === 0 ? (
-            <div className="text-center py-12 md:py-16">
-              <div className="max-w-md mx-auto">
-                <h3 className="text-lg md:text-xl text-[#000000] mb-2 md:mb-3 font-['Oswald']">
-                  Nenhum produto encontrado
-                </h3>
-                <p className="text-xs md:text-sm text-[#9c9c9c] mb-4 md:mb-6 font-['Oswald']">
-                  Tente ajustar seus filtros de busca
-                </p>
-                <button
-                  onClick={handleClearFilters}
-                  className="px-6 py-2 bg-[#89764b] hover:bg-[#756343] text-white rounded-lg transition-colors uppercase text-sm font-['Oswald']"
-                  aria-label="Limpar filtros"
-                >
-                  Limpar filtros
-                </button>
-              </div>
-            </div>
-          ) : (
-            <div className="grid grid-cols-2 gap-4 md:grid-cols-3 md:gap-6 lg:grid-cols-4 lg:gap-8">
-              {wineList}
-            </div>
-          )}
+              </motion.div>
+            ) : wines.length === 0 ? (
+              <motion.div
+                key="empty"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="text-center py-12 md:py-16"
+              >
+                <div className="max-w-md mx-auto">
+                  <h3 className="text-lg md:text-xl text-[#000000] mb-2 md:mb-3 font-['Oswald']">
+                    Nenhum produto encontrado
+                  </h3>
+                  <p className="text-xs md:text-sm text-[#9c9c9c] mb-4 md:mb-6 font-['Oswald']">
+                    Tente ajustar seus filtros de busca
+                  </p>
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={handleClearFilters}
+                    className="px-6 py-2 bg-[#89764b] hover:bg-[#756343] text-white rounded-lg transition-colors uppercase text-sm font-['Oswald']"
+                    aria-label="Limpar filtros"
+                  >
+                    Limpar filtros
+                  </motion.button>
+                </div>
+              </motion.div>
+            ) : (
+              <motion.div
+                key="products"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="grid grid-cols-2 gap-4 md:grid-cols-3 md:gap-6 lg:grid-cols-4 lg:gap-8"
+              >
+                <AnimatePresence>{wineList}</AnimatePresence>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           {hasMore && !loadingMore && wines.length > 0 && (
             <div className="text-center mt-8 md:mt-12 lg:mt-16">
-              <button
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
                 onClick={() => setPage((p) => p + 1)}
                 disabled={loadingMore}
                 className="px-6 md:px-8 py-2 md:py-3 bg-transparent text-[#89764b] border border-[#89764b] rounded-lg hover:bg-[#89764b]/10 transition-all uppercase tracking-wider flex items-center justify-center gap-2 mx-auto text-sm md:text-base font-['Oswald']"
@@ -415,13 +561,22 @@ const VinhosPage = () => {
               >
                 {loadingMore ? (
                   <>
-                    <Loader2 className="h-4 w-4 md:h-5 md:w-5 animate-spin" />
+                    <motion.div
+                      animate={{ rotate: 360 }}
+                      transition={{
+                        duration: 1,
+                        repeat: Infinity,
+                        ease: "linear",
+                      }}
+                    >
+                      <Loader2 className="h-4 w-4 md:h-5 md:w-5" />
+                    </motion.div>
                     Carregando...
                   </>
                 ) : (
                   "Carregar Mais"
                 )}
-              </button>
+              </motion.button>
             </div>
           )}
         </div>
