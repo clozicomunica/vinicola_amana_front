@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { useCart } from "../context/useCart";
 import { ShoppingCart, X, ArrowLeft, Wine, ChevronRight } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom"; // Adicionado useNavigate
+import { Link, useNavigate } from "react-router-dom";
+import { toast } from "react-hot-toast";
 import type { CartItem } from "../context/CartProvider";
 
 interface OrderSummary {
@@ -26,7 +27,7 @@ const CartPage = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [orderSummary, setOrderSummary] = useState<OrderSummary | null>(null);
-  const navigate = useNavigate(); // Hook para navegação
+  const navigate = useNavigate();
 
   // Calculate cart subtotal
   const total = cart.reduce(
@@ -130,9 +131,28 @@ const CartPage = () => {
       setLoading(false);
 
       if (response.ok) {
+        console.log("Checkout bem-sucedido, limpando carrinho...");
         setOrderSummary(data);
-        // Redireciona para a página de sucesso com orderSummary como estado
-        navigate("/success", { state: { orderSummary: data, customer } });
+        clearCart(); // Limpa o carrinho
+        console.log("Carrinho após clearCart:", cart); // Log para verificar o estado
+        toast.success("Compra finalizada com sucesso! Carrinho limpo.", {
+          position: "bottom-right",
+          style: {
+            background: "#89764b",
+            color: "#fff",
+            borderRadius: "8px",
+            padding: "16px 24px",
+            fontFamily: "'Oswald', sans-serif",
+          },
+          iconTheme: {
+            primary: "#fff",
+            secondary: "#89764b",
+          },
+        });
+        // Atraso para garantir que o estado do carrinho seja atualizado
+        setTimeout(() => {
+          navigate("/success", { state: { orderSummary: data, customer } });
+        }, 100);
       } else {
         setError(`Erro ao criar pedido: ${data.error || "Tente novamente"}`);
       }
@@ -586,7 +606,10 @@ const CartPage = () => {
                 </div>
 
                 {error && (
-                  <div className="flex items-center justify-between bg-red-50 text-red-600 p-2 rounded-lg mt-3">
+                  <div
+                    className="flex items-center justify-between bg-red-50 text-red-600 p-2 rounded-lg mt-3"
+                    aria-live="polite"
+                  >
                     <span className="text-sm">{error}</span>
                     <button
                       onClick={() => setError("")}

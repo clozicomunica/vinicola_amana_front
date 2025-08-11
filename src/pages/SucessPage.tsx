@@ -138,7 +138,7 @@ const SuccessPage = () => {
                           product.image?.src || "/path/to/fallback-image.jpg"
                         }
                         alt={product.name || "Produto"}
-                        className="max-w-[120px] md:max-w-[150px] h-auto rounded-lg shadow-md object-contain mix-blend-multiply"
+                        className="w-[150px] h-[150px] rounded-lg shadow-md object-contain bg-white p-2"
                         onError={(e) => {
                           e.currentTarget.src = "/path/to/fallback-image.jpg";
                         }}
