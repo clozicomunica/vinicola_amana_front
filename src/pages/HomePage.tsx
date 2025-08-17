@@ -147,7 +147,7 @@ const HomePage = () => {
             <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-black mb-3 md:mb-6 tracking-tight">
               <span className="relative inline-block">
                 <span className="relative z-10 uppercase">
-                  Nossos Vinhos Sorteados
+                  Nossos Vinhos Premiados
                 </span>
               </span>
             </h2>
