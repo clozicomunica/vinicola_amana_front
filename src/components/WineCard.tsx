@@ -1,168 +1,131 @@
 // src/components/WineCard.tsx
-import { ShoppingCart, Eye, Star, Heart } from "lucide-react";
+import { ShoppingCart, Eye} from "lucide-react";
 import { Link } from "react-router-dom";
-import { useCart } from "../context/useCart";
-import { toast } from "react-hot-toast";
+import wineImage from "../assets/wine-bottle.jpg";
+import { decodeHtmlEntities } from "../utils/htmlUtils";
 
-type WineCategory = "Tinto" | "Branco" | "Rosé" | "Espumante" | "Sobremesa";
-
-type Wine = {
+export type Wine = {
   id: number;
-  variant_id: number;
-  name: string;
-  price: number;
-  image: string;
-  category: WineCategory;
-  description: string;
+  name: { pt: string; en?: string };
+  description?: { pt?: string; en?: string };
+  images: { src: string; alt?: string }[];
+  categories: { id: number; name: { pt: string; en?: string } }[];
+  variants: { id: number; price: string; stock?: number }[];
   rating?: number;
   year?: number;
-  discount?: number;
+  sku?: string;
+  alcohol?: string;
+  region?: string;
+  awards?: string[];
 };
 
-const WineCard = ({ wine }: { wine: Wine }) => {
-  const { addToCart } = useCart();
+type WineCardProps = {
+  wine: Wine;
+  setQuickViewProduct: (product: Wine | null) => void;
+  onAddToCart: (wine: Wine) => void;
+};
 
-  const handleAddToCart = () => {
-    addToCart({
-      id: wine.id,
-      variant_id: wine.variant_id,
-      name: wine.name,
-      image: wine.image,
-      price: wine.price,
-      quantity: 1,
-      category: wine.category,
-    });
-
-    toast.success(`${wine.name} adicionado ao carrinho!`, {
-      position: "bottom-right",
-      style: {
-        background: "#89764b",
-        color: "#fff",
-      },
-    });
+const WineCard = ({ wine, setQuickViewProduct, onAddToCart }: WineCardProps) => {
+  const handleQuickView = () => {
+    setQuickViewProduct(wine);
   };
 
-  const handleQuickView = () => {
-    toast(`Visualizando ${wine.name}`, {
-      icon: "🔍",
-      position: "top-center",
-    });
+  const handleAddToCartClick = () => {
+    onAddToCart(wine);
   };
 
   return (
-    <div className="group overflow-hidden border border-gray-200 rounded-lg hover:shadow-xl transition-all duration-300 bg-white flex flex-col h-full font-oswald">
-      {/* Badges */}
-      <div className="absolute top-3 left-3 z-10 flex flex-col space-y-2">
-        {wine.discount && (
-          <span className="bg-[#89764b] text-white text-xs px-2 py-1 rounded-full shadow-md">
-            -{wine.discount}%
-          </span>
-        )}
-        {wine.rating && wine.rating >= 4.5 && (
-          <span className="bg-amber-600 text-white text-xs px-2 py-1 rounded-full shadow-md flex items-center">
-            <Star className="h-3 w-3 mr-1 fill-current" />
-            {wine.rating.toFixed(1)}
-          </span>
-        )}
-      </div>
-
-      {/* Wishlist Button */}
-      <button
-        className="absolute top-3 right-3 z-10 p-2 bg-white/80 backdrop-blur-sm rounded-full hover:bg-white transition-all duration-200 shadow-sm hover:shadow-md"
-        aria-label="Adicionar à lista de desejos"
-      >
-        <Heart className="h-4 w-4 text-[#9c9c9c] hover:text-red-500 transition-colors" />
-      </button>
-
-      {/* Wine Image */}
-      <div className="relative overflow-hidden h-64 flex-shrink-0">
-        <Link to={`/vinhos/${wine.id}`}>
+    <div
+      className="group bg-white rounded-xl sm:rounded-2xl overflow-hidden shadow-sm hover:shadow-md md:hover:shadow-xl transition-all duration-500 border border-gray-100 flex flex-col h-full transform hover:-translate-y-1 md:hover:-translate-y-2 font-oswald"
+    >
+      <div className="relative aspect-square bg-white p-3 sm:p-4 flex items-center justify-center overflow-hidden">
+        <Link
+          to={`/produto/${wine.id}`}
+          className="h-full w-full flex items-center justify-center p-2 sm:p-3 md:p-4"
+        >
           <img
-            src={wine.image}
-            alt={wine.name}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-in-out"
+            src={wine.images[0]?.src || wineImage}
+            alt={wine.images[0]?.alt || wine.name.pt}
+            className="max-h-[240px] sm:max-h-[200px] md:max-h-[220px] w-full object-contain mix-blend-multiply"
             loading="lazy"
+            onError={(e) => {
+              e.currentTarget.src = wineImage;
+              e.currentTarget.className =
+                "max-h-[240px] sm:max-h-[200px] md:max-h-[220px] w-full object-contain";
+            }}
           />
         </Link>
-
-        {/* Quick Actions */}
-        <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-3">
+        <div className="absolute top-2 left-2 sm:top-3 sm:left-3 md:top-4 md:left-4 flex flex-col space-y-1 sm:space-y-2 z-10">
+          {wine.variants[0]?.stock === 0 && (
+            <span className="bg-red-600 text-white text-xs px-2 py-0.5 sm:px-3 sm:py-1 rounded-full shadow-md font-medium tracking-wide font-oswald">
+              Esgotado
+            </span>
+          )}
+        </div>
+        <div className="absolute bottom-3 right-3 flex items-center gap-2 z-10 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-300">
           <button
-            onClick={handleQuickView}
-            className="p-3 bg-white/90 rounded-full hover:bg-white transition-all duration-200 transform hover:scale-110 shadow-md"
+            onClick={(e) => {
+              e.stopPropagation();
+              handleQuickView();
+            }}
+            className="p-2 bg-white/90 rounded-full hover:bg-white transition-all duration-300 transform hover:scale-105 shadow-md cursor-pointer"
             aria-label="Visualização rápida"
           >
-            <Eye className="h-5 w-5 text-[#9c9c9c]" />
+            <Eye className="h-4 w-4 text-gray-800" />
           </button>
-          <button
-            onClick={handleAddToCart}
-            className="p-3 bg-[#89764b] text-white rounded-full hover:bg-[#9a3324] transition-all duration-200 transform hover:scale-110 shadow-md"
-            aria-label="Adicionar ao carrinho"
-          >
-            <ShoppingCart className="h-5 w-5" />
-          </button>
+          {wine.variants[0]?.stock !== 0 && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                handleAddToCartClick();
+              }}
+              className="p-2 bg-[#89764b] text-white rounded-full hover:bg-[#756343] transition-all duration-300 transform hover:scale-105 shadow-md cursor-pointer"
+              aria-label="Adicionar ao carrinho"
+            >
+              <ShoppingCart className="h-4 w-4" />
+            </button>
+          )}
         </div>
       </div>
-
-      {/* Wine Details */}
-      <div className="p-5 flex flex-col flex-grow">
-        <div className="mb-2">
-          <Link to={`/vinhos/${wine.id}`}>
-            <h3 className="text-lg mb-1 hover:text-[#89764b] transition-colors line-clamp-1">
-              {wine.name}
+      <div className="p-3 sm:p-4 md:p-6 flex flex-col flex-grow">
+        <div className="mb-2 sm:mb-3 md:mb-4">
+          <Link to={`/produto/${wine.id}`}>
+            <h3 className="text-base sm:text-lg md:text-xl text-gray-900 mb-1 sm:mb-2 hover:text-[#89764b] transition-colors duration-300 line-clamp-1 uppercase tracking-tight font-oswald">
+              {wine.name.pt}
             </h3>
           </Link>
-          <div className="flex items-center justify-between">
-            <span style={{ color: "#9c9c9c" }} className="text-sm capitalize">
-              {wine.category}
-            </span>
-            {wine.year && (
-              <span
-                style={{ backgroundColor: "#f9f9f9", color: "#9c9c9c" }}
-                className="text-xs px-2 py-1 rounded"
-              >
-                Safra {wine.year}
-              </span>
-            )}
-          </div>
+          <p className="text-xs sm:text-sm text-gray-600 uppercase tracking-wider font-light font-oswald">
+            {wine.categories[0]?.name.pt || "Vinho"}
+          </p>
         </div>
-
-        <p
-          className="text-sm my-2 line-clamp-2 flex-grow"
-          style={{ color: "#9c9c9c" }}
-        >
-          {wine.description}
+        <p className="text-gray-700 mb-3 sm:mb-4 md:mb-6 line-clamp-2 min-h-[36px] sm:min-h-[40px] text-xs sm:text-sm leading-relaxed font-light font-oswald">
+          {wine.description?.pt
+            ? decodeHtmlEntities(wine.description.pt.replace(/<[^>]*>/g, ""))
+            : "Descrição não disponível"}
         </p>
-
-        <div className="flex justify-between items-center mt-4">
-          <div className="flex items-center gap-2">
-            <span
-              className={`text-lg ${wine.discount ? "line-through" : ""}`}
-              style={{
-                color: wine.discount ? "#9c9c9c" : "#89764b",
-                fontWeight: "normal",
-              }}
-            >
-              R$ {wine.price.toFixed(2).replace(".", ",")}
-            </span>
-            {wine.discount && (
-              <span
-                className="text-lg"
-                style={{ color: "#89764b", fontWeight: "normal" }}
-              >
-                R${" "}
-                {(wine.price * (1 - wine.discount / 100))
-                  .toFixed(2)
-                  .replace(".", ",")}
+        <div className="mt-auto">
+          <div className="flex items-center justify-between mb-2 sm:mb-3 md:mb-4">
+            <div className="flex items-baseline gap-1 sm:gap-2">
+              <span className="text-black text-base sm:text-lg md:text-xl font-oswald">
+                {wine.variants[0]?.price
+                  ? `R$ ${parseFloat(wine.variants[0].price)
+                      .toFixed(2)
+                      .replace(".", ",")}`
+                  : "---"}
               </span>
-            )}
+            </div>
           </div>
           <button
-            onClick={handleAddToCart}
-            className="px-4 py-2 bg-[#89764b] hover:bg-[#9a3324] text-white rounded text-sm transition-colors duration-300 flex items-center gap-1"
+            onClick={handleAddToCartClick}
+            disabled={wine.variants[0]?.stock === 0}
+            className={`w-full py-2 sm:py-3 px-3 sm:px-4 rounded-lg transition-all duration-300 flex items-center justify-center gap-1 sm:gap-2 uppercase text-xs sm:text-sm ${
+              wine.variants[0]?.stock === 0
+                ? "bg-gray-200 text-gray-600 cursor-not-allowed"
+                : "bg-[#89764b] hover:bg-[#756343] text-white hover:shadow-md"
+            } font-oswald`}
           >
-            <ShoppingCart className="h-4 w-4" />
-            <span>Add</span>
+            <ShoppingCart className="h-3 w-3 sm:h-4 sm:w-4" />
+            {wine.variants[0]?.stock === 0 ? "Esgotado" : "Adicionar"}
           </button>
         </div>
       </div>

@@ -279,18 +279,6 @@ const ProductDetailsPage = () => {
                 ))}
               </div>
             )}
-
-            {/* Segundo Botão de Compra */}
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              onClick={handleAddToCart}
-              className="w-full mt-4 sm:mt-6 py-3 sm:py-4 bg-[#89764b] hover:bg-[#756343] text-white rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl font-medium flex items-center justify-center gap-2 sm:gap-3 text-sm sm:text-base font-['Oswald']"
-              aria-label="Adicionar ao carrinho"
-            >
-              <ShoppingCart className="h-4 w-4 sm:h-5 sm:w-5" />
-              Adicionar ao Carrinho
-            </motion.button>
           </div>
 
           {/* Detalhes do Produto */}

@@ -8,3 +8,5 @@ export const useCart = () => {
   }
   return context;
 };
+
+export { CartContext };
