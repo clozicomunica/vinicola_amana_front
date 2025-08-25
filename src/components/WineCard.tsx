@@ -62,30 +62,31 @@ const WineCard = ({ wine, setQuickViewProduct, onAddToCart }: WineCardProps) => 
             </span>
           )}
         </div>
-        <div className="absolute bottom-3 right-3 flex items-center gap-2 z-10 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-300">
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              handleQuickView();
-            }}
-            className="p-2 bg-white/90 rounded-full hover:bg-white transition-all duration-300 transform hover:scale-105 shadow-md cursor-pointer"
-            aria-label="Visualização rápida"
-          >
-            <Eye className="h-4 w-4 text-gray-800" />
-          </button>
-          {wine.variants[0]?.stock !== 0 && (
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                handleAddToCartClick();
-              }}
-              className="p-2 bg-[#89764b] text-white rounded-full hover:bg-[#756343] transition-all duration-300 transform hover:scale-105 shadow-md cursor-pointer"
-              aria-label="Adicionar ao carrinho"
-            >
-              <ShoppingCart className="h-4 w-4" />
-            </button>
-          )}
-        </div>
+        <div className="absolute top-3 right-3 flex items-center gap-2 z-10 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-300">
+  <button
+    onClick={(e) => {
+      e.stopPropagation();
+      handleQuickView();
+    }}
+    className="p-2 bg-white/90 rounded-full hover:bg-white transition-all duration-300 transform hover:scale-105 shadow-md cursor-pointer"
+    aria-label="Visualização rápida"
+  >
+    <Eye className="h-4 w-4 text-gray-800" />
+  </button>
+  {wine.variants[0]?.stock !== 0 && (
+    <button
+      onClick={(e) => {
+        e.stopPropagation();
+        handleAddToCartClick();
+      }}
+      className="p-2 bg-[#89764b] text-white rounded-full hover:bg-[#756343] transition-all duration-300 transform hover:scale-105 shadow-md cursor-pointer"
+      aria-label="Adicionar ao carrinho"
+    >
+      <ShoppingCart className="h-4 w-4" />
+    </button>
+  )}
+</div>
+
       </div>
       <div className="p-3 sm:p-4 md:p-6 flex flex-col flex-grow">
         <div className="mb-2 sm:mb-3 md:mb-4">
