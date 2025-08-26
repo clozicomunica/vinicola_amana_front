@@ -5,7 +5,7 @@ import logo from "../assets/logo.png";
 import { useCart } from "../context/useCart";
 
 const navLinks = [
-  { path: "/vinhos", label: "Nossos Vinhos" },
+  { path: "/vinhos", label: "Nossos produtos" },
   { path: "/sobrenos", label: "Sobre Nós" },
   { path: "/experiencias", label: "Experiências" },
   { path: "/contato", label: "Contato" },
