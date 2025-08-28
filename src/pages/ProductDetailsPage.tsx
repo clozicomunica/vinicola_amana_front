@@ -4,11 +4,14 @@ import { motion } from "framer-motion";
 import {
   ArrowLeft,
   ShoppingCart,
-  Star,
   ChevronRight,
   Wine,
   Utensils,
   ZoomIn,
+  Leaf,
+  Thermometer,
+  Clock,
+  Hourglass,
 } from "lucide-react";
 import { useCart } from "../context/useCart";
 import toast from "react-hot-toast";
@@ -29,9 +32,102 @@ interface Wine {
   created_at: string;
   region?: string;
   alcohol?: string;
-  rating?: number;
   pairing?: string;
+  vintage?: string;
+  temperatura?: string;
+  varietal?: string;
+  amadurecimento?: string;
+  expectativa_guarda?: string;
 }
+
+const WINES_DATA = {
+  wines: {
+    "282621881": {
+      id: 1,
+      name: "Sauvignon Blanc Amana",
+      vintage: "2024",
+      alcohol: "13,1%",
+      region: "Espírito Santo do Pinhal",
+      pairing: "saladas, sushi, ceviche, massas com molho pesto e queijos leves",
+      temperatura: "8 ºC a 10 ºC",
+      varietal: "100% Sauvignon Blanc",
+      amadurecimento: "6 meses em cubas de inox",
+      expectativa_guarda: "Pronto para consumo"
+    },
+    "282630061": {
+      id: 2,
+      name: "Chenin Blanc Amana",
+      vintage: "2024",
+      alcohol: "13,0%",
+      region: "Espírito Santo do Pinhal",
+      pairing: "queijos médios, peixes, frutos do mar e carnes brancas grelhadas com molho bechamel",
+      temperatura: "8 ºC a 10 ºC",
+      varietal: "100% Chenin Blanc",
+      amadurecimento: "50% por 5 meses em barricas francesas",
+      expectativa_guarda: "Pronto para consumo"
+    },
+    "282629404": {
+      id: 3,
+      name: "Rosé Amana",
+      vintage: "2024",
+      alcohol: "13,0%",
+      region: "Espírito Santo do Pinhal",
+      pairing: "camarões salteados, lagosta, salmão grelhado ou gravlax e massas com limão siciliano",
+      temperatura: "8 ºC a 10 ºC",
+      varietal: "70% Syrah e 30% Chenin Blanc",
+      amadurecimento: "6 meses em cubas de inox",
+      expectativa_guarda: "Pronto para consumo"
+    },
+    "282630773": {
+      id: 4,
+      name: "Syrah Amana",
+      vintage: "2022",
+      alcohol: "14%",
+      region: "Espírito Santo do Pinhal",
+      pairing: "charcutaria, queijos meia-cura, massa seca à bolonhesa ou ragú de calabresa",
+      temperatura: "12 ºC a 14 ºC",
+      varietal: "100% Syrah",
+      amadurecimento: "6 meses em tanques de aço inox",
+      expectativa_guarda: "Bom potencial de guarda"
+    },
+    "281768712": {
+      id: 5,
+      name: "Syrah T4 Linha Singular",
+      vintage: "2022",
+      alcohol: "14.9%",
+      region: "Espírito Santo do Pinhal",
+      pairing: "Carnes vermelhas de longa cocção e massas acompanhadas de molhos encorpados e condimentados",
+      temperatura: "16 ºC a 18 ºC",
+      varietal: "100% Syrah",
+      amadurecimento: "12 meses em barricas de carvalho francês de primeiro e segundo uso",
+      expectativa_guarda: "Ótimo potencial de guarda com excelente longevidade"
+    },
+    "282621048": {
+      id: 6,
+      name: "Sauvignon Blanc Amana Una",
+      vintage: "2023",
+      alcohol: "13,0%",
+      region: "Espírito Santo do Pinhal",
+      pairing: "massas, peixes ou aves com molhos cremosos e untuosos: risotos de frutos do mar ou de limão siciliano; queijos de média maturação",
+      temperatura: "8 ºC a 10 ºC",
+      varietal: "100% Sauvignon Blanc",
+      amadurecimento: "80% passou 10 meses em barricas francesas",
+      expectativa_guarda: "Pronto para consumo"
+    },
+    "282619996": {
+      id: 7,
+      name: "Syrah Amana Una",
+      vintage: "2022",
+      alcohol: "14,9%",
+      region: "Espírito Santo do Pinhal",
+      pairing: "Carnes vermelhas de longa cocção e massas acompanhadas de molhos encorpados e condimentados",
+      temperatura: "16 ºC a 18 ºC",
+      varietal: "100% Syrah",
+      amadurecimento: "12 meses em barricas de carvalho francês de primeiro e segundo uso",
+      expectativa_guarda: "Ótimo potencial de guarda com excelente longevidade"
+    }
+  }
+};
 
 const ProductDetailsPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -46,6 +142,25 @@ const ProductDetailsPage = () => {
 
   const formatPrice = (price: string) =>
     parseFloat(price).toFixed(2).replace(".", ",");
+
+  const enhanceWine = (data: Wine, wineId: string): Wine => {
+    const additionalData = WINES_DATA.wines[wineId as keyof typeof WINES_DATA.wines];
+    if (!additionalData) {
+      // Removido o fallback aleatório para evitar adicionar dados irrelevantes em produtos não-vinhos
+      return data;
+    }
+    return {
+      ...data,
+      alcohol: additionalData.alcohol,
+      region: additionalData.region,
+      pairing: additionalData.pairing,
+      vintage: additionalData.vintage,
+      temperatura: additionalData.temperatura,
+      varietal: additionalData.varietal,
+      amadurecimento: additionalData.amadurecimento,
+      expectativa_guarda: additionalData.expectativa_guarda,
+    };
+  };
 
   const handleAddToCart = useCallback(() => {
     if (!wine || wine.variants.length === 0) return;
@@ -96,39 +211,21 @@ const ProductDetailsPage = () => {
 
         const data = await response.json();
 
-        const enhancedData = {
-          ...data,
-          rating: data.rating || +(4.0 + Math.random() * 1.0).toFixed(1),
-          alcohol: data.alcohol || `${(12 + Math.random() * 4).toFixed(1)}%`,
-          region:
-            data.region ||
-            ["Vale dos Vinhedos", "Serra Gaúcha", "Vale do São Francisco"][
-              Math.floor(Math.random() * 3)
-            ],
-          pairing:
-            data.pairing ||
-            [
-              "Carnes vermelhas grelhadas",
-              "Queijos amarelos",
-              "Massas com molhos encorpados",
-              "Chocolates amargos",
-              "Frutos do mar",
-            ][Math.floor(Math.random() * 5)],
-        };
+        const enhancedWine = enhanceWine(data, id);
+        setWine(enhancedWine);
 
-        setWine(enhancedData);
-
-        const categoryName = enhancedData.categories[0]?.name.pt || "";
+        const categoryName = enhancedWine.categories[0]?.name.pt || "";
         if (categoryName) {
           const similarResponse = await fetch(
-            `https://vinicola-amana-back.onrender.com/api/products/${enhancedData.id}/similares`
+            `https://vinicola-amana-back.onrender.com/api/products/${enhancedWine.id}/similares`
           );
           if (similarResponse.ok) {
             const similarData = await similarResponse.json();
             setSimilarProducts(
               similarData
-                .filter((item: Wine) => item.id !== enhancedData.id)
+                .filter((item: Wine) => item.id !== enhancedWine.id)
                 .slice(0, 4)
+                .map((item: Wine) => enhanceWine(item, item.id.toString()))
             );
           }
         } else {
@@ -203,6 +300,7 @@ const ProductDetailsPage = () => {
       </div>
     );
   }
+
 
   return (
     <div className="bg-[#f8f5f0] min-h-screen font-['Oswald']">
@@ -285,17 +383,6 @@ const ProductDetailsPage = () => {
           <div className="bg-white rounded-xl shadow-lg p-4 sm:p-6 lg:p-8 flex flex-col">
             <div className="mb-4 sm:mb-6">
               <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4 flex-wrap">
-                {wine.rating !== undefined && (
-                  <motion.div
-                    whileHover={{ scale: 1.05 }}
-                    className="flex items-center bg-black px-2 sm:px-3 py-1 rounded-full"
-                  >
-                    <Star className="h-3 w-3 sm:h-4 sm:w-4 fill-[#89764b] text-[#89764b] mr-1" />
-                    <span className="text-[#89764b] text-xs sm:text-sm font-medium font-['Oswald']">
-                      {wine.rating.toFixed(1)}
-                    </span>
-                  </motion.div>
-                )}
                 <motion.span
                   whileHover={{ scale: 1.05 }}
                   className="text-xs sm:text-sm bg-black rounded-full text-[#89764b] py-1 px-2 sm:px-3 flex items-center font-medium font-['Oswald']"
@@ -340,18 +427,10 @@ const ProductDetailsPage = () => {
                 )}
                 {wine.alcohol && (
                   <span className="flex items-center font-['Oswald']">
-                    <svg
-                      className="h-3 w-3 sm:h-4 sm:w-4 mr-1 text-[#89764b]"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M7 11.5V14m0-2.5v-6a1.5 1.5 0 113 0m-3 6a1.5 1.5 0 00-3 0v2a7.5 7.5 0 0015 0v-5a1.5 1.5 0 00-3 0m-6-3V11m0-5.5v-1a1.5 1.5 0 013 0v1m0 0V11m0-5.5a1.5 1.5 0 013 0v3m0 0V11"
-                      />
+                    <svg className="h-3 w-3 sm:h-4 sm:w-4 mr-1 text-[#89764b]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <circle cx="10" cy="14" r="6" />
+                      <circle cx="18" cy="8" r="4" />
+                      <circle cx="20" cy="16" r="2" />
                     </svg>
                     {wine.alcohol}
                   </span>
@@ -362,7 +441,7 @@ const ProductDetailsPage = () => {
                     {wine.pairing}
                   </span>
                 )}
-                {wine.created_at && (
+                {wine.vintage && (
                   <span className="flex items-center font-['Oswald']">
                     <svg
                       className="h-3 w-3 sm:h-4 sm:w-4 mr-1 text-[#89764b]"
@@ -377,7 +456,31 @@ const ProductDetailsPage = () => {
                         d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
                       />
                     </svg>
-                    {new Date(wine.created_at).getFullYear()}
+                    {wine.vintage}
+                  </span>
+                )}
+                {wine.varietal && (
+                  <span className="flex items-center font-['Oswald']">
+                    <Leaf className="h-3 w-3 sm:h-4 sm:w-4 mr-1 text-[#89764b]" />
+                    {wine.varietal}
+                  </span>
+                )}
+                {wine.temperatura && (
+                  <span className="flex items-center font-['Oswald']">
+                    <Thermometer className="h-3 w-3 sm:h-4 sm:w-4 mr-1 text-[#89764b]" />
+                    {wine.temperatura}
+                  </span>
+                )}
+                {wine.amadurecimento && (
+                  <span className="flex items-center font-['Oswald']">
+                    <Clock className="h-3 w-3 sm:h-4 sm:w-4 mr-1 text-[#89764b]" />
+                    {wine.amadurecimento}
+                  </span>
+                )}
+                {wine.expectativa_guarda && (
+                  <span className="flex items-center font-['Oswald']">
+                    <Hourglass className="h-3 w-3 sm:h-4 sm:w-4 mr-1 text-[#89764b]" />
+                    {wine.expectativa_guarda}
                   </span>
                 )}
               </div>
@@ -471,17 +574,19 @@ const ProductDetailsPage = () => {
                   </p>
                 </div>
               </div>
-              <div className="flex items-start gap-2 sm:gap-3">
-                <Utensils className="h-4 w-4 sm:h-5 sm:w-5 text-[#89764b] mt-0.5" />
-                <div>
-                  <p className="text-gray-800 font-medium font-['Oswald']">
-                    Harmonização
-                  </p>
-                  <p className="text-gray-500 font-['Oswald']">
-                    {wine.pairing || "Sugestões de acompanhamento"}
-                  </p>
+              {wine.pairing && (
+                <div className="flex items-start gap-2 sm:gap-3">
+                  <Utensils className="h-4 w-4 sm:h-5 sm:w-5 text-[#89764b] mt-0.5" />
+                  <div>
+                    <p className="text-gray-800 font-medium font-['Oswald']">
+                      Harmonização
+                    </p>
+                    <p className="text-gray-500 font-['Oswald']">
+                      {wine.pairing}
+                    </p>
+                  </div>
                 </div>
-              </div>
+              )}
             </motion.div>
           </div>
         </div>
@@ -512,7 +617,7 @@ const ProductDetailsPage = () => {
                 <motion.div
                   key={product.id}
                   whileHover={{ y: -5 }}
-                  className="group bg-white rounded-xl溢出-hidden shadow-md hover:shadow-lg transition-all duration-300 flex-shrink-0 w-60 sm:w-auto snap-center"
+                  className="group bg-white rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-all duration-300 flex-shrink-0 w-60 sm:w-auto snap-center"
                   aria-label={`Produto similar: ${product.name.pt}`}
                 >
                   <Link to={`/produto/${product.id}`} className="block">
@@ -537,12 +642,6 @@ const ProductDetailsPage = () => {
                         <span className="font-bold text-[#89764b] text-sm sm:text-base font-['Oswald']">
                           R$ {formatPrice(product.variants[0].price)}
                         </span>
-                        {product.rating !== undefined && (
-                          <div className="flex items-center text-xs sm:text-sm text-gray-500 font-['Oswald']">
-                            <Star className="h-3 w-3 sm:h-4 sm:w-4 fill-[#89764b] text-[#89764b] mr-1" />
-                            {product.rating.toFixed(1)}
-                          </div>
-                        )}
                       </div>
                     </div>
                   </Link>
