@@ -38,7 +38,7 @@ const ScrollToTopButton = () => {
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      {/* Efeito de pulsação sutil */}
+  
       <div
         className={`absolute inset-0 rounded-full border border-[#89764b] ${
           isHovered ? "animate-ping opacity-20" : "opacity-0"
@@ -46,7 +46,6 @@ const ScrollToTopButton = () => {
         style={{ animationDuration: "1500ms" }}
       ></div>
 
-      {/* Ícone com animação */}
       <ChevronUp
         className={`w-6 h-6 transition-transform duration-300 ${
           isHovered ? "translate-y-[-2px]" : "translate-y-0"
@@ -54,7 +53,7 @@ const ScrollToTopButton = () => {
         strokeWidth={2.5}
       />
 
-      {/* Tooltip */}
+   
       <div
         className={`absolute right-full mr-3 bg-black text-white text-sm px-3 py-1 rounded whitespace-nowrap transition-opacity duration-200 ${
           isHovered ? "opacity-100" : "opacity-0 pointer-events-none"
