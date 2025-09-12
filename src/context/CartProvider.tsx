@@ -7,7 +7,7 @@ export interface CartItem {
   price: number;
   quantity: number;
   category: string;
-  variant_id: number; // Garantido na interface
+  variant_id: number;
 }
 
 interface CartContextType {
@@ -50,10 +50,9 @@ const CartProvider = ({ children }: { children: ReactNode }) => {
   const [cart, dispatch] = useReducer(cartReducer, [], () => {
     const stored = localStorage.getItem("cart");
     const initialCart = stored ? JSON.parse(stored) : [];
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return initialCart.map((item: any) => ({
       ...item,
-      variant_id: item.variant_id || 0, // Valor padrão temporário (corrigir na origem)
+      variant_id: item.variant_id || 0, 
       quantity: item.quantity || 1,
     }));
   });
@@ -65,7 +64,7 @@ const CartProvider = ({ children }: { children: ReactNode }) => {
   const addToCart = (item: CartItem) => {
     if (!item.variant_id) {
       console.error("variant_id is missing for item:", item);
-      return; // Impede adição sem variant_id
+      return; 
     }
     dispatch({ type: "ADD", item });
   };
