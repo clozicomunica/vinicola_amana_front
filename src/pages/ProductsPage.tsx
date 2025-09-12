@@ -338,7 +338,7 @@ const VinhosPage = () => {
   }, [wines, sortOrder, selectedCategory]);
 
   return (
-    <div className="min-h-screen bg-[#f8f5f0] font-['Oswald']">
+    <div className="min-h-screen bg-[#d4d4d4] font-['Oswald']">
       {/* Hero Section */}
       <section className="relative pt-24 md:pt-32 lg:pt-40 pb-12 md:pb-16 lg:pb-20 text-center text-white overflow-hidden">
         <div className="absolute inset-0 bg-black">
@@ -503,7 +503,7 @@ const VinhosPage = () => {
 
       {/* Lista de Produtos */}
       <section
-        className="py-8 md:py-12 lg:py-16 bg-[#f8f5f0] pt-16 md:pt-20"
+        className="py-8 md:py-12 lg:py-16 bg-[#d4d4d4] pt-16 md:pt-20"
         role="region"
         aria-label="Lista de produtos"
       >
