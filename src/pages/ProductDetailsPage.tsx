@@ -244,7 +244,7 @@ const ProductDetailsPage = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex justify-center items-center bg-[#f8f5f0] font-['Oswald']">
+      <div className="min-h-screen flex justify-center items-center bg-[#d4d4d4] font-['Oswald']">
         <motion.div
           animate={{ rotate: 360 }}
           transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
@@ -256,7 +256,7 @@ const ProductDetailsPage = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen flex flex-col justify-center items-center bg-[#f8f5f0] p-4 sm:p-6 text-center font-['Oswald']">
+      <div className="min-h-screen flex flex-col justify-center items-center bg-[#d4d4d4] p-4 sm:p-6 text-center font-['Oswald']">
         <div className="bg-white p-6 sm:p-8 rounded-xl shadow-lg max-w-md">
           <h2 className="text-xl sm:text-2xl font-bold text-[#9a3324] mb-4">
             Ocorreu um erro
@@ -279,7 +279,7 @@ const ProductDetailsPage = () => {
 
   if (!wine) {
     return (
-      <div className="min-h-screen flex flex-col justify-center items-center bg-[#f8f5f0] p-4 sm:p-6 text-center font-['Oswald']">
+      <div className="min-h-screen flex flex-col justify-center items-center bg-[#d4d4d4] p-4 sm:p-6 text-center font-['Oswald']">
         <div className="bg-white p-6 sm:p-8 rounded-xl shadow-lg max-w-md">
           <Wine className="h-10 w-10 sm:h-12 sm:w-12 mx-auto text-[#89764b] mb-4" />
           <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-4">
@@ -303,7 +303,7 @@ const ProductDetailsPage = () => {
 
 
   return (
-    <div className="bg-[#f8f5f0] min-h-screen font-['Oswald']">
+    <div className="bg-[#d4d4d4] min-h-screen font-['Oswald']">
       {/* Voltar */}
       <div className="container mx-auto px-4 sm:px-6 pt-8 sm:pt-16">
         <motion.div whileHover={{ x: -5 }}>
