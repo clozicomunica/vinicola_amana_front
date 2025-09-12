@@ -8,7 +8,7 @@ const WhatsAppButton = () => {
     "Olá! Gostaria de saber mais sobre seus vinhos."
   );
 
-  // Efeito de aparecimento suave
+ 
   useEffect(() => {
     const timer = setTimeout(() => setIsVisible(true), 1000);
     return () => clearTimeout(timer);
@@ -20,7 +20,7 @@ const WhatsAppButton = () => {
         isVisible ? "opacity-100" : "opacity-0 translate-y-4"
       }`}
     >
-      {/* Balão de mensagem */}
+
       <div
         className={`absolute right-14 bottom-0 bg-white text-gray-800 px-4 py-2 rounded-lg shadow-md flex items-center transition-all duration-300 ${
           isHovered
@@ -35,7 +35,7 @@ const WhatsAppButton = () => {
         </span>
       </div>
 
-      {/* Botão principal */}
+
       <a
         href={`https://wa.me/${phoneNumber}?text=${message}`}
         target="_blank"
@@ -47,7 +47,7 @@ const WhatsAppButton = () => {
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
-        {/* Ícone oficial do WhatsApp */}
+  
         <svg
           width="28"
           height="28"
@@ -62,7 +62,6 @@ const WhatsAppButton = () => {
           />
         </svg>
 
-        {/* Efeito de pulsação sutil */}
         <div
           className={`absolute inset-0 border-2 border-[#25D366] rounded-full animate-ping opacity-0 ${
             isHovered ? "opacity-40" : "opacity-20"
