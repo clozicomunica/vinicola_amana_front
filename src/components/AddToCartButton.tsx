@@ -1,4 +1,3 @@
-// src/components/AddToCartButton.tsx
 import { useCart } from "../context/useCart";
 
 interface Props {
