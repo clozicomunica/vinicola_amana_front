@@ -28,7 +28,6 @@ const features = [
   },
 ];
 
-// Componente para cada feature
 const FeatureCard = ({ icon: Icon, title, description }: any) => (
   <div className="border border-[#9c9c9c]/50 rounded-lg hover:shadow-md transition-all hover:border-[#9a3324]/30 bg-black p-4 sm:p-5 w-full">
     <div className="flex items-start space-x-3 sm:space-x-4">
@@ -43,7 +42,6 @@ const FeatureCard = ({ icon: Icon, title, description }: any) => (
   </div>
 );
 
-// Componente para badges ("Rótulos" e "Prêmios")
 const Badge = ({ value, label, position }: any) => (
   <div
     className={`absolute ${position} bg-white/95 backdrop-blur-sm border border-[#9c9c9c]/50 rounded-lg p-3 sm:p-4 shadow w-24 sm:w-auto text-center`}
@@ -57,7 +55,7 @@ const AboutSection = () => (
   <section className="py-12 lg:py-24 bg-[#f5f5f5] overflow-hidden w-full font-['Oswald']">
     <div className="container mx-auto px-4 sm:px-6 w-full">
       <div className="flex flex-col lg:flex-row gap-8 lg:gap-16 items-start w-full">
-        {/* Texto e features */}
+
         <div className="order-2 lg:order-1 w-full space-y-6 lg:space-y-8">
           <div>
             <h2 className="text-black text-2xl sm:text-3xl lg:text-4xl mb-4 lg:mb-6">
@@ -98,7 +96,6 @@ const AboutSection = () => (
           </div>
         </div>
 
-        {/* Imagem e badges */}
         <div className="order-1 lg:order-2 relative w-full h-full">
           <div className="relative overflow-hidden rounded-xl sm:rounded-2xl shadow-lg w-full">
             <img
