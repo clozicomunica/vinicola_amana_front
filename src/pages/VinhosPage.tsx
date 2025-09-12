@@ -34,6 +34,8 @@ const CATEGORIES = [
   { id: "diversos", name: "Diversos" },
 ];
 
+const PER_PAGE = 12;
+
 const VinhosPage = () => {
   const [wines, setWines] = useState<Wine[]>([]);
   const [page, setPage] = useState(1);
@@ -44,10 +46,10 @@ const VinhosPage = () => {
   const [error, setError] = useState<string | null>(null);
   const [hasMore, setHasMore] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState("all");
-  const [sortOrder, setSortOrder] = useState<string>("");
+  const [sortOrder, setSortOrder] = useState<string>("price_asc");
   const { addToCart } = useCart();
 
-  // Função para normalizar strings, igual ao backend
+
   const cleanString = (str: string) =>
     str
       .toLowerCase()
@@ -70,7 +72,7 @@ const VinhosPage = () => {
     }
 
     try {
-      let url = `https://vinicola-amana-back.onrender.com/api/products?page=${pageNumber}&per_page=8&published=true`;
+      let url = `https://vinicola-amana-back.onrender.com/api/products?page=${pageNumber}&per_page=${PER_PAGE}&published=true`;
 
       if (category !== "all") {
         url += `&category=${encodeURIComponent(category)}`;
@@ -86,19 +88,8 @@ const VinhosPage = () => {
       if (!res.ok) throw new Error(`Erro ${res.status}: ${res.statusText}`);
       const data: Wine[] = await res.json();
 
-      // Log detalhado para depuração
-      console.log(
-        "API Response:",
-        data.map((w) => ({
-          name: w.name.pt,
-          categories: w.categories.map((c) => c.name.pt),
-          variantValues: w.variants.flatMap((v) =>
-            v.values.map((val) => val.pt)
-          ),
-        }))
-      );
+    
 
-      // Filtrar "Visita Guiada" e "Degustação"
       let filteredData = data.filter(
         (wine) =>
           !wine.name.pt.toLowerCase().includes("visita guiada") &&
@@ -120,7 +111,7 @@ const VinhosPage = () => {
         );
       }
 
-      setHasMore(data.length === 8);
+      setHasMore(data.length === PER_PAGE);
 
       if (isFirstPage) {
         setWines(filteredData);
@@ -464,7 +455,6 @@ const VinhosPage = () => {
                   onChange={(e) => setSortOrder(e.target.value)}
                   className="bg-black/70 text-white border border-white/20 rounded-full px-3 py-1.5 text-xs md:text-sm focus:border-[#89764b] focus:ring-2 focus:ring-[#89764b]/50 transition-all font-['Oswald'] appearance-none bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgZmlsbD0iI2ZmZmZmZiI+PHBhdGggZD0iTTcuMjQ3IDEwLjE0TDQuNDU3IDcuMzVhLjUuNSAwIDAgMSAwLS43MDdsLjM1LS4zNWEuNS41IDAgMCAxIC43MDcgMGwyLjE0NiAyLjE0NyAyLjE0Ni0yLjE0N2EuNS41IDAgMCAxIC43MDcgMGwuMzUuMzVhLjUuNSAwIDAgMSAwIC43MDdsLTIuNzkgMi43OWEuNS41IDAgMCAxLS43MDcgMHoiLz48L3N2Zz4=')] bg-no-repeat bg-[center_right_0.5rem] pr-6"
                 >
-                  <option value="">Padrão</option>
                   <option value="price_asc">Mais barato</option>
                   <option value="price_desc">Mais caro</option>
                 </select>
@@ -533,7 +523,7 @@ const VinhosPage = () => {
                 exit={{ opacity: 0 }}
                 className="grid grid-cols-2 gap-4 md:grid-cols-3 md:gap-6 lg:grid-cols-4 lg:gap-8"
               >
-                {[...Array(8)].map((_, i) => (
+                {[...Array(PER_PAGE)].map((_, i) => (
                   <motion.div
                     key={i}
                     initial={{ opacity: 0, y: 20 }}
