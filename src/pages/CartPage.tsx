@@ -1,22 +1,20 @@
 import { useState } from "react";
 import { useCart } from "../context/useCart";
 import { ShoppingCart, X, ArrowLeft, Wine, ChevronRight } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import type { CartItem } from "../context/CartProvider";
 
-interface OrderSummary {
-  id?: number;
-  number?: string;
-  contact_name?: string;
-  contact_email?: string;
-  products?: { name: string; quantity: number; image?: { src: string } }[];
-  total?: number;
-}
-
 const CartPage = () => {
   const { cart, removeFromCart, clearCart, addToCart } = useCart();
-  const [customer, setCustomer] = useState({
+  const [customer, setCustomer] = useState<{
+    email: string;
+    name: string;
+    document: string;
+    address: string;
+    city: string;
+    zipcode: string;
+  }>({
     email: "",
     name: "",
     document: "",
@@ -26,12 +24,10 @@ const CartPage = () => {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [orderSummary, setOrderSummary] = useState<OrderSummary | null>(null);
-  const navigate = useNavigate();
 
   // Calculate cart subtotal
   const total = cart.reduce(
-    (sum, item) => sum + Number(item.price) * (item.quantity || 1),
+    (sum, item: CartItem) => sum + Number(item.price) * (item.quantity || 1),
     0
   );
 
@@ -50,10 +46,10 @@ const CartPage = () => {
   const handleCheckout = async () => {
     setLoading(true);
     setError("");
-    setOrderSummary(null);
 
     if (!cart.length) {
       setError("O carrinho está vazio!");
+      toast.error("O carrinho está vazio!");
       setLoading(false);
       return;
     }
@@ -66,99 +62,75 @@ const CartPage = () => {
       !customer.zipcode
     ) {
       setError("Preencha todos os campos obrigatórios!");
+      toast.error("Preencha todos os campos obrigatórios!");
       setLoading(false);
       return;
     }
 
-    const orderData = {
-      currency: "BRL",
-      language: "pt",
-      status: "open",
-      gateway: "mercadopago",
-      payment_status: "pending",
-      products: cart.map((item) => ({
-        variant_id: item.variant_id || 0,
+    // Validação simples para CPF (11 dígitos) e CEP (8 dígitos)
+    const cleanDocument = customer.document.replace(/\D/g, "");
+    const cleanZipcode = customer.zipcode.replace(/\D/g, "");
+    if (cleanDocument.length !== 11) {
+      setError("CPF inválido (deve ter 11 dígitos)");
+      toast.error("CPF inválido (deve ter 11 dígitos)");
+      setLoading(false);
+      return;
+    }
+    if (cleanZipcode.length !== 8) {
+      setError("CEP inválido (deve ter 8 dígitos)");
+      toast.error("CEP inválido (deve ter 8 dígitos)");
+      setLoading(false);
+      return;
+    }
+
+    const checkoutData = {
+      produtos: cart.map((item: CartItem) => ({
+        name: item.name,
         quantity: item.quantity || 1,
+        price: Number(item.price),
+        variant_id: item.variant_id || 0, // Use IDs reais em produção
       })),
-      customer: {
-        email: customer.email,
+      cliente: {
         name: customer.name,
-        document: customer.document,
-        phone: "+55 11 99999-9999",
-      },
-      billing_address: {
-        first_name: customer.name.split(" ")[0] || "Cliente",
-        last_name: customer.name.split(" ").slice(1).join(" ") || "Sobrenome",
+        email: customer.email,
+        document: cleanDocument,
         address: customer.address,
-        number: "s/n",
         city: customer.city,
-        province: "SP",
-        zipcode: customer.zipcode,
-        country: "BR",
-        phone: "+55 11 99999-9999",
+        zipcode: cleanZipcode,
       },
-      shipping_address: {
-        first_name: customer.name.split(" ")[0] || "Cliente",
-        last_name: customer.name.split(" ").slice(1).join(" ") || "Sobrenome",
-        address: customer.address,
-        number: "s/n",
-        city: customer.city,
-        province: "SP",
-        zipcode: customer.zipcode,
-        country: "BR",
-        phone: "+55 11 99999-9999",
-      },
-      shipping_pickup_type: "ship",
-      shipping: "correios",
-      shipping_option: "Correios - PAC",
-      checkout_enabled: true,
+      total,
     };
 
     try {
+      // Use http://localhost:3001 para testes locais com ngrok
       const response = await fetch(
-        "https://vinicola-amana-back.onrender.com/api/orders/checkout",
+        "http://localhost:3001/api/orders/create-checkout", // Troque por ngrok ou Render URL após testes
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(orderData),
+          body: JSON.stringify(checkoutData),
         }
       );
 
       const data = await response.json();
 
-      setLoading(false);
-
       if (response.ok) {
-        console.log("Checkout bem-sucedido, limpando carrinho...");
-        setOrderSummary(data);
-        clearCart(); // Limpa o carrinho
-        console.log("Carrinho após clearCart:", cart); // Log para verificar o estado
-        toast.success("Compra finalizada com sucesso! Carrinho limpo.", {
-          position: "bottom-right",
-          style: {
-            background: "#89764b",
-            color: "#fff",
-            borderRadius: "8px",
-            padding: "16px 24px",
-            fontFamily: "'Oswald', sans-serif",
-          },
-          iconTheme: {
-            primary: "#fff",
-            secondary: "#89764b",
-          },
-        });
-        // Atraso para garantir que o estado do carrinho seja atualizado
-        setTimeout(() => {
-          navigate("/success", { state: { orderSummary: data, customer } });
-        }, 100);
+        toast.success("Redirecionando para o pagamento...");
+        // Redireciona para o Checkout Pro do Mercado Pago
+        window.location.href = data.redirect_url;
       } else {
-        setError(`Erro ao criar pedido: ${data.error || "Tente novamente"}`);
+        const errorMsg = `Erro ao iniciar checkout: ${data.error || "Tente novamente"}`;
+        setError(errorMsg);
+        toast.error(errorMsg);
+        setLoading(false);
       }
     } catch (err) {
+      const errorMsg = "Erro ao conectar com o servidor. Tente novamente.";
+      setError(errorMsg);
+      toast.error(errorMsg);
       setLoading(false);
-      setError("Erro ao conectar com o servidor. Tente novamente.");
       console.error("Erro ao iniciar checkout:", err);
     }
   };
@@ -183,10 +155,9 @@ const CartPage = () => {
               Carrinho
             </h1>
             <div className="text-xs bg-white/20 px-2 py-1 rounded-full uppercase tracking-wide">
-              {cart.reduce((total, item) => total + (item.quantity || 1), 0)}{" "}
+              {cart.reduce((total, item: CartItem) => total + (item.quantity || 1), 0)}{" "}
               ITEM
-              {cart.reduce((total, item) => total + (item.quantity || 1), 0) !==
-                1 && "S"}
+              {cart.reduce((total, item: CartItem) => total + (item.quantity || 1), 0) !== 1 && "S"}
             </div>
           </div>
         </div>
@@ -237,7 +208,7 @@ const CartPage = () => {
                   </div>
                 </div>
                 <ul className="divide-y divide-gray-100">
-                  {cart.map((item) => (
+                  {cart.map((item: CartItem) => (
                     <li
                       key={item.id}
                       className="p-3 hover:bg-gray-50 transition-colors"
@@ -247,13 +218,9 @@ const CartPage = () => {
                           <div className="relative flex-shrink-0">
                             <div className="w-14 h-14 bg-gray-50 rounded-lg flex items-center justify-center p-2">
                               <img
-                                src={item.image || ""}
+                                src={item.image || "/path/to/fallback-image.jpg"}
                                 alt={item.name}
                                 className="max-h-full max-w-full object-contain mix-blend-multiply"
-                                onError={(e) => {
-                                  e.currentTarget.src =
-                                    "/path/to/fallback-image.jpg";
-                                }}
                               />
                             </div>
                             {(item.quantity || 1) > 1 && (
@@ -271,10 +238,7 @@ const CartPage = () => {
                             </p>
                             <div className="sm:hidden mt-2">
                               <span className="font-medium text-gray-700 text-sm">
-                                R$
-                                {Number(item.price || 0)
-                                  .toFixed(2)
-                                  .replace(".", ",")}
+                                R${Number(item.price || 0).toFixed(2).replace(".", ",")}
                               </span>
                             </div>
                           </div>
@@ -301,10 +265,7 @@ const CartPage = () => {
                           </div>
                           <div className="flex items-center space-x-2">
                             <span className="font-bold text-gray-900 text-sm">
-                              R$
-                              {(Number(item.price || 0) * (item.quantity || 1))
-                                .toFixed(2)
-                                .replace(".", ",")}
+                              R${(Number(item.price || 0) * (item.quantity || 1)).toFixed(2).replace(".", ",")}
                             </span>
                             <button
                               onClick={() => removeFromCart(item.id)}
@@ -317,10 +278,7 @@ const CartPage = () => {
                         </div>
                         <div className="hidden sm:grid sm:grid-cols-3 sm:gap-3 sm:items-center">
                           <div className="text-center text-gray-700 font-medium text-sm">
-                            R$
-                            {Number(item.price || 0)
-                              .toFixed(2)
-                              .replace(".", ",")}
+                            R${Number(item.price || 0).toFixed(2).replace(".", ",")}
                           </div>
                           <div className="flex items-center justify-center">
                             <div className="flex items-center border border-gray-200 rounded-lg">
@@ -345,10 +303,7 @@ const CartPage = () => {
                           </div>
                           <div className="flex items-center justify-end space-x-3">
                             <span className="font-bold text-gray-900 text-sm">
-                              R$
-                              {(Number(item.price || 0) * (item.quantity || 1))
-                                .toFixed(2)
-                                .replace(".", ",")}
+                              R${(Number(item.price || 0) * (item.quantity || 1)).toFixed(2).replace(".", ",")}
                             </span>
                             <button
                               onClick={() => removeFromCart(item.id)}
@@ -523,55 +478,6 @@ const CartPage = () => {
             {/* Right Column - Order Summary */}
             <div className="lg:w-1/3">
               <div className="bg-white rounded-lg shadow-md p-4 border border-[#89764b]/10 lg:sticky lg:top-20">
-                {orderSummary && (
-                  <div className="mb-4 border-b pb-4">
-                    <h3 className="text-lg font-bold text-gray-900 mb-2 uppercase tracking-tight">
-                      Resumo do Pedido Criado
-                    </h3>
-                    <div className="space-y-2 text-sm">
-                      <p>
-                        <strong>Número do Pedido:</strong>{" "}
-                        {orderSummary.number ||
-                          orderSummary.id?.toString() ||
-                          "N/A"}
-                      </p>
-                      <p>
-                        <strong>Cliente:</strong>{" "}
-                        {orderSummary.contact_name || customer.name} (
-                        {orderSummary.contact_email || customer.email})
-                      </p>
-                      <p>
-                        <strong>Produtos:</strong>{" "}
-                        {orderSummary.products
-                          ?.map((p) => `${p.name} (Qtd: ${p.quantity})`)
-                          .join(", ") ||
-                          cart
-                            .map(
-                              (item) =>
-                                `${item.name} (Qtd: ${item.quantity || 1})`
-                            )
-                            .join(", ")}
-                      </p>
-                      <p>
-                        <strong>Total:</strong> R${" "}
-                        {parseFloat((orderSummary.total || total).toString())
-                          .toFixed(2)
-                          .replace(".", ",")}
-                      </p>
-                      {orderSummary?.products?.[0]?.image?.src && (
-                        <img
-                          src={orderSummary.products[0].image.src}
-                          alt={orderSummary.products[0].name || "Produto"}
-                          className="max-w-[100px] rounded-lg mt-2"
-                        />
-                      )}
-                      <p>
-                        <strong>Status:</strong> Aguardando pagamento
-                      </p>
-                    </div>
-                  </div>
-                )}
-
                 <h3 className="text-lg font-bold text-gray-900 mb-3 pb-2 border-b flex items-center uppercase tracking-tight">
                   <Wine className="h-4 w-4 mr-1 text-[#89764b]" />
                   Resumo
