@@ -14,6 +14,9 @@ import ScrollToTop from "./components/ScrollToTop";
 import WhatsAppButton from "./components/WhatsappButton";
 import ScrollToTopLeft from "./components/ScrollToTopLeft";
 import SuccessPage from "./pages/SucessPage";
+import ConfigPage from "./pages/Config";
+import SupportPage from "./pages/Suporte";
+import PrivacyPolicyPage from "./pages/Privacidade";
 
 function App() {
   return (
@@ -48,6 +51,9 @@ function App() {
             <Route path="/sobrenos" element={<AboutPage />} />
             <Route path="/experiencias" element={<ExperiencesPage />} />
             <Route path="/contato" element={<ContactPage />} />
+            <Route path="/config" element={<ConfigPage />} />
+            <Route path="/suporte" element={<SupportPage />} />
+            <Route path="/privacidade" element={<PrivacyPolicyPage />} />
           </Routes>
         </main>
         <Footer />
