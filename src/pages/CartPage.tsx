@@ -673,8 +673,8 @@ const CartPage = () => {
                   )}
 
                   <button
-                    onClick={handleCheckout}
-                    disabled={loading}
+                    //onClick={handleCheckout}
+                    disabled//</div>={loading}
                     className="w-full mt-4 bg-gradient-to-r from-[#89764b] to-[#a08d5f] hover:from-[#756343] hover:to-[#89764b] text-white py-4 px-6 rounded-lg transition-all shadow-md hover:shadow-lg hover:scale-105 uppercase tracking-wider font-bold text-sm flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                     aria-label="Finalizar compra"
                   >
