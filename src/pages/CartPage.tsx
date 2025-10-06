@@ -5,6 +5,20 @@ import { Link } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import type { CartItem } from "../context/CartProvider";
 
+/** Base da API vinda de env pública (funciona em Vite e Next) */
+const API_URL =
+  // Vite
+  (typeof import.meta !== "undefined" &&
+    // @ts-ignore
+    (import.meta.env?.VITE_API_URL as string)) ||
+  // Next.js
+  (typeof process !== "undefined" && (process.env.NEXT_PUBLIC_API_URL as string)) ||
+  // fallback local
+  "http://localhost:3001";
+
+/** Caminho do endpoint que cria a preferência/checkout no seu backend */
+const CREATE_CHECKOUT_PATH = "/api/orders/create-checkout";
+
 const CartPage = () => {
   const { cart, removeFromCart, clearCart, addToCart } = useCart();
   const [customer, setCustomer] = useState<{
@@ -25,7 +39,7 @@ const CartPage = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // Calculate cart subtotal
+  // Total do carrinho
   const total = cart.reduce(
     (sum, item: CartItem) => sum + Number(item.price) * (item.quantity || 1),
     0
@@ -47,9 +61,11 @@ const CartPage = () => {
     setLoading(true);
     setError("");
 
+    // Validações básicas
     if (!cart.length) {
-      setError("O carrinho está vazio!");
-      toast.error("O carrinho está vazio!");
+      const msg = "O carrinho está vazio!";
+      setError(msg);
+      toast.error(msg);
       setLoading(false);
       return;
     }
@@ -61,34 +77,38 @@ const CartPage = () => {
       !customer.city ||
       !customer.zipcode
     ) {
-      setError("Preencha todos os campos obrigatórios!");
-      toast.error("Preencha todos os campos obrigatórios!");
+      const msg = "Preencha todos os campos obrigatórios!";
+      setError(msg);
+      toast.error(msg);
       setLoading(false);
       return;
     }
 
-    // Validação simples para CPF (11 dígitos) e CEP (8 dígitos)
+    // CPF e CEP
     const cleanDocument = customer.document.replace(/\D/g, "");
     const cleanZipcode = customer.zipcode.replace(/\D/g, "");
     if (cleanDocument.length !== 11) {
-      setError("CPF inválido (deve ter 11 dígitos)");
-      toast.error("CPF inválido (deve ter 11 dígitos)");
+      const msg = "CPF inválido (deve ter 11 dígitos)";
+      setError(msg);
+      toast.error(msg);
       setLoading(false);
       return;
     }
     if (cleanZipcode.length !== 8) {
-      setError("CEP inválido (deve ter 8 dígitos)");
-      toast.error("CEP inválido (deve ter 8 dígitos)");
+      const msg = "CEP inválido (deve ter 8 dígitos)";
+      setError(msg);
+      toast.error(msg);
       setLoading(false);
       return;
     }
 
+    // Payload esperado pelo backend
     const checkoutData = {
       produtos: cart.map((item: CartItem) => ({
         name: item.name,
         quantity: item.quantity || 1,
         price: Number(item.price),
-        variant_id: item.variant_id || 0, // Use IDs reais em produção
+        variant_id: item.variant_id || 0, // em produção usar IDs reais
       })),
       cliente: {
         name: customer.name,
@@ -102,36 +122,49 @@ const CartPage = () => {
     };
 
     try {
-    
-      const response = await fetch(
-        "https://vinicola-amana-back.onrender.com", // Troque por ngrok ou Render URL após testes
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(checkoutData),
-        }
-      );
+      // CHAMADA CORRETA: base + endpoint (nada de localhost em produção)
+      const response = await fetch(`${API_URL}${CREATE_CHECKOUT_PATH}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(checkoutData),
+      });
 
-      const data = await response.json();
+      const text = await response.text();
+      let data: any = {};
+      try {
+        data = text ? JSON.parse(text) : {};
+      } catch {
+        // mantém data vazio mesmo se vier HTML / não-JSON
+      }
 
       if (response.ok) {
+        // pega a URL de redirecionamento qualquer que seja o nome que seu backend/mP retornam
+        const redirect =
+          data.redirect_url || data.init_point || data.sandbox_init_point;
+
+        if (!redirect) {
+          throw new Error(
+            "O servidor não retornou a URL de pagamento (redirect_url/init_point)."
+          );
+        }
+
         toast.success("Redirecionando para o pagamento...");
-        // Redireciona para o Checkout Pro do Mercado Pago
-        window.location.href = data.redirect_url;
+        window.location.href = redirect;
       } else {
-        const errorMsg = `Erro ao iniciar checkout: ${data.error || "Tente novamente"}`;
-        setError(errorMsg);
-        toast.error(errorMsg);
-        setLoading(false);
+        const msg = `Erro ao iniciar checkout: ${
+          data?.error || data?.message || `${response.status} ${response.statusText}`
+        }`;
+        setError(msg);
+        toast.error(msg);
+        console.error("create-checkout error:", { status: response.status, data });
       }
     } catch (err) {
-      const errorMsg = "Erro ao conectar com o servidor. Tente novamente.";
-      setError(errorMsg);
-      toast.error(errorMsg);
-      setLoading(false);
+      const msg = "Erro ao conectar com o servidor. Tente novamente.";
+      setError(msg);
+      toast.error(msg);
       console.error("Erro ao iniciar checkout:", err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -155,9 +188,8 @@ const CartPage = () => {
               Carrinho
             </h1>
             <div className="text-xs bg-white/20 px-2 py-1 rounded-full uppercase tracking-wide">
-              {cart.reduce((total, item: CartItem) => total + (item.quantity || 1), 0)}{" "}
-              ITEM
-              {cart.reduce((total, item: CartItem) => total + (item.quantity || 1), 0) !== 1 && "S"}
+              {cart.reduce((t, item: CartItem) => t + (item.quantity || 1), 0)} ITEM
+              {cart.reduce((t, i: CartItem) => t + (i.quantity || 1), 0) !== 1 && "S"}
             </div>
           </div>
         </div>
@@ -209,16 +241,13 @@ const CartPage = () => {
                 </div>
                 <ul className="divide-y divide-gray-100">
                   {cart.map((item: CartItem) => (
-                    <li
-                      key={item.id}
-                      className="p-3 hover:bg-gray-50 transition-colors"
-                    >
+                    <li key={item.id} className="p-3 hover:bg-gray-50 transition-colors">
                       <div className="flex flex-col sm:grid sm:grid-cols-2 sm:gap-6">
                         <div className="flex items-start space-x-3">
                           <div className="relative flex-shrink-0">
                             <div className="w-14 h-14 bg-gray-50 rounded-lg flex items-center justify-center p-2">
                               <img
-                                src={item.image || "/path/to/fallback-image.jpg"}
+                                src={item.image || "/fallback-image.jpg"}
                                 alt={item.name}
                                 className="max-h-full max-w-full object-contain mix-blend-multiply"
                               />
@@ -265,7 +294,10 @@ const CartPage = () => {
                           </div>
                           <div className="flex items-center space-x-2">
                             <span className="font-bold text-gray-900 text-sm">
-                              R${(Number(item.price || 0) * (item.quantity || 1)).toFixed(2).replace(".", ",")}
+                              R$
+                              {(Number(item.price || 0) * (item.quantity || 1))
+                                .toFixed(2)
+                                .replace(".", ",")}
                             </span>
                             <button
                               onClick={() => removeFromCart(item.id)}
@@ -303,7 +335,10 @@ const CartPage = () => {
                           </div>
                           <div className="flex items-center justify-end space-x-3">
                             <span className="font-bold text-gray-900 text-sm">
-                              R${(Number(item.price || 0) * (item.quantity || 1)).toFixed(2).replace(".", ",")}
+                              R$
+                              {(Number(item.price || 0) * (item.quantity || 1))
+                                .toFixed(2)
+                                .replace(".", ",")}
                             </span>
                             <button
                               onClick={() => removeFromCart(item.id)}
@@ -469,9 +504,7 @@ const CartPage = () => {
                     />
                   </div>
                 </div>
-                <p className="text-xs text-gray-500 mt-2">
-                  * Campos obrigatórios
-                </p>
+                <p className="text-xs text-gray-500 mt-2">* Campos obrigatórios</p>
               </div>
             </div>
 
@@ -496,16 +529,12 @@ const CartPage = () => {
                     <span className="text-gray-600 uppercase tracking-wider text-sm">
                       Desconto
                     </span>
-                    <span className="text-[#89764b] font-medium text-sm">
-                      - R$ 0,00
-                    </span>
+                    <span className="text-[#89764b] font-medium text-sm">- R$ 0,00</span>
                   </div>
                 </div>
 
                 <div className="flex justify-between items-center py-2 border-t border-b">
-                  <span className="font-bold text-lg uppercase tracking-tight">
-                    Total
-                  </span>
+                  <span className="font-bold text-lg uppercase tracking-tight">Total</span>
                   <span className="text-lg text-[#89764b]">
                     R${total.toFixed(2).replace(".", ",")}
                   </span>
