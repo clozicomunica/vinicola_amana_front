@@ -25,7 +25,7 @@ function DevBanner() {
       role="status"
       aria-live="polite"
     >
-      SITE EM DESENVOLVIMENTO - COMPRA NÃO DISPONÍVEL AINDA
+      SITE EM DESENVOLVIMENTO - COMPRA NÃO DISPONÍVEL
     </div>
   );
 }
