@@ -102,9 +102,9 @@ const CartPage = () => {
     };
 
     try {
-      // Use http://localhost:3001 para testes locais com ngrok
+    
       const response = await fetch(
-        "http://localhost:3001/api/orders/create-checkout", // Troque por ngrok ou Render URL após testes
+        "https://vinicola-amana-back.onrender.com", // Troque por ngrok ou Render URL após testes
         {
           method: "POST",
           headers: {
