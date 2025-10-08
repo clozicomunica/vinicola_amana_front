@@ -9,7 +9,7 @@ import ExperiencesPage from "./pages/ExperiencesPage";
 import ContactPage from "./pages/ContactPage";
 import Footer from "./components/Footer";
 import ProductDetailsPage from "./pages/ProductDetailsPage";
-
+import  CartPage from "./pages/CartPage";
 import ScrollToTop from "./components/ScrollToTop";
 import WhatsAppButton from "./components/WhatsappButton";
 import ScrollToTopLeft from "./components/ScrollToTopLeft";
@@ -63,7 +63,7 @@ function App() {
             <Route path="/" element={<HomePage />} />
             <Route path="/vinhos" element={<VinhosPage />} />
             <Route path="/produto/:id" element={<ProductDetailsPage />} />
-            
+            <Route path="/carrinho" element={<CartPage />} />
             <Route path="/success" element={<SuccessPage />} />
             <Route path="/sobrenos" element={<AboutPage />} />
             <Route path="/experiencias" element={<ExperiencesPage />} />
