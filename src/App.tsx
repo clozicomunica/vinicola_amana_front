@@ -5,7 +5,6 @@ import Header from "./components/Header";
 import HomePage from "./pages/HomePage";
 import VinhosPage from "./pages/ProductsPage";
 import AboutPage from "./pages/AboutPage";
-import ExperiencesPage from "./pages/ExperiencesPage";
 import ContactPage from "./pages/ContactPage";
 import Footer from "./components/Footer";
 import ProductDetailsPage from "./pages/ProductDetailsPage";
@@ -66,7 +65,6 @@ function App() {
             <Route path="/carrinho" element={<CartPage />} />
             <Route path="/success" element={<SuccessPage />} />
             <Route path="/sobrenos" element={<AboutPage />} />
-            <Route path="/experiencias" element={<ExperiencesPage />} />
             <Route path="/contato" element={<ContactPage />} />
             <Route path="/config" element={<ConfigPage />} />
             <Route path="/suporte" element={<SupportPage />} />
