@@ -1,59 +1,100 @@
 import { useState } from "react";
 import { useCart } from "../context/useCart";
-import { ShoppingCart, X, ArrowLeft, Wine, ChevronRight, MapPin, User, Mail, FileText, Home } from "lucide-react";
+import {
+  ShoppingCart, X, ArrowLeft, Wine, ChevronRight, MapPin, User, Mail,
+  FileText, Home, Phone, Lock
+} from "lucide-react";
 import { Link } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import type { CartItem } from "../context/CartProvider";
 
 /** Base da API vinda de env pública (funciona em Vite e Next) */
 const API_URL =
-  // Vite
-  (typeof import.meta !== "undefined" &&
-    // @ts-ignore
-    (import.meta.env?.VITE_API_URL as string)) ||
-  // Next.js
+  (typeof import.meta !== "undefined" && /* @ts-ignore */ (import.meta.env?.VITE_API_URL as string)) ||
   (typeof process !== "undefined" && (process.env.NEXT_PUBLIC_API_URL as string)) ||
-  // fallback local
   "http://localhost:3001";
 
-/** Caminho do endpoint que cria a preferência/checkout no seu backend */
+/** Endpoint do seu backend */
 const CREATE_CHECKOUT_PATH = "/api/orders/create-checkout";
 
-// Lista de cidades brasileiras (exemplo)
-const CITIES = [
-  "São Paulo - SP",
-  "Rio de Janeiro - RJ",
-  "Belo Horizonte - MG",
-  "Porto Alegre - RS",
-  "Curitiba - PR",
-  "Salvador - BA",
-  "Fortaleza - CE",
-  "Recife - PE",
-  "Brasília - DF",
-  "Goiânia - GO",
-  "Manaus - AM",
-  "Belém - PA"
+/** UFs (estados) */
+const STATES = [
+  "AC","AL","AP","AM","BA","CE","DF","ES","GO","MA","MT","MS","MG","PA","PB","PR","PE","PI","RJ","RN","RS","RO","RR","SC","SP","SE","TO",
 ];
+
+/** cidades só para autocomplete de exemplo */
+const CITIES = [
+  "São Paulo", "Rio de Janeiro", "Belo Horizonte", "Porto Alegre", "Curitiba",
+  "Salvador", "Fortaleza", "Recife", "Brasília", "Goiânia", "Manaus", "Belém"
+];
+
+/* -------- helpers -------- */
+const onlyDigits = (v: string) => v.replace(/\D/g, "");
+
+/** Validação oficial de CPF (com DV) */
+function validateCPF(cpfRaw: string) {
+  const cpf = onlyDigits(cpfRaw);
+  if (cpf.length !== 11) return false;
+  if (/^(\d)\1{10}$/.test(cpf)) return false;
+  const calc = (base: string, factor: number) => {
+    let sum = 0;
+    for (let i = 0; i < base.length; i++) sum += Number(base[i]) * (factor - i);
+    const rest = (sum * 10) % 11;
+    return rest === 10 ? 0 : rest;
+  };
+  const d1 = calc(cpf.slice(0, 9), 10);
+  const d2 = calc(cpf.slice(0, 10), 11);
+  return d1 === Number(cpf[9]) && d2 === Number(cpf[10]);
+}
+
+/** Email básico */
+const validateEmail = (email: string) =>
+  /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email);
+
+/** ViaCEP -> {address, city, state} */
+async function lookupByCEP(cepRaw: string) {
+  const cep = onlyDigits(cepRaw);
+  if (cep.length !== 8) throw new Error("CEP deve ter 8 dígitos");
+  const res = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+  if (!res.ok) throw new Error("Falha ao consultar CEP");
+  const data = await res.json();
+  if (data.erro) throw new Error("CEP não encontrado");
+  const addressParts = [data.logradouro, data.bairro].filter(Boolean).join(", ");
+  return {
+    address: addressParts,
+    city: data.localidade || "",
+    state: data.uf || "",
+  };
+}
+/* ------------------------- */
 
 const CartPage = () => {
   const { cart, removeFromCart, clearCart, addToCart } = useCart();
   const [customer, setCustomer] = useState<{
     email: string;
     name: string;
-    document: string;
-    address: string;
+    document: string; // CPF
+    phone: string;    // WhatsApp
+    address: string;  // preenchido SOMENTE via CEP
+    complement: string; // precisa ter número
     city: string;
-    zipcode: string;
+    state: string;
+    zipcode: string;  // CEP
   }>({
     email: "",
     name: "",
     document: "",
+    phone: "",
     address: "",
+    complement: "",
     city: "",
+    state: "",
     zipcode: "",
   });
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [cepLoading, setCepLoading] = useState(false);
   const [showCitiesDropdown, setShowCitiesDropdown] = useState(false);
 
   // Total do carrinho
@@ -62,84 +103,109 @@ const CartPage = () => {
     0
   );
 
-  const handleIncrement = (item: CartItem) => {
-    addToCart({ ...item, quantity: 1 });
+  const handleIncrement = (item: CartItem) => addToCart({ ...item, quantity: 1 });
+  const handleDecrement = (item: CartItem) =>
+    (item.quantity || 1) > 1 ? addToCart({ ...item, quantity: -1 }) : removeFromCart(item.id);
+
+  /* CEP -> auto-preenchimento */
+  const handleCepBlur = async () => {
+    const cep = onlyDigits(customer.zipcode);
+    if (cep.length !== 8) return; // não tenta enquanto incompleto
+    try {
+      setCepLoading(true);
+      const info = await lookupByCEP(cep);
+      setCustomer(prev => ({
+        ...prev,
+        address: info.address, // SEMPRE substitui; endereço é 100% controlado pelo CEP
+        city: info.city,
+        state: info.state,
+      }));
+      toast.success("Endereço preenchido pelo CEP 😉");
+    } catch (e: any) {
+      setCustomer(prev => ({ ...prev, address: "" })); // limpa endereço se falhar
+      toast.error(e.message || "Não foi possível buscar o CEP.");
+    } finally {
+      setCepLoading(false);
+    }
   };
 
-  const handleDecrement = (item: CartItem) => {
-    if ((item.quantity || 1) > 1) {
-      addToCart({ ...item, quantity: -1 });
-    } else {
-      removeFromCart(item.id);
-    }
+  const filteredCities = CITIES.filter(c =>
+    c.toLowerCase().includes(customer.city.toLowerCase())
+  );
+  const handleCitySelect = (city: string) => {
+    setCustomer({ ...customer, city });
+    setShowCitiesDropdown(false);
   };
 
   const handleCheckout = async () => {
     setLoading(true);
     setError("");
 
-    // Validações básicas
     if (!cart.length) {
       const msg = "O carrinho está vazio!";
-      setError(msg);
-      toast.error(msg);
-      setLoading(false);
-      return;
+      setError(msg); toast.error(msg); setLoading(false); return;
     }
+
+    // obrigatórios
     if (
-      !customer.email ||
-      !customer.name ||
-      !customer.document ||
-      !customer.address ||
-      !customer.city ||
-      !customer.zipcode
+      !customer.name || !customer.document || !customer.phone || !customer.email ||
+      !customer.zipcode || !customer.address || !customer.city || !customer.state
     ) {
       const msg = "Preencha todos os campos obrigatórios!";
-      setError(msg);
-      toast.error(msg);
-      setLoading(false);
-      return;
+      setError(msg); toast.error(msg); setLoading(false); return;
     }
 
-    // CPF e CEP
-    const cleanDocument = customer.document.replace(/\D/g, "");
-    const cleanZipcode = customer.zipcode.replace(/\D/g, "");
-    if (cleanDocument.length !== 11) {
-      const msg = "CPF inválido (deve ter 11 dígitos)";
-      setError(msg);
-      toast.error(msg);
-      setLoading(false);
-      return;
+    // validações rígidas
+    if (!validateEmail(customer.email)) {
+      const msg = "Email inválido.";
+      setError(msg); toast.error(msg); setLoading(false); return;
     }
-    if (cleanZipcode.length !== 8) {
-      const msg = "CEP inválido (deve ter 8 dígitos)";
-      setError(msg);
-      toast.error(msg);
-      setLoading(false);
-      return;
+    if (!validateCPF(customer.document)) {
+      const msg = "CPF inválido.";
+      setError(msg); toast.error(msg); setLoading(false); return;
+    }
+    if (onlyDigits(customer.zipcode).length !== 8) {
+      const msg = "CEP inválido (8 dígitos).";
+      setError(msg); toast.error(msg); setLoading(false); return;
+    }
+    const phoneDigits = onlyDigits(customer.phone);
+    if (phoneDigits.length < 10 || phoneDigits.length > 11) {
+      const msg = "WhatsApp inválido (use DDD + número).";
+      setError(msg); toast.error(msg); setLoading(false); return;
+    }
+    if (!/\d/.test(customer.complement || "")) {
+      const msg = "Informe o Nº no campo Complemento (ex.: 123, apto 45).";
+      setError(msg); toast.error(msg); setLoading(false); return;
     }
 
-    // Payload esperado pelo backend
+    // exige endereço vindo do CEP
+    if (!customer.address) {
+      const msg = "Preencha um CEP válido para gerar o endereço.";
+      setError(msg); toast.error(msg); setLoading(false); return;
+    }
+
     const checkoutData = {
       produtos: cart.map((item: CartItem) => ({
         name: item.name,
         quantity: item.quantity || 1,
         price: Number(item.price),
-        variant_id: item.variant_id || 0, // em produção usar IDs reais
+        variant_id: item.variant_id || 0,
       })),
       cliente: {
         name: customer.name,
         email: customer.email,
-        document: cleanDocument,
+        document: onlyDigits(customer.document),
+        phone: phoneDigits,
         address: customer.address,
+        complement: customer.complement,
         city: customer.city,
-        zipcode: cleanZipcode,
+        state: customer.state,
+        zipcode: onlyDigits(customer.zipcode),
       },
       total,
     };
 
     try {
-      // CHAMADA CORRETA: base + endpoint (nada de localhost em produção)
       const response = await fetch(`${API_URL}${CREATE_CHECKOUT_PATH}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -148,50 +214,27 @@ const CartPage = () => {
 
       const text = await response.text();
       let data: any = {};
-      try {
-        data = text ? JSON.parse(text) : {};
-      } catch {
-        // mantém data vazio mesmo se vier HTML / não-JSON
-      }
+      try { data = text ? JSON.parse(text) : {}; } catch {}
 
       if (response.ok) {
-        // pega a URL de redirecionamento qualquer que seja o nome que seu backend/mP retornam
-        const redirect =
-          data.redirect_url || data.init_point || data.sandbox_init_point;
-
-        if (!redirect) {
-          throw new Error(
-            "O servidor não retornou a URL de pagamento (redirect_url/init_point)."
-          );
-        }
-
+        const redirect = data.redirect_url || data.init_point || data.sandbox_init_point;
+        if (!redirect) throw new Error("Servidor não retornou URL de pagamento.");
         toast.success("Redirecionando para o pagamento...");
         window.location.href = redirect;
       } else {
         const msg = `Erro ao iniciar checkout: ${
           data?.error || data?.message || `${response.status} ${response.statusText}`
         }`;
-        setError(msg);
-        toast.error(msg);
+        setError(msg); toast.error(msg);
         console.error("create-checkout error:", { status: response.status, data });
       }
     } catch (err) {
       const msg = "Erro ao conectar com o servidor. Tente novamente.";
-      setError(msg);
-      toast.error(msg);
+      setError(msg); toast.error(msg);
       console.error("Erro ao iniciar checkout:", err);
     } finally {
       setLoading(false);
     }
-  };
-
-  const filteredCities = CITIES.filter(city => 
-    city.toLowerCase().includes(customer.city.toLowerCase())
-  );
-
-  const handleCitySelect = (city: string) => {
-    setCustomer({ ...customer, city });
-    setShowCitiesDropdown(false);
   };
 
   return (
@@ -436,26 +479,7 @@ const CartPage = () => {
                       </div>
 
                       <div className="space-y-4">
-                        <div>
-                          <label className="block text-sm text-gray-600 uppercase tracking-wider mb-2 flex items-center">
-                            <Mail className="h-4 w-4 mr-1" />
-                            Email *
-                          </label>
-                          <div className="relative">
-                            <input
-                              type="email"
-                              value={customer.email}
-                              onChange={(e) =>
-                                setCustomer({ ...customer, email: e.target.value })
-                              }
-                              placeholder="seu@email.com"
-                              className="w-full px-4 py-3 pl-10 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#89764b] focus:border-transparent transition-all text-sm bg-gray-50"
-                              aria-required="true"
-                            />
-                            <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                          </div>
-                        </div>
-
+                        {/* Nome */}
                         <div>
                           <label className="block text-sm text-gray-600 uppercase tracking-wider mb-2 flex items-center">
                             <User className="h-4 w-4 mr-1" />
@@ -476,6 +500,7 @@ const CartPage = () => {
                           </div>
                         </div>
 
+                        {/* CPF */}
                         <div>
                           <label className="block text-sm text-gray-600 uppercase tracking-wider mb-2 flex items-center">
                             <FileText className="h-4 w-4 mr-1" />
@@ -495,6 +520,48 @@ const CartPage = () => {
                             <FileText className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                           </div>
                         </div>
+
+                        {/* WhatsApp */}
+                        <div>
+                          <label className="block text-sm text-gray-600 uppercase tracking-wider mb-2 flex items-center">
+                            <Phone className="h-4 w-4 mr-1" />
+                            WhatsApp *
+                          </label>
+                          <div className="relative">
+                            <input
+                              type="tel"
+                              value={customer.phone}
+                              onChange={(e) =>
+                                setCustomer({ ...customer, phone: e.target.value })
+                              }
+                              placeholder="(11) 90000-0000"
+                              className="w-full px-4 py-3 pl-10 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#89764b] focus:border-transparent transition-all text-sm bg-gray-50"
+                              aria-required="true"
+                            />
+                            <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                          </div>
+                        </div>
+
+                        {/* Email */}
+                        <div>
+                          <label className="block text-sm text-gray-600 uppercase tracking-wider mb-2 flex items-center">
+                            <Mail className="h-4 w-4 mr-1" />
+                            Email *
+                          </label>
+                          <div className="relative">
+                            <input
+                              type="email"
+                              value={customer.email}
+                              onChange={(e) =>
+                                setCustomer({ ...customer, email: e.target.value })
+                              }
+                              placeholder="seu@email.com"
+                              className="w-full px-4 py-3 pl-10 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#89764b] focus:border-transparent transition-all text-sm bg-gray-50"
+                              aria-required="true"
+                            />
+                            <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                          </div>
+                        </div>
                       </div>
                     </div>
 
@@ -510,43 +577,67 @@ const CartPage = () => {
                       </div>
 
                       <div className="space-y-4">
+                        {/* CEP */}
                         <div>
+                          <label className="block text-sm text-gray-600 uppercase tracking-wider mb-2">
+                            CEP *
+                          </label>
+                          <input
+                            type="text"
+                            value={customer.zipcode}
+                            onChange={(e) =>
+                              setCustomer({ ...customer, zipcode: e.target.value })
+                            }
+                            onBlur={handleCepBlur}
+                            placeholder="00000-000"
+                            className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#89764b] focus:border-transparent transition-all text-sm bg-gray-50"
+                            aria-required="true"
+                          />
+                          {cepLoading && (
+                            <p className="mt-1 text-xs text-gray-500">Consultando CEP...</p>
+                          )}
+                        </div>
+
+                        {/* Endereço (SOMENTE VIA CEP) */}
+                        <div title="Campo preenchido automaticamente pelo CEP">
                           <label className="block text-sm text-gray-600 uppercase tracking-wider mb-2 flex items-center">
                             <Home className="h-4 w-4 mr-1" />
-                            Endereço Completo *
+                            Endereço (auto) *
                           </label>
                           <div className="relative">
                             <input
                               type="text"
                               value={customer.address}
-                              onChange={(e) =>
-                                setCustomer({ ...customer, address: e.target.value })
-                              }
-                              placeholder="Rua, número, bairro"
-                              className="w-full px-4 py-3 pl-10 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#89764b] focus:border-transparent transition-all text-sm bg-gray-50"
+                              readOnly
+                              placeholder="Preencha o CEP para carregar a rua e bairro"
+                              className="w-full px-4 py-3 pl-10 border border-gray-200 rounded-lg bg-gray-100 text-gray-700 cursor-not-allowed select-none"
                               aria-required="true"
+                              aria-readonly="true"
                             />
-                            <Home className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                            <Home className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                            <Lock className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                           </div>
                         </div>
 
-                        <div className="grid grid-cols-2 gap-4">
-                          <div>
-                            <label className="block text-sm text-gray-600 uppercase tracking-wider mb-2">
-                              CEP *
-                            </label>
-                            <input
-                              type="text"
-                              value={customer.zipcode}
-                              onChange={(e) =>
-                                setCustomer({ ...customer, zipcode: e.target.value })
-                              }
-                              placeholder="00000-000"
-                              className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#89764b] focus:border-transparent transition-all text-sm bg-gray-50"
-                              aria-required="true"
-                            />
-                          </div>
+                        {/* Complemento (com nº obrigatório) */}
+                        <div>
+                          <label className="block text-sm text-gray-600 uppercase tracking-wider mb-2">
+                            Complemento (informe o Nº) *
+                          </label>
+                          <input
+                            type="text"
+                            value={customer.complement}
+                            onChange={(e) =>
+                              setCustomer({ ...customer, complement: e.target.value })
+                            }
+                            placeholder="Ex.: 123, apto 45, bloco B (o número é obrigatório)"
+                            className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#89764b] focus:border-transparent transition-all text-sm bg-gray-50"
+                            aria-required="true"
+                          />
+                        </div>
 
+                        {/* Cidade e Estado */}
+                        <div className="grid grid-cols-2 gap-4">
                           <div className="relative">
                             <label className="block text-sm text-gray-600 uppercase tracking-wider mb-2 flex items-center">
                               <MapPin className="h-4 w-4 mr-1" />
@@ -564,8 +655,8 @@ const CartPage = () => {
                                 className="w-full px-4 py-3 pl-10 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#89764b] focus:border-transparent transition-all text-sm bg-gray-50 cursor-pointer"
                                 aria-required="true"
                               />
-                              <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                              <ChevronRight className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 rotate-90" />
+                              <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                              <ChevronRight className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 rotate-90" />
                             </div>
 
                             {showCitiesDropdown && (
@@ -582,6 +673,27 @@ const CartPage = () => {
                                 ))}
                               </div>
                             )}
+                          </div>
+
+                          <div>
+                            <label className="block text-sm text-gray-600 uppercase tracking-wider mb-2">
+                              Estado (UF) *
+                            </label>
+                            <select
+                              value={customer.state}
+                              onChange={(e) =>
+                                setCustomer({ ...customer, state: e.target.value })
+                              }
+                              className="w-full px-4 py-3 border border-gray-200 rounded-lg bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#89764b] focus:border-transparent transition-all text-sm"
+                              aria-required="true"
+                            >
+                              <option value="">Selecione</option>
+                              {STATES.map((uf) => (
+                                <option key={uf} value={uf}>
+                                  {uf}
+                                </option>
+                              ))}
+                            </select>
                           </div>
                         </div>
                       </div>
@@ -626,7 +738,7 @@ const CartPage = () => {
                         R${total.toFixed(2).replace(".", ",")}
                       </span>
                     </div>
-                    
+
                     <div className="flex justify-between items-center py-2 border-t border-gray-100">
                       <span className="text-gray-600 uppercase tracking-wider text-sm">
                         Desconto
@@ -664,7 +776,7 @@ const CartPage = () => {
                       </button>
                     </div>
                   )}
-                  
+
                   {loading && (
                     <div className="flex items-center justify-center gap-2 text-gray-600 mt-4 p-3 bg-gray-50 rounded-lg">
                       <div className="w-4 h-4 border-2 border-[#89764b] border-t-transparent rounded-full animate-spin"></div>
@@ -706,6 +818,7 @@ const CartPage = () => {
                 </div>
               </div>
             </div>
+            {/* fim col direita */}
           </div>
         )}
       </div>

@@ -17,17 +17,6 @@ import ConfigPage from "./pages/Config";
 import SupportPage from "./pages/Suporte";
 import PrivacyPolicyPage from "./pages/Privacidade";
 
-function DevBanner() {
-  return (
-    <div
-      className="fixed top-0 left-0 right-0 z-[100] bg-black text-white text-center text-xs sm:text-sm font-semibold tracking-wide py-2"
-      role="status"
-      aria-live="polite"
-    >
-      SITE EM DESENVOLVIMENTO - COMPRA NÃO DISPONÍVEL
-    </div>
-  );
-}
 
 function App() {
   return (
@@ -46,10 +35,6 @@ function App() {
           },
         }}
       />
-
-      {/* Banner fixo no topo, acima de tudo */}
-      <DevBanner />
-
       <ScrollToTop />
       <WhatsAppButton />
       <ScrollToTopLeft />
