@@ -41,7 +41,6 @@ const ContactPage = () => {
 
   return (
     <div className="min-h-screen bg-[#f8f5f0] font-['Oswald']">
-      {/* Hero Section - Estilo Vinícola */}
       <section className="relative pt-24 md:pt-32 lg:pt-40 pb-12 md:pb-16 lg:pb-20 text-center text-white overflow-hidden">
         <div className="absolute inset-0 bg-black">
           <div className="absolute inset-0 bg-black bg-cover bg-center opacity-30"></div>
@@ -55,12 +54,9 @@ const ContactPage = () => {
           </p>
         </div>
       </section>
-
-      {/* Contato e Formulário - Estilo Minimalista */}
       <section className="py-12 md:py-16 lg:py-20 bg-[#d4d4d4]">
         <div className="container mx-auto px-4">
           <div className="flex flex-col lg:flex-row gap-8 md:gap-12">
-            {/* Informações de Contato - Card Elegante */}
             <motion.div
               initial={{ opacity: 0, x: -50 }}
               whileInView={{ opacity: 1, x: 0 }}
@@ -72,7 +68,6 @@ const ContactPage = () => {
                 <h2 className="text-2xl md:text-3xl text-[#89764b] mb-8 uppercase tracking-tight border-b border-[#89764b]/30 pb-4">
                   Nossos Canais
                 </h2>
-
                 <div className="space-y-6">
                   <div className="flex items-start gap-4">
                     <div className="p-2 bg-[#89764b]/10 rounded-full">
@@ -81,14 +76,13 @@ const ContactPage = () => {
                     <div>
                       <h3 className="text-lg text-gray-300 mb-1">E-mail</h3>
                       <a
-                        href="mailto:vinicolaamana@gmail.com"
+                        href="mailto:sac@vinicolaamana.com.br"
                         className="text-gray-400 hover:text-[#89764b] transition-colors text-sm"
                       >
-                        vinicolaamana@gmail.com
+                        sac@vinicolaamana.com.br
                       </a>
                     </div>
                   </div>
-
                   <div className="flex items-start gap-4">
                     <div className="p-2 bg-[#89764b]/10 rounded-full">
                       <Phone className="h-5 w-5 text-[#89764b]" />
@@ -96,10 +90,10 @@ const ContactPage = () => {
                     <div>
                       <h3 className="text-lg text-gray-300 mb-1">Telefone</h3>
                       <a
-                        href="tel:+5581999999999"
+                        href="tel:+55 19 97179-9448"
                         className="text-gray-400 hover:text-[#89764b] transition-colors text-sm"
                       >
-                        (81) 99999-9999
+                        (19) 97179-9448
                       </a>
                     </div>
                   </div>
@@ -232,7 +226,7 @@ const ContactPage = () => {
                       className="mt-4 p-4 bg-red-900/20 text-red-300 rounded-sm border border-red-800/50 text-sm"
                     >
                       Ocorreu um erro. Por favor, tente novamente ou envie
-                      diretamente para vinicolaamana@gmail.com
+                      diretamente para sac@vinicolaamana.com.br
                     </motion.div>
                   )}
                 </form>
@@ -241,8 +235,6 @@ const ContactPage = () => {
           </div>
         </div>
       </section>
-
-      {/* Mapa - Estilo Integrado */}
       <section className="py-12 md:py-16 lg:py-20 bg-[#f8f5f0]">
         <div className="container mx-auto px-4">
           <motion.div

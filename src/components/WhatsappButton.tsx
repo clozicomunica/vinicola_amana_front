@@ -3,12 +3,11 @@ import { useState, useEffect } from "react";
 const WhatsAppButton = () => {
   const [isHovered, setIsHovered] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
-  const phoneNumber = "5511999999999"; // Substitua pelo seu número
+  const phoneNumber = "5519971799448";
   const message = encodeURIComponent(
     "Olá! Gostaria de saber mais sobre seus vinhos."
   );
 
- 
   useEffect(() => {
     const timer = setTimeout(() => setIsVisible(true), 1000);
     return () => clearTimeout(timer);
@@ -20,7 +19,6 @@ const WhatsAppButton = () => {
         isVisible ? "opacity-100" : "opacity-0 translate-y-4"
       }`}
     >
-
       <div
         className={`absolute right-14 bottom-0 bg-white text-gray-800 px-4 py-2 rounded-lg shadow-md flex items-center transition-all duration-300 ${
           isHovered
@@ -35,7 +33,6 @@ const WhatsAppButton = () => {
         </span>
       </div>
 
-
       <a
         href={`https://wa.me/${phoneNumber}?text=${message}`}
         target="_blank"
@@ -47,7 +44,6 @@ const WhatsAppButton = () => {
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
-  
         <svg
           width="28"
           height="28"

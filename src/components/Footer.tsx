@@ -1,5 +1,12 @@
 import { Link } from "react-router-dom";
-import { Facebook, Instagram, Youtube, Mail, Phone, MapPin } from "lucide-react";
+import {
+  Facebook,
+  Instagram,
+  Youtube,
+  Mail,
+  Phone,
+  MapPin,
+} from "lucide-react";
 import logo from "../assets/Amana.png";
 import developedby from "../assets/developedby.png";
 
@@ -8,15 +15,12 @@ const Footer = () => {
   const navLinks = [
     { label: "Nossos Vinhos", to: "/vinhos" },
     { label: "Nossa História", to: "/sobrenos" },
-    { label: "Experiências", to: "/experiencias" },
     { label: "Contato", to: "/contato" },
   ];
 
   const categoryLinks = [
     { label: "Vinhos", to: "/vinhos" },
     { label: "Cafés", to: "/vinhos" },
-    { label: "Experiências", to: "/vinhos" },
-    { label: "Vale Presente", to: "/vinhos" },
   ];
 
   const socialLinks = [
@@ -24,9 +28,11 @@ const Footer = () => {
     { icon: Instagram, url: "https://www.instagram.com/vinicola_amana/" },
     { icon: Youtube, url: "https://www.youtube.com/@Vin%C3%ADcolaAmana" },
   ];
-
-  // Componentes internos
-  const FooterLinkList = ({ links }: { links: { label: string; to: string }[] }) => (
+  const FooterLinkList = ({
+    links,
+  }: {
+    links: { label: string; to: string }[];
+  }) => (
     <ul className="space-y-3">
       {links.map((link) => (
         <li key={link.label}>
@@ -60,7 +66,6 @@ const Footer = () => {
   return (
     <footer className="bg-black text-white font-['Oswald']">
       <div className="container mx-auto px-4">
-
         {/* Newsletter */}
         <div className="py-8 md:py-12 border-b border-white/20">
           <div className="max-w-4xl mx-auto text-center px-2 md:px-0">
@@ -68,7 +73,8 @@ const Footer = () => {
               Receba Novidades Exclusivas
             </h3>
             <p className="text-white/80 mb-4 md:mb-6 max-w-2xl mx-auto text-sm md:text-base">
-              Seja o primeiro a saber sobre novos lançamentos, eventos especiais e ofertas exclusivas da Vinícola Amana.
+              Seja o primeiro a saber sobre novos lançamentos, eventos especiais
+              e ofertas exclusivas da Vinícola Amana.
             </p>
             <div className="flex flex-col sm:flex-row gap-3 md:gap-4 max-w-md mx-auto">
               <input
@@ -88,9 +94,14 @@ const Footer = () => {
           {/* Logo e contatos */}
           <div className="lg:col-span-2">
             <div className="mb-6 flex flex-col items-start gap-4">
-              <img src={logo} alt="Logo da Vinícola" className="w-32 h-auto max-h-20 object-contain" />
+              <img
+                src={logo}
+                alt="Logo da Vinícola"
+                className="w-32 h-auto max-h-20 object-contain"
+              />
               <p className="text-white/80 leading-relaxed max-w-md text-sm md:text-base mt-2">
-                Desfrute de vinhos excepcionais, cardápio cuidadoso e um ambiente único, imerso nas encostas da serra da Mantiqueira.
+                Desfrute de vinhos excepcionais, cardápio cuidadoso e um
+                ambiente único, imerso nas encostas da serra da Mantiqueira.
               </p>
             </div>
 
@@ -105,11 +116,15 @@ const Footer = () => {
               </div>
               <div className="flex items-center gap-3">
                 <Phone className="h-5 w-5 text-white" />
-                <span className="text-white/90 text-sm md:text-base">+55 19 99842-3261</span>
+                <span className="text-white/90 text-sm md:text-base">
+                  +55 19 97179-9448
+                </span>
               </div>
               <div className="flex items-center gap-3">
                 <Mail className="h-5 w-5 text-white" />
-                <span className="text-white/90 text-sm md:text-base">contato@vinicolaamana.com.br</span>
+                <span className="text-white/90 text-sm md:text-base">
+                  sac@vinicolaamana.com.br
+                </span>
               </div>
             </div>
 
@@ -132,7 +147,8 @@ const Footer = () => {
         <div className="py-6 border-t border-white/20">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-center md:text-left">
             <p className="text-sm text-white order-1 md:order-none">
-              © {new Date().getFullYear()} Vinícola Amana. Todos os direitos reservados.
+              © {new Date().getFullYear()} Vinícola Amana. Todos os direitos
+              reservados.
             </p>
 
             <div className="flex items-center gap-2 text-sm text-white bg-black/20 px-3 py-2 rounded-lg">
@@ -143,14 +159,24 @@ const Footer = () => {
                 rel="noopener noreferrer"
                 className="flex items-center gap-2 hover:opacity-90 transition-opacity"
               >
-                <img src={developedby} alt="Clozi Comunica" className="h-5 w-auto object-contain" />
-                <span className="tracking-tight">CLOZI COMUNICAÇÃO E IMAGEM</span>
+                <img
+                  src={developedby}
+                  alt="Clozi Comunica"
+                  className="h-5 w-auto object-contain"
+                />
+                <span className="tracking-tight">
+                  CLOZI COMUNICAÇÃO E IMAGEM
+                </span>
               </a>
             </div>
 
             <div className="flex gap-4 md:gap-6 order-2 md:order-none">
-              <Link to="/privacidade" className="text-sm text-white hover:text-[#9a3324] transition-colors">Política de Privacidade</Link>
-              <Link to="/termos" className="text-sm text-white hover:text-[#9a3324] transition-colors">Termos de Uso</Link>
+              <Link
+                to="/privacidade"
+                className="text-sm text-white hover:text-[#9a3324] transition-colors"
+              >
+                Política de Privacidade
+              </Link>
             </div>
           </div>
         </div>

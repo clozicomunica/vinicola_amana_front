@@ -1,5 +1,3 @@
-// src/pages/VinhosPage.tsx
-
 import React from "react";
 import { motion } from "framer-motion";
 import { useWines } from "../hooks/useWines";
@@ -19,12 +17,11 @@ const VinhosPage: React.FC = () => {
     retry,
   } = useWines();
   const handleClearFilters = () => {
-    setFilters({ category: 'all', search: '', sort: 'price_asc' });
+    setFilters({ category: "all", search: "", sort: "price_asc" });
   };
 
   return (
     <div className="min-h-screen bg-[#d4d4d4] font-['Oswald']">
-  
       <section className="relative pt-24 md:pt-32 lg:pt-40 pb-12 md:pb-16 lg:pb-20 text-center text-white overflow-hidden">
         <div className="absolute inset-0 bg-black">
           <div className="absolute inset-0 bg-black bg-cover bg-center opacity-30"></div>
