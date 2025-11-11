@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useCart } from "../context/useCart";
 import {
   ShoppingCart,
@@ -46,7 +46,13 @@ function validateCPF(cpfRaw: string) {
 const validateEmail = (email: string) =>
   /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email);
 
-async function lookupByCEP(cepRaw: string) {
+interface AddressInfo {
+  address: string;
+  city: string;
+  state: string;
+}
+
+async function lookupByCEP(cepRaw: string): Promise<AddressInfo> {
   const cep = onlyDigits(cepRaw);
   if (cep.length !== 8) throw new Error("CEP deve ter 8 dígitos");
   const res = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
@@ -65,18 +71,7 @@ async function lookupByCEP(cepRaw: string) {
 
 const CartPage = () => {
   const { cart, removeFromCart, clearCart, addToCart } = useCart();
-  const [customer, setCustomer] = useState<{
-    email: string;
-    name: string;
-    document: string;
-    phone: string;
-    address: string;
-    number: string;
-    complement: string;
-    city: string;
-    state: string;
-    zipcode: string;
-  }>({
+  const [customer, setCustomer] = useState({
     email: "",
     name: "",
     document: "",
@@ -89,7 +84,6 @@ const CartPage = () => {
     zipcode: "",
   });
 
-  const [cities, setCities] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [cepLoading, setCepLoading] = useState(false);
@@ -98,38 +92,6 @@ const CartPage = () => {
     (sum, item: CartItem) => sum + Number(item.price) * (item.quantity || 1),
     0
   );
-
-  // 🔹 Busca as cidades do IBGE quando o estado (UF) muda
-  useEffect(() => {
-    const fetchCities = async () => {
-      if (!customer.state) {
-        setCities([]);
-        return;
-      }
-
-      // cache local opcional
-      const cached = localStorage.getItem(`cities_${customer.state}`);
-      if (cached) {
-        setCities(JSON.parse(cached));
-        return;
-      }
-
-      try {
-        const res = await fetch(
-          `https://servicodados.ibge.gov.br/api/v1/localidades/estados/${customer.state}/municipios`
-        );
-        const data = await res.json();
-        const names = data.map((c: any) => c.nome);
-        setCities(names);
-        localStorage.setItem(`cities_${customer.state}`, JSON.stringify(names));
-      } catch (err) {
-        console.error("Erro ao carregar cidades:", err);
-        setCities([]);
-      }
-    };
-
-    fetchCities();
-  }, [customer.state]);
 
   const handleIncrement = (item: CartItem) =>
     addToCart({ ...item, quantity: 1 });
@@ -151,15 +113,16 @@ const CartPage = () => {
         state: info.state,
       }));
       toast.success("Endereço preenchido pelo CEP 😉");
-    } catch (e: any) {
+    } catch (e: unknown) {
+      const message =
+        e instanceof Error ? e.message : "Não foi possível buscar o CEP.";
       setCustomer((prev) => ({ ...prev, address: "" }));
-      toast.error(e.message || "Não foi possível buscar o CEP.");
+      toast.error(message);
     } finally {
       setCepLoading(false);
     }
   };
 
-  // Formatadores de input
   const formatCPF = (value: string) => {
     const digits = onlyDigits(value).slice(0, 11);
     if (digits.length <= 3) return digits;
@@ -202,22 +165,26 @@ const CartPage = () => {
       return;
     }
 
-    if (
-      !customer.name ||
-      !customer.document ||
-      !customer.phone ||
-      !customer.email ||
-      !customer.zipcode ||
-      !customer.address ||
-      !customer.number ||
-      !customer.city ||
-      !customer.state
-    ) {
-      const msg = "Preencha todos os campos obrigatórios!";
-      setError(msg);
-      toast.error(msg);
-      setLoading(false);
-      return;
+    const requiredFields = [
+      "name",
+      "document",
+      "phone",
+      "email",
+      "zipcode",
+      "address",
+      "number",
+      "city",
+      "state",
+    ] as const;
+
+    for (const field of requiredFields) {
+      if (!customer[field]) {
+        const msg = "Preencha todos os campos obrigatórios!";
+        setError(msg);
+        toast.error(msg);
+        setLoading(false);
+        return;
+      }
     }
 
     if (!validateEmail(customer.email)) {
@@ -234,31 +201,10 @@ const CartPage = () => {
       setLoading(false);
       return;
     }
-    if (onlyDigits(customer.zipcode).length !== 8) {
-      const msg = "CEP inválido (8 dígitos).";
-      setError(msg);
-      toast.error(msg);
-      setLoading(false);
-      return;
-    }
+
     const phoneDigits = onlyDigits(customer.phone);
     if (phoneDigits.length < 10 || phoneDigits.length > 11) {
       const msg = "WhatsApp inválido (use DDD + número).";
-      setError(msg);
-      toast.error(msg);
-      setLoading(false);
-      return;
-    }
-    if (!customer.number.trim()) {
-      const msg = "Informe o número do endereço.";
-      setError(msg);
-      toast.error(msg);
-      setLoading(false);
-      return;
-    }
-
-    if (!customer.address) {
-      const msg = "Preencha um CEP válido para gerar o endereço.";
       setError(msg);
       toast.error(msg);
       setLoading(false);
@@ -273,15 +219,9 @@ const CartPage = () => {
         variant_id: item.variant_id || 0,
       })),
       cliente: {
-        name: customer.name,
-        email: customer.email,
+        ...customer,
         document: onlyDigits(customer.document),
         phone: phoneDigits,
-        address: customer.address,
-        number: customer.number,
-        complement: customer.complement,
-        city: customer.city,
-        state: customer.state,
         zipcode: onlyDigits(customer.zipcode),
       },
       total,
@@ -295,10 +235,7 @@ const CartPage = () => {
       });
 
       const text = await response.text();
-      let data: any = {};
-      try {
-        data = text ? JSON.parse(text) : {};
-      } catch {}
+      const data = text ? JSON.parse(text) : {};
 
       if (response.ok) {
         const redirect =
@@ -320,7 +257,7 @@ const CartPage = () => {
           data,
         });
       }
-    } catch (err) {
+    } catch (err: unknown) {
       const msg = "Erro ao conectar com o servidor. Tente novamente.";
       setError(msg);
       toast.error(msg);
@@ -329,7 +266,6 @@ const CartPage = () => {
       setLoading(false);
     }
   };
-
   return (
     <div className="min-h-screen bg-[#d4d4d4] font-['Oswald'] antialiased">
       <div className="container mx-auto px-4 py-6 pt-12">
