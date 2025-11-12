@@ -22,7 +22,7 @@ const API_URL =
     (import.meta.env?.VITE_API_URL as string)) ||
   (typeof process !== "undefined" &&
     (process.env.NEXT_PUBLIC_API_URL as string)) ||
-  "http://localhost:3001";
+  "https://vinicola-amana-nestjs.onrender.com";
 
 const CREATE_CHECKOUT_PATH = "/api/orders/create-checkout";
 
