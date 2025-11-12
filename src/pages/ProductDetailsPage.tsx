@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { useCart } from "../context/useCart";
 import toast from "react-hot-toast";
+const API_URL = import.meta.env.VITE_API_URL;
 
 interface Variant {
   id: number;
@@ -48,11 +49,12 @@ const WINES_DATA = {
       vintage: "2024",
       alcohol: "13,1%",
       region: "Espírito Santo do Pinhal",
-      pairing: "saladas, sushi, ceviche, massas com molho pesto e queijos leves",
+      pairing:
+        "saladas, sushi, ceviche, massas com molho pesto e queijos leves",
       temperatura: "8 ºC a 10 ºC",
       varietal: "100% Sauvignon Blanc",
       amadurecimento: "6 meses em cubas de inox",
-      expectativa_guarda: "Pronto para consumo"
+      expectativa_guarda: "Pronto para consumo",
     },
     "282630061": {
       id: 2,
@@ -60,11 +62,12 @@ const WINES_DATA = {
       vintage: "2024",
       alcohol: "13,0%",
       region: "Espírito Santo do Pinhal",
-      pairing: "queijos médios, peixes, frutos do mar e carnes brancas grelhadas com molho bechamel",
+      pairing:
+        "queijos médios, peixes, frutos do mar e carnes brancas grelhadas com molho bechamel",
       temperatura: "8 ºC a 10 ºC",
       varietal: "100% Chenin Blanc",
       amadurecimento: "50% por 5 meses em barricas francesas",
-      expectativa_guarda: "Pronto para consumo"
+      expectativa_guarda: "Pronto para consumo",
     },
     "282629404": {
       id: 3,
@@ -72,11 +75,12 @@ const WINES_DATA = {
       vintage: "2024",
       alcohol: "13,0%",
       region: "Espírito Santo do Pinhal",
-      pairing: "camarões salteados, lagosta, salmão grelhado ou gravlax e massas com limão siciliano",
+      pairing:
+        "camarões salteados, lagosta, salmão grelhado ou gravlax e massas com limão siciliano",
       temperatura: "8 ºC a 10 ºC",
       varietal: "70% Syrah e 30% Chenin Blanc",
       amadurecimento: "6 meses em cubas de inox",
-      expectativa_guarda: "Pronto para consumo"
+      expectativa_guarda: "Pronto para consumo",
     },
     "282630773": {
       id: 4,
@@ -84,11 +88,12 @@ const WINES_DATA = {
       vintage: "2022",
       alcohol: "14%",
       region: "Espírito Santo do Pinhal",
-      pairing: "charcutaria, queijos meia-cura, massa seca à bolonhesa ou ragú de calabresa",
+      pairing:
+        "charcutaria, queijos meia-cura, massa seca à bolonhesa ou ragú de calabresa",
       temperatura: "12 ºC a 14 ºC",
       varietal: "100% Syrah",
       amadurecimento: "6 meses em tanques de aço inox",
-      expectativa_guarda: "Bom potencial de guarda"
+      expectativa_guarda: "Bom potencial de guarda",
     },
     "281768712": {
       id: 5,
@@ -96,11 +101,13 @@ const WINES_DATA = {
       vintage: "2022",
       alcohol: "14.9%",
       region: "Espírito Santo do Pinhal",
-      pairing: "Carnes vermelhas de longa cocção e massas acompanhadas de molhos encorpados e condimentados",
+      pairing:
+        "Carnes vermelhas de longa cocção e massas acompanhadas de molhos encorpados e condimentados",
       temperatura: "16 ºC a 18 ºC",
       varietal: "100% Syrah",
-      amadurecimento: "12 meses em barricas de carvalho francês de primeiro e segundo uso",
-      expectativa_guarda: "Ótimo potencial de guarda com excelente longevidade"
+      amadurecimento:
+        "12 meses em barricas de carvalho francês de primeiro e segundo uso",
+      expectativa_guarda: "Ótimo potencial de guarda com excelente longevidade",
     },
     "282621048": {
       id: 6,
@@ -108,11 +115,12 @@ const WINES_DATA = {
       vintage: "2023",
       alcohol: "13,0%",
       region: "Espírito Santo do Pinhal",
-      pairing: "massas, peixes ou aves com molhos cremosos e untuosos: risotos de frutos do mar ou de limão siciliano; queijos de média maturação",
+      pairing:
+        "massas, peixes ou aves com molhos cremosos e untuosos: risotos de frutos do mar ou de limão siciliano; queijos de média maturação",
       temperatura: "8 ºC a 10 ºC",
       varietal: "100% Sauvignon Blanc",
       amadurecimento: "80% passou 10 meses em barricas francesas",
-      expectativa_guarda: "Pronto para consumo"
+      expectativa_guarda: "Pronto para consumo",
     },
     "282619996": {
       id: 7,
@@ -120,13 +128,15 @@ const WINES_DATA = {
       vintage: "2022",
       alcohol: "14,9%",
       region: "Espírito Santo do Pinhal",
-      pairing: "Carnes vermelhas de longa cocção e massas acompanhadas de molhos encorpados e condimentados",
+      pairing:
+        "Carnes vermelhas de longa cocção e massas acompanhadas de molhos encorpados e condimentados",
       temperatura: "16 ºC a 18 ºC",
       varietal: "100% Syrah",
-      amadurecimento: "12 meses em barricas de carvalho francês de primeiro e segundo uso",
-      expectativa_guarda: "Ótimo potencial de guarda com excelente longevidade"
-    }
-  }
+      amadurecimento:
+        "12 meses em barricas de carvalho francês de primeiro e segundo uso",
+      expectativa_guarda: "Ótimo potencial de guarda com excelente longevidade",
+    },
+  },
 };
 
 const ProductDetailsPage = () => {
@@ -144,7 +154,8 @@ const ProductDetailsPage = () => {
     parseFloat(price).toFixed(2).replace(".", ",");
 
   const enhanceWine = (data: Wine, wineId: string): Wine => {
-    const additionalData = WINES_DATA.wines[wineId as keyof typeof WINES_DATA.wines];
+    const additionalData =
+      WINES_DATA.wines[wineId as keyof typeof WINES_DATA.wines];
     if (!additionalData) {
       // Removido o fallback aleatório para evitar adicionar dados irrelevantes em produtos não-vinhos
       return data;
@@ -203,9 +214,7 @@ const ProductDetailsPage = () => {
         setLoading(true);
         setError(null);
 
-        const response = await fetch(
-          `https://vinicola-amana-back.onrender.com/api/products/${id}`
-        );
+        const response = await fetch(`${API_URL}/api/products/${id}`);
 
         if (!response.ok) throw new Error("Produto não encontrado");
 
@@ -217,7 +226,7 @@ const ProductDetailsPage = () => {
         const categoryName = enhancedWine.categories[0]?.name.pt || "";
         if (categoryName) {
           const similarResponse = await fetch(
-            `https://vinicola-amana-back.onrender.com/api/products/${enhancedWine.id}/similares`
+            `${API_URL}/api/products/${enhancedWine.id}/similares`
           );
           if (similarResponse.ok) {
             const similarData = await similarResponse.json();
@@ -300,7 +309,6 @@ const ProductDetailsPage = () => {
       </div>
     );
   }
-
 
   return (
     <div className="bg-[#d4d4d4] min-h-screen font-['Oswald']">
@@ -427,7 +435,15 @@ const ProductDetailsPage = () => {
                 )}
                 {wine.alcohol && (
                   <span className="flex items-center font-['Oswald']">
-                    <svg className="h-3 w-3 sm:h-4 sm:w-4 mr-1 text-[#89764b]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <svg
+                      className="h-3 w-3 sm:h-4 sm:w-4 mr-1 text-[#89764b]"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
                       <circle cx="10" cy="14" r="6" />
                       <circle cx="18" cy="8" r="4" />
                       <circle cx="20" cy="16" r="2" />

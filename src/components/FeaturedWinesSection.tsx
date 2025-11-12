@@ -4,6 +4,7 @@ import { Loader2, ChevronRight, ChevronLeft } from "lucide-react";
 import { useCartActions } from "../context/useCartActions";
 import WineCard, { type Wine } from "./WineCard";
 import { motion } from "framer-motion";
+const API_URL = import.meta.env.VITE_API_URL;
 
 type FeaturedWinesSectionProps = {
   setQuickViewProduct: (product: Wine | null) => void;
@@ -22,7 +23,9 @@ const Loading = () => (
 
 const ErrorState = ({ message }: { message: string }) => (
   <div className="text-center py-12 md:py-20">
-    <p className="text-red-600 mb-6 text-base font-medium font-oswald">{message}</p>
+    <p className="text-red-600 mb-6 text-base font-medium font-oswald">
+      {message}
+    </p>
     <button
       onClick={() => window.location.reload()}
       className="px-6 py-3 bg-[#89764b] hover:bg-[#756343] text-white rounded-lg transition-all duration-300 shadow-md hover:shadow-lg font-medium uppercase text-sm font-oswald"
@@ -59,11 +62,17 @@ const NavButton = ({
     onClick={onClick}
     disabled={disabled}
     className={`absolute top-1/2 -translate-y-1/2 bg-[#89764b]/80 hover:bg-[#89764b] text-white p-2 rounded-full transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed shadow-md z-50 ${
-      direction === "left" ? "left-0 sm:left-[-50px]" : "right-0 sm:right-[-50px]"
+      direction === "left"
+        ? "left-0 sm:left-[-50px]"
+        : "right-0 sm:right-[-50px]"
     }`}
     aria-label={direction === "left" ? "Vinho anterior" : "Próximo vinho"}
   >
-    {direction === "left" ? <ChevronLeft className="h-5 w-5" /> : <ChevronRight className="h-5 w-5" />}
+    {direction === "left" ? (
+      <ChevronLeft className="h-5 w-5" />
+    ) : (
+      <ChevronRight className="h-5 w-5" />
+    )}
   </button>
 );
 
@@ -91,10 +100,12 @@ const WineCarousel = ({
 
   const maxIndex = Math.max(0, wines.length - getSlidesPerView());
 
-  const handleNext = () => setCurrentIndex((prev) => Math.min(prev + 1, maxIndex));
+  const handleNext = () =>
+    setCurrentIndex((prev) => Math.min(prev + 1, maxIndex));
   const handlePrev = () => setCurrentIndex((prev) => Math.max(prev - 1, 0));
 
-  const handleTouchStart = (e: React.TouchEvent) => (touchStartX.current = e.touches[0].clientX);
+  const handleTouchStart = (e: React.TouchEvent) =>
+    (touchStartX.current = e.touches[0].clientX);
 
   const handleTouchEnd = (e: React.TouchEvent) => {
     if (touchStartX.current === null) return;
@@ -106,18 +117,41 @@ const WineCarousel = ({
 
   return (
     <div className="relative">
-      <NavButton onClick={handlePrev} disabled={currentIndex === 0} direction="left" />
-      <NavButton onClick={handleNext} disabled={currentIndex >= maxIndex} direction="right" />
+      <NavButton
+        onClick={handlePrev}
+        disabled={currentIndex === 0}
+        direction="left"
+      />
+      <NavButton
+        onClick={handleNext}
+        disabled={currentIndex >= maxIndex}
+        direction="right"
+      />
 
-      <div className="overflow-hidden" onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
+      <div
+        className="overflow-hidden"
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+      >
         <div
-          style={{ transform: `translateX(-${currentIndex * (100 / getSlidesPerView())}%)` }}
+          style={{
+            transform: `translateX(-${
+              currentIndex * (100 / getSlidesPerView())
+            }%)`,
+          }}
           className="flex transition-transform duration-300 ease-in-out"
         >
           {wines.map((wine) => (
-            <div key={wine.id} className="flex-shrink-0 w-full sm:w-1/2 lg:w-1/3 xl:w-1/4 px-2">
+            <div
+              key={wine.id}
+              className="flex-shrink-0 w-full sm:w-1/2 lg:w-1/3 xl:w-1/4 px-2"
+            >
               <div className="group relative rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300">
-                <WineCard wine={wine} setQuickViewProduct={setQuickViewProduct} onAddToCart={addToCart} />
+                <WineCard
+                  wine={wine}
+                  setQuickViewProduct={setQuickViewProduct}
+                  onAddToCart={addToCart}
+                />
               </div>
             </div>
           ))}
@@ -129,7 +163,9 @@ const WineCarousel = ({
 
 // Componente Principal
 
-const FeaturedWinesSection = ({ setQuickViewProduct }: FeaturedWinesSectionProps) => {
+const FeaturedWinesSection = ({
+  setQuickViewProduct,
+}: FeaturedWinesSectionProps) => {
   const [featuredWines, setFeaturedWines] = useState<Wine[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -147,9 +183,10 @@ const FeaturedWinesSection = ({ setQuickViewProduct }: FeaturedWinesSectionProps
 
         while (allWines.length < 7) {
           const response = await fetch(
-            `https://vinicola-amana-back.onrender.com/api/products?per_page=${perPage}&published=true&page=${page}&t=${Date.now()}`
+            `${API_URL}/api/products?per_page=${perPage}&published=true&page=${page}`
           );
-          if (!response.ok) throw new Error(`Erro ${response.status}: ${response.statusText}`);
+          if (!response.ok)
+            throw new Error(`Erro ${response.status}: ${response.statusText}`);
           const data: Wine[] = await response.json();
 
           const filtered = data.filter((p) =>
@@ -167,7 +204,11 @@ const FeaturedWinesSection = ({ setQuickViewProduct }: FeaturedWinesSectionProps
 
         setFeaturedWines(allWines.slice(0, 7));
       } catch (err: unknown) {
-        setError(err instanceof Error ? err.message : "Erro ao carregar os vinhos. Tente novamente mais tarde.");
+        setError(
+          err instanceof Error
+            ? err.message
+            : "Erro ao carregar os vinhos. Tente novamente mais tarde."
+        );
       } finally {
         setLoading(false);
       }
@@ -189,7 +230,8 @@ const FeaturedWinesSection = ({ setQuickViewProduct }: FeaturedWinesSectionProps
             Nossos Vinhos
           </h2>
           <p className="text-sm sm:text-base md:text-lg text-gray-700 max-w-2xl mx-auto leading-relaxed font-light px-2 font-oswald">
-            Cada garrafa conta uma história única, criada com paixão e dedicação por nossos vinicultores.
+            Cada garrafa conta uma história única, criada com paixão e dedicação
+            por nossos vinicultores.
           </p>
         </motion.div>
 

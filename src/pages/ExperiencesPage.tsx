@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import type { Variants } from "framer-motion";
 import experienceBg from "../assets/experienceBg.jpg";
 import wineImage from "../assets/wine-bottle.jpg"; // Fallback image from VinhosPage
+const API_URL = import.meta.env.VITE_API_URL;
 
 interface Wine {
   id: number;
@@ -27,9 +28,7 @@ const ExperiencesPage = () => {
         setLoading(true);
         setError(null);
 
-        const response = await fetch(
-          "https://vinicola-amana-back.onrender.com/api/products?per_page=2"
-        );
+        const response = await fetch(`${API_URL}/api/products?per_page=2`);
 
         if (!response.ok) {
           throw new Error(`Erro ${response.status}: ${response.statusText}`);

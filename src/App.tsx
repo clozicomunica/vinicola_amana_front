@@ -3,7 +3,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 import Header from "./components/Header";
 import HomePage from "./pages/HomePage";
-import VinhosPage from "./pages/ProductsPage";
+import VinhosPage from "./pages/VinhosPage.tsx";
 import AboutPage from "./pages/AboutPage";
 import ContactPage from "./pages/ContactPage";
 import Footer from "./components/Footer";
@@ -16,7 +16,6 @@ import SuccessPage from "./pages/SucessPage";
 import ConfigPage from "./pages/Config";
 import SupportPage from "./pages/Suporte";
 import PrivacyPolicyPage from "./pages/Privacidade";
-
 
 function App() {
   return (

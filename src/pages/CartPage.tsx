@@ -17,12 +17,7 @@ import { Link } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import type { CartItem } from "../context/CartProvider";
 
-const API_URL =
-  (typeof import.meta !== "undefined" &&
-    (import.meta.env?.VITE_API_URL as string)) ||
-  (typeof process !== "undefined" &&
-    (process.env.NEXT_PUBLIC_API_URL as string)) ||
-  "https://vinicola-amana-nestjs.onrender.com";
+const API_URL = import.meta.env.VITE_API_URL;
 
 const CREATE_CHECKOUT_PATH = "/api/orders/create-checkout";
 
