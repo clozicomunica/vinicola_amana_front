@@ -53,7 +53,7 @@ function App() {
             <Route path="/contato" element={<ContactPage />} />
             <Route path="/config" element={<ConfigPage />} />
             <Route path="/suporte" element={<SupportPage />} />
-            <Route path="/sucesso" element={<SuccessPage />} />
+            <Route path="/sucesso/:id" element={<SuccessPage />} />
             <Route path="/falha" element={<OrderFailedPage />} />
             <Route path="/privacidade" element={<PrivacyPolicyPage />} />
           </Routes>
