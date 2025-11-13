@@ -8,13 +8,16 @@ interface NuvemshopOrder {
   created_at: string;
   payment_status: string;
   gateway?: string;
-  products?: Array<{
-    name: string;
-    quantity: number;
-    price: number;
-    variant_id: number;
+  fulfillments?: Array<{
+    line_items: Array<{
+      name: string;
+      quantity: number;
+      price: string; // Preço pode vir como string na API
+      variant_id: number;
+    }>;
   }>;
 }
+
 const API_URL = import.meta.env.VITE_API_URL;
 
 const OrderSuccessPage = () => {
@@ -23,14 +26,23 @@ const OrderSuccessPage = () => {
 
   const [order, setOrder] = useState<NuvemshopOrder | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
 
   useEffect(() => {
     if (!orderId) return;
 
     fetch(`${API_URL}/orders/${orderId}`)
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error("Erro na resposta da API");
+        }
+        return res.json();
+      })
       .then((data) => setOrder(data))
-      .catch((err) => console.error("Erro ao carregar pedido:", err))
+      .catch((err) => {
+        console.error("Erro ao carregar pedido:", err);
+        setError(true);
+      })
       .finally(() => setLoading(false));
   }, [orderId]);
 
@@ -92,7 +104,7 @@ const OrderSuccessPage = () => {
                     Nº do Pedido
                   </p>
                   <p className="text-lg font-medium text-black">
-                    {loading ? "Carregando..." : order?.id}
+                    {loading ? "Carregando..." : order?.id ?? "Indisponível"}
                   </p>
                 </div>
 
@@ -123,7 +135,7 @@ const OrderSuccessPage = () => {
                     Status
                   </p>
                   <p className="text-lg font-medium text-[#89764b]">
-                    {loading ? "..." : order?.payment_status}
+                    {loading ? "..." : order?.payment_status ?? "Indisponível"}
                   </p>
                 </div>
               </div>
@@ -154,13 +166,21 @@ const OrderSuccessPage = () => {
                 </li>
               </ul>
             </motion.div>
-            {!loading && order?.products && order.products.length > 0 && (
+
+            {/* Itens do Pedido */}
+            {error ? (
+              <p className="text-red-600 mb-8">
+                Erro ao carregar detalhes do pedido. Tente novamente.
+              </p>
+            ) : !loading &&
+              order?.fulfillments?.[0]?.line_items &&
+              order.fulfillments[0].line_items.length > 0 ? (
               <div className="mt-8">
                 <h3 className="text-xl font-light mb-4 text-black">
                   Itens do Pedido
                 </h3>
                 <ul className="space-y-2 text-left">
-                  {order.products.map((item, index) => (
+                  {order.fulfillments[0].line_items.map((item, index) => (
                     <li
                       key={index}
                       className="flex justify-between text-gray-700"
@@ -168,11 +188,19 @@ const OrderSuccessPage = () => {
                       <span>
                         {item.name} (x{item.quantity})
                       </span>
-                      <span>R$ {(item.price * item.quantity).toFixed(2)}</span>
+                      <span>
+                        R$ {(Number(item.price) * item.quantity).toFixed(2)}
+                      </span>
                     </li>
                   ))}
                 </ul>
               </div>
+            ) : (
+              !loading && (
+                <p className="text-gray-600 mb-8">
+                  Nenhum item encontrado no pedido.
+                </p>
+              )
             )}
 
             {/* Botões */}
