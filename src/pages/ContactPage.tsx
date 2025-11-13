@@ -21,7 +21,7 @@ const ContactPage = () => {
 
     try {
       await new Promise((resolve) => setTimeout(resolve, 1500));
-      window.location.href = `mailto:vinicolaamana@gmail.com?subject=Contato via Site - ${formData.name}&body=${formData.message}%0D%0A%0D%0AResponder para: ${formData.email}`;
+      window.location.href = `mailto:sac@vinicolaamana@gmail.com?subject=Contato via Site - ${formData.name}&body=${formData.message}%0D%0A%0D%0AResponder para: ${formData.email}`;
 
       setSubmitStatus("success");
       setFormData({ name: "", email: "", message: "" });

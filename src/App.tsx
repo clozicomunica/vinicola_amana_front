@@ -12,10 +12,11 @@ import CartPage from "./pages/CartPage.tsx";
 import ScrollToTop from "./components/ScrollToTop";
 import WhatsAppButton from "./components/WhatsappButton";
 import ScrollToTopLeft from "./components/ScrollToTopLeft";
-import SuccessPage from "./pages/SucessPage";
+import SuccessPage from "./pages/SuccessPage.tsx";
 import ConfigPage from "./pages/Config";
 import SupportPage from "./pages/Suporte";
 import PrivacyPolicyPage from "./pages/Privacidade";
+import OrderFailedPage from "./pages/OrderFailedPage.tsx";
 
 function App() {
   return (
@@ -52,6 +53,8 @@ function App() {
             <Route path="/contato" element={<ContactPage />} />
             <Route path="/config" element={<ConfigPage />} />
             <Route path="/suporte" element={<SupportPage />} />
+            <Route path="/sucesso" element={<SuccessPage />} />
+            <Route path="/falha" element={<OrderFailedPage />} />
             <Route path="/privacidade" element={<PrivacyPolicyPage />} />
           </Routes>
         </main>

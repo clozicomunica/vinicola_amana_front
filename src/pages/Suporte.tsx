@@ -1,19 +1,18 @@
-import React, {  useState } from "react";
+import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { Send, Mail, Phone, MapPin } from "lucide-react";
 import toast from "react-hot-toast";
 
 const SupportPage: React.FC = () => {
-
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     message: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitStatus, setSubmitStatus] = useState<"idle" | "success" | "error">(
-    "idle"
-  );
+  const [submitStatus, setSubmitStatus] = useState<
+    "idle" | "success" | "error"
+  >("idle");
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -29,7 +28,7 @@ const SupportPage: React.FC = () => {
 
     try {
       await new Promise((resolve) => setTimeout(resolve, 1500));
-      window.location.href = `mailto:suporte@vinicolaamana.com?subject=Suporte App - ${formData.name}&body=${formData.message}%0D%0A%0D%0AResponder para: ${formData.email}`;
+      window.location.href = `mailto:sac@vinicolaamana.com?subject=Suporte App - ${formData.name}&body=${formData.message}%0D%0A%0D%0AResponder para: ${formData.email}`;
 
       toast.success("Mensagem enviada com sucesso!", {
         position: "bottom-right",
@@ -83,7 +82,8 @@ const SupportPage: React.FC = () => {
             transition={{ delay: 0.2, duration: 0.5 }}
             className="text-sm md:text-base max-w-3xl mx-auto text-[#9c9c9c] leading-relaxed"
           >
-            Entre em contato para suporte com a integração do app Vinícola Amana na Nuvemshop.
+            Entre em contato para suporte com a integração do app Vinícola Amana
+            na Nuvemshop.
           </motion.p>
         </div>
       </section>
@@ -112,10 +112,10 @@ const SupportPage: React.FC = () => {
                     <div>
                       <h3 className="text-lg text-gray-300 mb-1">E-mail</h3>
                       <a
-                        href="mailto:suporte@vinicolaamana.com"
+                        href="mailto:sac@vinicolaamana.com"
                         className="text-gray-400 hover:text-[#89764b] transition-colors text-sm"
                       >
-                        amana.lojaonline@gmail.com
+                        sac@vinicolaamana.com
                       </a>
                     </div>
                   </div>
@@ -240,7 +240,8 @@ const SupportPage: React.FC = () => {
                       animate={{ opacity: 1, y: 0 }}
                       className="mt-4 p-4 bg-green-900/20 text-green-300 rounded-sm border border-green-800/50 text-sm"
                     >
-                      Mensagem enviada com sucesso! Responderemos em até 24 horas.
+                      Mensagem enviada com sucesso! Responderemos em até 24
+                      horas.
                     </motion.div>
                   )}
                   {submitStatus === "error" && (
@@ -251,11 +252,12 @@ const SupportPage: React.FC = () => {
                     >
                       Erro ao enviar. Tente novamente ou envie para{" "}
                       <a
-                        href="mailto:suporte@vinicolaamana.com"
+                        href="mailto:sac@vinicolaamana.com"
                         className="text-[#89764b] hover:text-[#756343] underline"
                       >
-                        suporte@vinicolaamana.com
-                      </a>.
+                        sac@vinicolaamana.com
+                      </a>
+                      .
                     </motion.div>
                   )}
                 </form>
