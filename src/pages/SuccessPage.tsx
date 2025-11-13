@@ -8,13 +8,18 @@ interface NuvemshopOrder {
   created_at: string;
   payment_status: string;
   gateway?: string;
+  products?: Array<{
+    name: string;
+    quantity: number;
+    price: number;
+    variant_id: number;
+  }>;
 }
-
 const API_URL = import.meta.env.VITE_API_URL;
 
 const OrderSuccessPage = () => {
   const [params] = useSearchParams();
-  const orderId = params.get("order_id");
+  const orderId = params.get("external_reference");
 
   const [order, setOrder] = useState<NuvemshopOrder | null>(null);
   const [loading, setLoading] = useState(true);
@@ -149,6 +154,26 @@ const OrderSuccessPage = () => {
                 </li>
               </ul>
             </motion.div>
+            {!loading && order?.products && order.products.length > 0 && (
+              <div className="mt-8">
+                <h3 className="text-xl font-light mb-4 text-black">
+                  Itens do Pedido
+                </h3>
+                <ul className="space-y-2 text-left">
+                  {order.products.map((item, index) => (
+                    <li
+                      key={index}
+                      className="flex justify-between text-gray-700"
+                    >
+                      <span>
+                        {item.name} (x{item.quantity})
+                      </span>
+                      <span>R$ {(item.price * item.quantity).toFixed(2)}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
 
             {/* Botões */}
             <motion.div
