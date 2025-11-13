@@ -8,12 +8,17 @@ interface NuvemshopOrder {
   created_at: string;
   payment_status: string;
   gateway?: string;
+  products?: Array<{
+    name: string;
+    quantity: number;
+    price: number | string; // Pode vir como string
+    variant_id: number;
+  }>;
+  // Opcional: fulfillments se usar aggregates
   fulfillments?: Array<{
     line_items: Array<{
-      name: string;
       quantity: number;
-      price: string; // Preço pode vir como string na API
-      variant_id: number;
+      // Outros campos; você pode mapear para name/price de products se necessário
     }>;
   }>;
 }
@@ -29,16 +34,25 @@ const OrderSuccessPage = () => {
   const [error, setError] = useState(false);
 
   useEffect(() => {
-    if (!orderId) return;
+    if (!orderId) {
+      console.log("Nenhum orderId encontrado na URL");
+      setLoading(false);
+      return;
+    }
+
+    console.log("Buscando pedido com ID:", orderId); // Depure o ID
 
     fetch(`${API_URL}/orders/${orderId}`)
       .then((res) => {
         if (!res.ok) {
-          throw new Error("Erro na resposta da API");
+          throw new Error(`Erro na resposta da API: Status ${res.status}`);
         }
         return res.json();
       })
-      .then((data) => setOrder(data))
+      .then((data) => {
+        console.log("Resposta do pedido:", data); // Depure a resposta
+        setOrder(data);
+      })
       .catch((err) => {
         console.error("Erro ao carregar pedido:", err);
         setError(true);
@@ -170,17 +184,16 @@ const OrderSuccessPage = () => {
             {/* Itens do Pedido */}
             {error ? (
               <p className="text-red-600 mb-8">
-                Erro ao carregar detalhes do pedido. Tente novamente.
+                Erro ao carregar detalhes do pedido. Verifique o console para
+                mais detalhes ou contate o suporte.
               </p>
-            ) : !loading &&
-              order?.fulfillments?.[0]?.line_items &&
-              order.fulfillments[0].line_items.length > 0 ? (
+            ) : !loading && order?.products && order.products.length > 0 ? (
               <div className="mt-8">
                 <h3 className="text-xl font-light mb-4 text-black">
                   Itens do Pedido
                 </h3>
                 <ul className="space-y-2 text-left">
-                  {order.fulfillments[0].line_items.map((item, index) => (
+                  {order.products.map((item, index) => (
                     <li
                       key={index}
                       className="flex justify-between text-gray-700"
@@ -198,7 +211,7 @@ const OrderSuccessPage = () => {
             ) : (
               !loading && (
                 <p className="text-gray-600 mb-8">
-                  Nenhum item encontrado no pedido.
+                  Nenhum item encontrado no pedido ou erro no carregamento.
                 </p>
               )
             )}
