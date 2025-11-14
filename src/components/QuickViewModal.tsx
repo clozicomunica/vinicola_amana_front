@@ -12,9 +12,14 @@ type QuickViewModalProps = {
   setQuickViewProduct: (product: Wine | null) => void;
 };
 
-const QuickViewModal = ({ quickViewProduct, setQuickViewProduct }: QuickViewModalProps) => {
+const QuickViewModal = ({
+  quickViewProduct,
+  setQuickViewProduct,
+}: QuickViewModalProps) => {
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const { addToCart } = useCartActions();
+
+  const isOutOfStock = quickViewProduct.variants[0]?.stock === 0;
 
   const handleAddToCart = () => {
     addToCart(quickViewProduct);
@@ -58,6 +63,14 @@ const QuickViewModal = ({ quickViewProduct, setQuickViewProduct }: QuickViewModa
                 {quickViewProduct.categories[0]?.name.pt || "Vinho"}
               </p>
             </div>
+
+            {/* Badge de status do produto */}
+            {isOutOfStock && (
+              <div className="bg-[#9c9c9c] text-white px-3 py-2 rounded-md text-xs sm:text-sm font-medium uppercase tracking-wide font-oswald">
+                Indisponível
+              </div>
+            )}
+
             <div className="flex items-center justify-between">
               <span className="text-xl sm:text-2xl lg:text-3xl text-[#89764b] font-medium font-oswald">
                 R${" "}
@@ -74,17 +87,7 @@ const QuickViewModal = ({ quickViewProduct, setQuickViewProduct }: QuickViewModa
                 </div>
               )}
             </div>
-            <div
-              className={`py-2 px-3 rounded-md text-xs sm:text-sm font-medium ${
-                quickViewProduct.variants[0]?.stock === 0
-                  ? "bg-red-50 text-red-700"
-                  : "bg-green-50 text-green-700"
-              } font-oswald`}
-            >
-              {quickViewProduct.variants[0]?.stock === 0
-                ? "Esgotado no momento"
-                : "Disponível para entrega"}
-            </div>
+
             <div className="prose max-w-none text-gray-700 text-xs sm:text-sm leading-relaxed border-b border-gray-200 pb-4 sm:pb-5">
               <p className="font-oswald">
                 {quickViewProduct.description?.pt
@@ -94,6 +97,7 @@ const QuickViewModal = ({ quickViewProduct, setQuickViewProduct }: QuickViewModa
                   : "Descrição não disponível."}
               </p>
             </div>
+
             <div className="grid grid-cols-2 gap-2 sm:gap-3">
               {quickViewProduct.year && (
                 <div className="bg-gray-50 p-2 sm:p-3 rounded-lg">
@@ -136,6 +140,7 @@ const QuickViewModal = ({ quickViewProduct, setQuickViewProduct }: QuickViewModa
                 </div>
               )}
             </div>
+
             {quickViewProduct.awards && quickViewProduct.awards.length > 0 && (
               <div className="space-y-2 pt-2">
                 <h4 className="font-medium flex items-center gap-2 text-gray-900 text-xs sm:text-sm font-oswald">
@@ -155,23 +160,24 @@ const QuickViewModal = ({ quickViewProduct, setQuickViewProduct }: QuickViewModa
                 </ul>
               </div>
             )}
+
             <div className="flex flex-col gap-3 pt-4 sticky bottom-0 bg-white sm:static sm:bg-transparent">
               <button
                 onClick={handleAddToCart}
-                disabled={quickViewProduct.variants[0]?.stock === 0}
+                disabled={isOutOfStock}
                 className={`flex-1 py-3 px-4 rounded-md transition-all duration-300 flex items-center justify-center gap-2 uppercase text-xs sm:text-sm font-medium ${
-                  quickViewProduct.variants[0]?.stock === 0
-                    ? "bg-gray-200 text-gray-600 cursor-not-allowed"
+                  isOutOfStock
+                    ? "bg-[#9c9c9c] text-white cursor-not-allowed"
                     : "bg-[#89764b] hover:bg-[#756343] text-white hover:shadow-md"
                 } font-oswald`}
                 aria-label={
-                  quickViewProduct.variants[0]?.stock === 0
-                    ? "Produto esgotado"
+                  isOutOfStock
+                    ? "Produto indisponível"
                     : "Adicionar ao carrinho"
                 }
               >
                 <ShoppingCart className="h-4 w-4" />
-                Adicionar ao Carrinho
+                {isOutOfStock ? "Indisponível" : "Adicionar ao Carrinho"}
               </button>
               <Link
                 to={`/produto/${quickViewProduct.id}`}

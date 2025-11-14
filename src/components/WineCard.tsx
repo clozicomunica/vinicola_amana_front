@@ -1,5 +1,5 @@
 // src/components/WineCard.tsx
-import { ShoppingCart, Eye} from "lucide-react";
+import { ShoppingCart, Eye } from "lucide-react";
 import { Link } from "react-router-dom";
 import wineImage from "../assets/wine-bottle.jpg";
 import { decodeHtmlEntities } from "../utils/htmlUtils";
@@ -25,7 +25,11 @@ type WineCardProps = {
   onAddToCart: (wine: Wine) => void;
 };
 
-const WineCard = ({ wine, setQuickViewProduct, onAddToCart }: WineCardProps) => {
+const WineCard = ({
+  wine,
+  setQuickViewProduct,
+  onAddToCart,
+}: WineCardProps) => {
   const handleQuickView = () => {
     setQuickViewProduct(wine);
   };
@@ -35,9 +39,7 @@ const WineCard = ({ wine, setQuickViewProduct, onAddToCart }: WineCardProps) => 
   };
 
   return (
-    <div
-      className="group bg-white rounded-xl sm:rounded-2xl overflow-hidden shadow-sm hover:shadow-md md:hover:shadow-xl transition-all duration-500 border border-gray-100 flex flex-col h-full transform hover:-translate-y-1 md:hover:-translate-y-2 font-oswald"
-    >
+    <div className="group bg-white rounded-xl sm:rounded-2xl overflow-hidden shadow-sm hover:shadow-md md:hover:shadow-xl transition-all duration-500 border border-gray-100 flex flex-col h-full transform hover:-translate-y-1 md:hover:-translate-y-2 font-oswald">
       <div className="relative aspect-square bg-white p-3 sm:p-4 flex items-center justify-center overflow-hidden">
         <Link
           to={`/produto/${wine.id}`}
@@ -57,36 +59,35 @@ const WineCard = ({ wine, setQuickViewProduct, onAddToCart }: WineCardProps) => 
         </Link>
         <div className="absolute top-2 left-2 sm:top-3 sm:left-3 md:top-4 md:left-4 flex flex-col space-y-1 sm:space-y-2 z-10">
           {wine.variants[0]?.stock === 0 && (
-            <span className="bg-red-600 text-white text-xs px-2 py-0.5 sm:px-3 sm:py-1 rounded-full shadow-md font-medium tracking-wide font-oswald">
-              Esgotado
+            <span className="bg-[#9c9c9c] text-white text-xs px-2 py-0.5 sm:px-3 sm:py-1 rounded-full shadow-md font-medium tracking-wide font-oswald">
+              Indisponível
             </span>
           )}
         </div>
         <div className="absolute top-3 right-3 flex items-center gap-2 z-10 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-300">
-  <button
-    onClick={(e) => {
-      e.stopPropagation();
-      handleQuickView();
-    }}
-    className="p-2 bg-white/90 rounded-full hover:bg-white transition-all duration-300 transform hover:scale-105 shadow-md cursor-pointer"
-    aria-label="Visualização rápida"
-  >
-    <Eye className="h-4 w-4 text-gray-800" />
-  </button>
-  {wine.variants[0]?.stock !== 0 && (
-    <button
-      onClick={(e) => {
-        e.stopPropagation();
-        handleAddToCartClick();
-      }}
-      className="p-2 bg-[#89764b] text-white rounded-full hover:bg-[#756343] transition-all duration-300 transform hover:scale-105 shadow-md cursor-pointer"
-      aria-label="Adicionar ao carrinho"
-    >
-      <ShoppingCart className="h-4 w-4" />
-    </button>
-  )}
-</div>
-
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              handleQuickView();
+            }}
+            className="p-2 bg-white/90 rounded-full hover:bg-white transition-all duration-300 transform hover:scale-105 shadow-md cursor-pointer"
+            aria-label="Visualização rápida"
+          >
+            <Eye className="h-4 w-4 text-gray-800" />
+          </button>
+          {wine.variants[0]?.stock !== 0 && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                handleAddToCartClick();
+              }}
+              className="p-2 bg-[#89764b] text-white rounded-full hover:bg-[#756343] transition-all duration-300 transform hover:scale-105 shadow-md cursor-pointer"
+              aria-label="Adicionar ao carrinho"
+            >
+              <ShoppingCart className="h-4 w-4" />
+            </button>
+          )}
+        </div>
       </div>
       <div className="p-3 sm:p-4 md:p-6 flex flex-col flex-grow">
         <div className="mb-2 sm:mb-3 md:mb-4">
@@ -126,7 +127,7 @@ const WineCard = ({ wine, setQuickViewProduct, onAddToCart }: WineCardProps) => 
             } font-oswald`}
           >
             <ShoppingCart className="h-3 w-3 sm:h-4 sm:w-4" />
-            {wine.variants[0]?.stock === 0 ? "Esgotado" : "Adicionar"}
+            {wine.variants[0]?.stock === 0 ? "Indisponível" : "Adicionar"}
           </button>
         </div>
       </div>

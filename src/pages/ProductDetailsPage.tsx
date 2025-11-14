@@ -21,6 +21,7 @@ interface Variant {
   id: number;
   price: string;
   compare_at_price?: string;
+  stock: number; // Mantido para lógica interna, mas não exibido
 }
 
 interface Wine {
@@ -150,6 +151,8 @@ const ProductDetailsPage = () => {
   const [similarProducts, setSimilarProducts] = useState<Wine[]>([]);
   const [isZoomed, setIsZoomed] = useState(false);
 
+  const isOutOfStock = wine?.variants[0]?.stock === 0;
+
   const formatPrice = (price: string) =>
     parseFloat(price).toFixed(2).replace(".", ",");
 
@@ -157,7 +160,6 @@ const ProductDetailsPage = () => {
     const additionalData =
       WINES_DATA.wines[wineId as keyof typeof WINES_DATA.wines];
     if (!additionalData) {
-      // Removido o fallback aleatório para evitar adicionar dados irrelevantes em produtos não-vinhos
       return data;
     }
     return {
@@ -175,6 +177,25 @@ const ProductDetailsPage = () => {
 
   const handleAddToCart = useCallback(() => {
     if (!wine || wine.variants.length === 0) return;
+
+    // Verificar se está indisponível
+    if (isOutOfStock) {
+      toast.error("Produto indisponível!", {
+        position: "bottom-right",
+        style: {
+          background: "#89764b",
+          color: "#fff",
+          borderRadius: "8px",
+          padding: "16px 24px",
+          fontFamily: "'Oswald', sans-serif",
+        },
+        iconTheme: {
+          primary: "#fff",
+          secondary: "#89764b",
+        },
+      });
+      return;
+    }
 
     addToCart({
       id: wine.id,
@@ -200,7 +221,7 @@ const ProductDetailsPage = () => {
         secondary: "#89764b",
       },
     });
-  }, [addToCart, wine]);
+  }, [addToCart, wine, isOutOfStock]);
 
   useEffect(() => {
     if (!id) {
@@ -331,6 +352,19 @@ const ProductDetailsPage = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-12">
           {/* Galeria de Imagens */}
           <div className="bg-white rounded-xl shadow-lg p-4 sm:p-6">
+            {/* Badge de Indisponível */}
+            {isOutOfStock && (
+              <div className="absolute top-4 right-4 z-10">
+                <motion.span
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  className="bg-[#9c9c9c] text-white px-3 py-2 rounded-full text-xs sm:text-sm uppercase tracking-wide font-medium shadow-lg font-['Oswald']"
+                >
+                  Indisponível
+                </motion.span>
+              </div>
+            )}
+
             {/* Imagem Principal com Zoom */}
             <div
               className="relative h-[300px] sm:h-[400px] lg:h-[500px] mb-4 sm:mb-6 bg-white rounded-lg overflow-hidden cursor-zoom-in"
@@ -550,14 +584,21 @@ const ProductDetailsPage = () => {
 
             {/* Botão de compra */}
             <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
+              whileHover={{ scale: isOutOfStock ? 1 : 1.02 }}
+              whileTap={{ scale: isOutOfStock ? 1 : 0.98 }}
               onClick={handleAddToCart}
-              className="w-full py-3 sm:py-4 bg-[#89764b] hover:bg-[#756343] text-white rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl font-medium flex items-center justify-center gap-2 sm:gap-3 text-sm sm:text-base font-['Oswald']"
-              aria-label="Adicionar ao carrinho"
+              className={`w-full py-3 sm:py-4 rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl font-medium flex items-center justify-center gap-2 sm:gap-3 text-sm sm:text-base font-['Oswald'] ${
+                isOutOfStock
+                  ? "bg-[#9c9c9c] cursor-not-allowed text-white"
+                  : "bg-[#89764b] hover:bg-[#756343] text-white"
+              }`}
+              aria-label={
+                isOutOfStock ? "Produto indisponível" : "Adicionar ao carrinho"
+              }
+              disabled={isOutOfStock}
             >
               <ShoppingCart className="h-4 w-4 sm:h-5 sm:w-5" />
-              Adicionar ao Carrinho
+              {isOutOfStock ? "Indisponível" : "Adicionar ao Carrinho"}
             </motion.button>
 
             {/* Entrega e Harmonização */}
@@ -638,6 +679,14 @@ const ProductDetailsPage = () => {
                 >
                   <Link to={`/produto/${product.id}`} className="block">
                     <div className="relative h-48 sm:h-64 bg-white flex items-center justify-center p-4 sm:p-6">
+                      {/* Badge de Indisponível para produtos similares */}
+                      {product.variants[0]?.stock === 0 && (
+                        <div className="absolute top-3 right-3 z-10">
+                          <span className="bg-[#9c9c9c] text-white px-2 py-1 rounded-full text-xs uppercase tracking-wide font-medium shadow-md font-['Oswald']">
+                            Indisponível
+                          </span>
+                        </div>
+                      )}
                       <img
                         src={product.images[0]?.src || "/placeholder-wine.jpg"}
                         alt={product.images[0]?.alt || product.name.pt}
