@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from "react";
 import { useCart } from "../context/useCart";
 import {
@@ -16,6 +17,7 @@ import {
 import { Link } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import type { CartItem } from "../context/CartProvider";
+import axios from "axios";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -82,11 +84,21 @@ const CartPage = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [cepLoading, setCepLoading] = useState(false);
+  const [couponCode, setCouponCode] = useState("");
+  const [appliedCoupon, setAppliedCoupon] = useState<{
+    id: string;
+    type: string;
+    value: number;
+    minPrice: number;
+  } | null>(null);
+  const [discountAmount, setDiscountAmount] = useState(0);
+  const [couponError, setCouponError] = useState("");
 
-  const total = cart.reduce(
+  const subtotal = cart.reduce(
     (sum, item: CartItem) => sum + Number(item.price) * (item.quantity || 1),
     0
   );
+  const finalTotal = subtotal - discountAmount;
 
   const handleIncrement = (item: CartItem) =>
     addToCart({ ...item, quantity: 1 });
@@ -94,6 +106,51 @@ const CartPage = () => {
     (item.quantity || 1) > 1
       ? addToCart({ ...item, quantity: -1 })
       : removeFromCart(item.id);
+
+  const handleApplyCoupon = async () => {
+    if (!couponCode) {
+      setCouponError("Digite um código válido!");
+      return;
+    }
+    try {
+      const response = await axios.post(`${API_URL}/api/coupons/validate`, {
+        code: couponCode,
+      });
+      const coupon = response.data;
+      if (coupon.minPrice > subtotal) {
+        setCouponError(
+          `Requer subtotal mínimo de R$ ${coupon.minPrice
+            .toFixed(2)
+            .replace(".", ",")}.`
+        );
+        return;
+      }
+      let calcDiscount = 0;
+      if (coupon.type === "percentage") {
+        calcDiscount = subtotal * (coupon.value / 100);
+      } else if (coupon.type === "absolute") {
+        calcDiscount = coupon.value;
+      }
+      setAppliedCoupon(coupon);
+      setDiscountAmount(calcDiscount);
+      setCouponError("");
+      toast.success(
+        `Cupom aplicado! Desconto de ${coupon.value}${
+          coupon.type === "percentage" ? "%" : ""
+        }.`
+      );
+    } catch (err: any) {
+      setCouponError(err.response?.data?.message || "Cupom inválido.");
+    }
+  };
+
+  const handleRemoveCoupon = () => {
+    setAppliedCoupon(null);
+    setDiscountAmount(0);
+    setCouponCode("");
+    setCouponError("");
+    toast.success("Cupom removido.");
+  };
 
   const handleCepBlur = async () => {
     const cep = onlyDigits(customer.zipcode);
@@ -219,7 +276,8 @@ const CartPage = () => {
         phone: phoneDigits,
         zipcode: onlyDigits(customer.zipcode),
       },
-      total,
+      total: finalTotal, // Envie o total com desconto
+      couponCode: appliedCoupon ? couponCode : undefined, // Adicionado para enviar ao backend
     };
 
     try {
@@ -261,6 +319,7 @@ const CartPage = () => {
       setLoading(false);
     }
   };
+
   return (
     <div className="min-h-screen bg-[#d4d4d4] font-['Oswald'] antialiased">
       <div className="container mx-auto px-4 py-6 pt-12">
@@ -434,17 +493,36 @@ const CartPage = () => {
                   <div className="flex rounded-lg overflow-hidden shadow-md">
                     <input
                       type="text"
+                      value={couponCode}
+                      onChange={(e) =>
+                        setCouponCode(e.target.value.toUpperCase())
+                      }
                       placeholder="CÓDIGO DE CUPOM"
                       className="flex-1 px-3 py-2 border border-gray-200 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-[#89764b] uppercase tracking-wider text-sm"
                       aria-label="Inserir código de cupom"
                     />
                     <button
+                      onClick={handleApplyCoupon}
                       className="px-3 py-2 bg-[#89764b] text-white hover:bg-[#756343] transition-all hover:scale-105 uppercase tracking-wider text-sm"
                       aria-label="Aplicar cupom"
                     >
                       Aplicar
                     </button>
                   </div>
+                  {appliedCoupon && (
+                    <div className="mt-2 flex justify-between text-sm text-gray-600">
+                      <span>Cupom aplicado: {couponCode}</span>
+                      <button
+                        onClick={handleRemoveCoupon}
+                        className="text-[#89764b] hover:underline"
+                      >
+                        Remover
+                      </button>
+                    </div>
+                  )}
+                  {couponError && (
+                    <p className="mt-2 text-sm text-red-600">{couponError}</p>
+                  )}
                 </div>
                 <button
                   onClick={clearCart}
@@ -744,7 +822,7 @@ const CartPage = () => {
                         Subtotal
                       </span>
                       <span className="text-gray-900 font-medium text-sm">
-                        R${total.toFixed(2).replace(".", ",")}
+                        R${subtotal.toFixed(2).replace(".", ",")}
                       </span>
                     </div>
 
@@ -753,7 +831,7 @@ const CartPage = () => {
                         Desconto
                       </span>
                       <span className="text-[#89764b] font-medium text-sm">
-                        - R$ 0,00
+                        - R$ {discountAmount.toFixed(2).replace(".", ",")}
                       </span>
                     </div>
 
@@ -772,7 +850,7 @@ const CartPage = () => {
                       Total
                     </span>
                     <span className="text-xl font-bold text-[#89764b]">
-                      R${total.toFixed(2).replace(".", ",")}
+                      R${finalTotal.toFixed(2).replace(".", ",")}
                     </span>
                   </div>
 
