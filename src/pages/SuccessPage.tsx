@@ -124,7 +124,7 @@ const SuccessPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#f8f5f0] font-['Oswald'] antialiased">
+    <div className="min-h-screen bg-[#d4d4d4] font-['Oswald'] antialiased">
       <div className="bg-gradient-to-r from-[#89764b] to-[#756343] text-white py-4 shadow-md sticky top-0 z-10">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between gap-4">
