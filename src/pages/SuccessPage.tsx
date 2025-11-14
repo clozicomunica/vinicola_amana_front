@@ -246,7 +246,7 @@ const SuccessPage: React.FC = () => {
                         <img
                           src={imageSrc}
                           alt={product.name || "Produto"}
-                          className="w-[150px] h-[150px] rounded-lg shadow-md object-contain bg-white p-2"
+                          className="w-[150px] h-[150px] rounded-lg shadow-md object-contain bg-[#d4d4d4] p-2"
                           onError={(e) => {
                             e.currentTarget.src = "/path/to/fallback-image.jpg";
                           }}
