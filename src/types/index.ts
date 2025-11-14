@@ -4,6 +4,7 @@ export interface WineVariant {
   id: number;
   price: string;
   compare_at_price?: string;
+  stock: number;
   values: { pt: string }[];
 }
 
@@ -18,16 +19,17 @@ export interface Wine {
 }
 
 export interface CartItem {
-    id: number;
-    variant_id: number;
-    name: string;
-    price: number;
-    quantity: number;
-    image: string;
-    category: string;
+  id: number;
+  variant_id: number;
+  name: string;
+  price: number;
+  quantity: number;
+  image: string;
+  category: string;
+  stock: number;
 }
 
 export interface Category {
-    id: string;
-    name: string;
+  id: string;
+  name: string;
 }

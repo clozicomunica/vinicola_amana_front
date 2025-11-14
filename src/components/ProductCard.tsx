@@ -28,10 +28,31 @@ export const ProductCard: React.FC<ProductCardProps> = ({ wine, index }) => {
     ? parseFloat(wine.variants[0].compare_at_price)
     : null;
   const isOnSale = compareAtPrice && compareAtPrice > price;
-  
-  const displayCategory = wine.variants[0]?.values[0]?.pt || wine.categories[0]?.name.pt || "Vinho";
+  const displayCategory = wine.variants[0].values
+    .map((val) => val.pt)
+    .join(" - ");
+  const stock = wine.variants.map((variant) => variant.stock);
+  const isOutOfStock = stock[0] === 0;
 
   const handleAddToCart = () => {
+    if (isOutOfStock) {
+      toast.error("Produto indisponível!", {
+        position: "bottom-right",
+        style: {
+          background: "#89764b",
+          color: "#fff",
+          borderRadius: "8px",
+          padding: "16px 24px",
+          fontFamily: "'Oswald', sans-serif",
+        },
+        iconTheme: {
+          primary: "#fff",
+          secondary: "#89764b",
+        },
+      });
+      return;
+    }
+
     const firstVariant = wine.variants[0];
     if (!firstVariant) return;
 
@@ -43,6 +64,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ wine, index }) => {
       quantity: 1,
       image: wine.images[0]?.src || wineImage,
       category: displayCategory,
+      stock: stock[0],
     };
 
     addToCart(item);
@@ -85,16 +107,34 @@ export const ProductCard: React.FC<ProductCardProps> = ({ wine, index }) => {
             whileHover={{ scale: 1.05 }}
           />
         </Link>
-        {isOnSale && (
+
+        {/* Badges superiores */}
+        <div className="absolute top-3 left-3 flex flex-col gap-2">
+          {isOnSale && (
+            <motion.span
+              className="bg-[#9a3324] text-white text-xs px-3 py-1 rounded-full shadow-md uppercase tracking-tight font-['Oswald']"
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ delay: 0.2 }}
+            >
+              Oferta
+            </motion.span>
+          )}
+        </div>
+
+        {/* Badge de indisponível - apenas a tag */}
+        {isOutOfStock && (
           <motion.span
-            className="absolute top-2 left-2 md:top-3 md:left-3 bg-[#9a3324] text-white text-xs px-2 md:px-3 py-0.5 md:py-1 rounded-full shadow-md uppercase tracking-tight font-['Oswald']"
+            className="absolute top-3 right-3 bg-[#9c9c9c] text-white text-xs px-3 py-1 rounded-full shadow-md uppercase tracking-tight font-['Oswald']"
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
             transition={{ delay: 0.2 }}
           >
-            Oferta
+            Indisponível
           </motion.span>
         )}
+
+        {/* Botões de ação */}
         <div className="absolute bottom-3 right-3 md:bottom-4 md:right-4 flex items-center gap-2 md:gap-3 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300">
           <Link
             to={`/produto/${wine.id}`}
@@ -105,15 +145,21 @@ export const ProductCard: React.FC<ProductCardProps> = ({ wine, index }) => {
           </Link>
           <motion.button
             onClick={handleAddToCart}
-            className="p-2 md:p-3 bg-[#89764b] text-white rounded-full hover:bg-[#756343] transition transform hover:scale-110 shadow-md"
+            className={`p-2 md:p-3 rounded-full transition transform hover:scale-110 shadow-md ${
+              isOutOfStock
+                ? "bg-[#9c9c9c] cursor-not-allowed"
+                : "bg-[#89764b] hover:bg-[#756343] text-white"
+            }`}
             aria-label="Adicionar ao carrinho"
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
+            whileHover={{ scale: isOutOfStock ? 1 : 1.1 }}
+            whileTap={{ scale: isOutOfStock ? 1 : 0.9 }}
+            disabled={isOutOfStock}
           >
             <ShoppingCart className="h-4 w-4 md:h-5 md:w-5" />
           </motion.button>
         </div>
       </div>
+
       <div className="p-4 md:p-6 flex flex-col flex-grow">
         <div className="mb-3 md:mb-4">
           <h3 className="text-[#000000] text-base md:text-lg uppercase tracking-tight mb-1 md:mb-2 line-clamp-1 font-['Oswald']">
@@ -122,10 +168,6 @@ export const ProductCard: React.FC<ProductCardProps> = ({ wine, index }) => {
           <div className="flex items-center gap-2 md:gap-3">
             <span className="text-xs md:text-sm text-[#000000] font-['Oswald']">
               {displayCategory}
-            </span>
-            <span className="w-1 h-1 bg-[#9c9c9c] rounded-full"></span>
-            <span className="text-xs md:text-sm text-[#000000] font-['Oswald']">
-              Safra {new Date(wine.created_at).getFullYear()}
             </span>
           </div>
         </div>
@@ -145,15 +187,21 @@ export const ProductCard: React.FC<ProductCardProps> = ({ wine, index }) => {
               </span>
             )}
           </div>
+
           <motion.button
             onClick={handleAddToCart}
-            className="w-full px-3 py-2 md:px-4 md:py-3 bg-[#89764b] hover:bg-[#756343] text-white rounded-lg transition-all duration-300 uppercase tracking-wide text-xs md:text-sm flex items-center justify-center gap-1 md:gap-2 font-['Oswald']"
+            className={`w-full px-3 py-2 md:px-4 md:py-3 rounded-lg transition-all duration-300 uppercase tracking-wide text-xs md:text-sm flex items-center justify-center gap-1 md:gap-2 font-['Oswald'] ${
+              isOutOfStock
+                ? "bg-[#9c9c9c] cursor-not-allowed text-white"
+                : "bg-[#89764b] hover:bg-[#756343] text-white hover:shadow-lg"
+            }`}
             aria-label="Adicionar ao carrinho"
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
+            whileHover={{ scale: isOutOfStock ? 1 : 1.02 }}
+            whileTap={{ scale: isOutOfStock ? 1 : 0.98 }}
+            disabled={isOutOfStock}
           >
             <ShoppingCart className="h-3 w-3 md:h-4 md:w-4" />
-            Adicionar
+            {isOutOfStock ? "Indisponível" : "Adicionar ao Carrinho"}
           </motion.button>
         </div>
       </div>
