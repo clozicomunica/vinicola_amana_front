@@ -13,6 +13,7 @@ import {
   Home,
   Phone,
   Lock,
+  Truck,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { toast } from "react-hot-toast";
@@ -22,6 +23,7 @@ import axios from "axios";
 const API_URL = import.meta.env.VITE_API_URL;
 
 const CREATE_CHECKOUT_PATH = "/api/orders/create-checkout";
+const CALCULATE_SHIPPING_PATH = "/api/shipping/calculate";
 
 const onlyDigits = (v: string) => v.replace(/\D/g, "");
 
@@ -47,6 +49,22 @@ interface AddressInfo {
   address: string;
   city: string;
   state: string;
+}
+
+interface ShippingOption {
+  id: number;
+  name: string;
+  price: string;
+  delivery_time: number;
+  delivery_range: {
+    min: number;
+    max: number;
+  };
+  company: {
+    id: number;
+    name: string;
+    picture: string;
+  };
 }
 
 async function lookupByCEP(cepRaw: string): Promise<AddressInfo> {
@@ -94,11 +112,18 @@ const CartPage = () => {
   const [discountAmount, setDiscountAmount] = useState(0);
   const [couponError, setCouponError] = useState("");
 
+  // Estados de frete
+  const [shippingOptions, setShippingOptions] = useState<ShippingOption[]>([]);
+  const [selectedShipping, setSelectedShipping] = useState<ShippingOption | null>(null);
+  const [shippingLoading, setShippingLoading] = useState(false);
+  const [shippingCalculated, setShippingCalculated] = useState(false);
+
   const subtotal = cart.reduce(
     (sum, item: CartItem) => sum + Number(item.price) * (item.quantity || 1),
     0,
   );
-  const finalTotal = subtotal - discountAmount;
+  const shippingCost = selectedShipping ? parseFloat(selectedShipping.price) : 0;
+  const finalTotal = subtotal - discountAmount + shippingCost;
 
   const handleIncrement = (item: CartItem) =>
     addToCart({ ...item, quantity: 1 });
@@ -152,6 +177,53 @@ const CartPage = () => {
     toast.success("Cupom removido.");
   };
 
+  const calculateShipping = async (zipcode: string) => {
+    if (!cart.length) {
+      toast.error("Adicione produtos ao carrinho primeiro");
+      return;
+    }
+
+    const cep = onlyDigits(zipcode);
+    if (cep.length !== 8) {
+      toast.error("CEP inválido");
+      return;
+    }
+
+    setShippingLoading(true);
+    setShippingCalculated(false);
+
+    try {
+      const response = await axios.post(`${API_URL}${CALCULATE_SHIPPING_PATH}`, {
+        zipcode: cep,
+        products: cart.map((item: CartItem) => ({
+          id: item.id,
+          quantity: item.quantity || 1,
+          price: Number(item.price),
+          weight: 1.5, // Peso padrão de garrafa
+        })),
+      });
+
+      if (response.data.success && response.data.options.length > 0) {
+        setShippingOptions(response.data.options);
+        setSelectedShipping(response.data.options[0]); // Seleciona o mais barato
+        setShippingCalculated(true);
+        toast.success("Frete calculado com sucesso!");
+      } else {
+        toast.error("Nenhuma opção de frete disponível para este CEP");
+        setShippingOptions([]);
+        setSelectedShipping(null);
+      }
+    } catch (err: any) {
+      toast.error(
+        err.response?.data?.message || "Erro ao calcular frete. Tente novamente.",
+      );
+      setShippingOptions([]);
+      setSelectedShipping(null);
+    } finally {
+      setShippingLoading(false);
+    }
+  };
+
   const handleCepBlur = async () => {
     const cep = onlyDigits(customer.zipcode);
     if (cep.length !== 8) return;
@@ -165,6 +237,9 @@ const CartPage = () => {
         state: info.state,
       }));
       toast.success("Endereço preenchido pelo CEP 😉");
+      
+      // Calcula o frete automaticamente após preencher o CEP
+      await calculateShipping(cep);
     } catch (e: unknown) {
       const message =
         e instanceof Error ? e.message : "Não foi possível buscar o CEP.";
@@ -263,6 +338,14 @@ const CartPage = () => {
       return;
     }
 
+    if (!shippingCalculated) {
+      const msg = "Por favor, calcule o frete antes de finalizar.";
+      setError(msg);
+      toast.error(msg);
+      setLoading(false);
+      return;
+    }
+
     const checkoutData = {
       produtos: cart.map((item: CartItem) => ({
         name: item.name,
@@ -277,7 +360,7 @@ const CartPage = () => {
         phone: phoneDigits,
         zipcode: onlyDigits(customer.zipcode),
       },
-      couponCode: appliedCoupon ? couponCode : undefined, // Adicionado para enviar ao backend
+      couponCode: appliedCoupon ? couponCode : undefined,
     };
 
     try {
@@ -688,6 +771,12 @@ const CartPage = () => {
                               Consultando CEP...
                             </p>
                           )}
+                          {shippingLoading && (
+                            <p className="mt-1 text-xs text-[#89764b] flex items-center">
+                              <Truck className="h-3 w-3 mr-1 animate-pulse" />
+                              Calculando frete...
+                            </p>
+                          )}
                         </div>
                         <div title="Campo preenchido automaticamente pelo CEP">
                           <label className="text-sm text-gray-600 uppercase tracking-wider mb-2 flex items-center">
@@ -805,6 +894,67 @@ const CartPage = () => {
                   </div>
                 </div>
               </div>
+
+              {/* Seção de Opções de Frete */}
+              {shippingCalculated && shippingOptions.length > 0 && (
+                <div className="bg-white rounded-lg shadow-md border border-[#89764b]/10 overflow-hidden">
+                  <div className="bg-gradient-to-r from-[#89764b] to-[#756343] text-white p-4">
+                    <h3 className="text-lg font-bold uppercase tracking-tight flex items-center">
+                      <Truck className="h-5 w-5 mr-2" />
+                      Opções de Frete
+                    </h3>
+                    <p className="text-white/80 text-sm mt-1 uppercase tracking-wider">
+                      Selecione a opção de entrega
+                    </p>
+                  </div>
+
+                  <div className="p-4 space-y-3">
+                    {shippingOptions.map((option) => (
+                      <div
+                        key={option.id}
+                        onClick={() => setSelectedShipping(option)}
+                        className={`p-4 border-2 rounded-lg cursor-pointer transition-all ${
+                          selectedShipping?.id === option.id
+                            ? "border-[#89764b] bg-[#89764b]/5"
+                            : "border-gray-200 hover:border-[#89764b]/50"
+                        }`}
+                      >
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center space-x-3">
+                            <div className="w-12 h-12 rounded-lg overflow-hidden bg-gray-50 flex items-center justify-center">
+                              <img
+                                src={option.company.picture}
+                                alt={option.company.name}
+                                className="max-w-full max-h-full object-contain"
+                              />
+                            </div>
+                            <div>
+                              <h4 className="text-sm font-bold text-gray-900 uppercase tracking-tight">
+                                {option.company.name} - {option.name}
+                              </h4>
+                              <p className="text-xs text-gray-600">
+                                Entrega em {option.delivery_time} dias úteis
+                                {option.delivery_range && (
+                                  <span className="text-gray-500">
+                                    {" "}
+                                    ({option.delivery_range.min} a{" "}
+                                    {option.delivery_range.max} dias)
+                                  </span>
+                                )}
+                              </p>
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <p className="text-lg font-bold text-[#89764b]">
+                              R$ {parseFloat(option.price).toFixed(2).replace(".", ",")}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
             <div className="lg:w-1/3">
               <div className="bg-white rounded-lg shadow-md border border-[#89764b]/10 lg:sticky lg:top-20 overflow-hidden">
@@ -836,11 +986,20 @@ const CartPage = () => {
                     </div>
 
                     <div className="flex justify-between items-center py-2 border-t border-gray-100">
-                      <span className="text-gray-600 uppercase tracking-wider text-sm">
+                      <span className="text-gray-600 uppercase tracking-wider text-sm flex items-center">
+                        <Truck className="h-4 w-4 mr-1" />
                         Frete
                       </span>
-                      <span className="text-[#89764b] font-medium text-sm">
-                        Grátis
+                      <span className={`font-medium text-sm ${shippingCost > 0 ? 'text-gray-900' : 'text-[#89764b]'}`}>
+                        {shippingCalculated ? (
+                          shippingCost > 0 ? (
+                            `R$ ${shippingCost.toFixed(2).replace(".", ",")}`
+                          ) : (
+                            "Grátis"
+                          )
+                        ) : (
+                          <span className="text-gray-500 text-xs">Preencha o CEP</span>
+                        )}
                       </span>
                     </div>
                   </div>
@@ -881,7 +1040,7 @@ const CartPage = () => {
 
                   <button
                     onClick={handleCheckout}
-                    disabled={loading}
+                    disabled={loading || !shippingCalculated}
                     className="w-full mt-4 bg-gradient-to-r from-[#89764b] to-[#a08d5f] hover:from-[#756343] hover:to-[#89764b] text-white py-4 px-6 rounded-lg transition-all shadow-md hover:shadow-lg hover:scale-105 uppercase tracking-wider font-bold text-sm flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                     aria-label="Finalizar compra"
                   >
@@ -889,6 +1048,11 @@ const CartPage = () => {
                       <>
                         <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                         Processando...
+                      </>
+                    ) : !shippingCalculated ? (
+                      <>
+                        <Truck className="h-4 w-4" />
+                        Calcule o frete primeiro
                       </>
                     ) : (
                       <>
