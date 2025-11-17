@@ -96,7 +96,7 @@ const CartPage = () => {
 
   const subtotal = cart.reduce(
     (sum, item: CartItem) => sum + Number(item.price) * (item.quantity || 1),
-    0
+    0,
   );
   const finalTotal = subtotal - discountAmount;
 
@@ -121,7 +121,7 @@ const CartPage = () => {
         setCouponError(
           `Requer subtotal mínimo de R$ ${coupon.minPrice
             .toFixed(2)
-            .replace(".", ",")}.`
+            .replace(".", ",")}.`,
         );
         return;
       }
@@ -137,7 +137,7 @@ const CartPage = () => {
       toast.success(
         `Cupom aplicado! Desconto de ${coupon.value}${
           coupon.type === "percentage" ? "%" : ""
-        }.`
+        }.`,
       );
     } catch (err: any) {
       setCouponError(err.response?.data?.message || "Cupom inválido.");
@@ -183,7 +183,7 @@ const CartPage = () => {
       return `${digits.slice(0, 3)}.${digits.slice(3, 6)}.${digits.slice(6)}`;
     return `${digits.slice(0, 3)}.${digits.slice(3, 6)}.${digits.slice(
       6,
-      9
+      9,
     )}-${digits.slice(9, 11)}`;
   };
 
@@ -195,7 +195,7 @@ const CartPage = () => {
       return `(${digits.slice(0, 2)}) ${digits.slice(2, 6)}-${digits.slice(6)}`;
     return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(
       7,
-      11
+      11,
     )}`;
   };
 
@@ -269,6 +269,7 @@ const CartPage = () => {
         quantity: item.quantity || 1,
         price: Number(item.price),
         variant_id: item.variant_id || 0,
+        idProduto: item.id,
       })),
       cliente: {
         ...customer,
@@ -276,7 +277,6 @@ const CartPage = () => {
         phone: phoneDigits,
         zipcode: onlyDigits(customer.zipcode),
       },
-      total: finalTotal, // Envie o total com desconto
       couponCode: appliedCoupon ? couponCode : undefined, // Adicionado para enviar ao backend
     };
 
